@@ -13,7 +13,7 @@ EnemyAIManager::EnemyAIManager(int enemyCount)
 {
 	for (int ii = 0; ii < enemyCount; ++ii)
 	{
-		mEnemies.push_back(EnemyAI(EEnemy::Ufo));
+		mEnemies.push_back(new EnemyAI(EEnemy::Ufo));
 	}
 }
 
@@ -21,7 +21,10 @@ EnemyAIManager::EnemyAIManager(int enemyCount)
 
 EnemyAIManager::~EnemyAIManager()
 {
-
+	for (auto * enemy : mEnemies)
+	{
+		delete enemy;
+	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -30,14 +33,14 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
 {
 	for (int ii = 0; ii < count; ++ii)
 	{
-		mEnemies.push_back(EnemyAI(type));
-		mEnemies.back().SetPosition(pos);
+		mEnemies.push_back(new EnemyAI(type));
+		mEnemies.back()->SetPosition(pos);
 	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-const std::vector<EnemyAI> & EnemyAIManager::GetAllEnemies()
+const std::vector<EnemyAI *> & EnemyAIManager::GetAllEnemies()
 {
 	return mEnemies;
 }
