@@ -9,6 +9,7 @@ GameManager::GameManager()
     , mPlayer()
 {
     InitWindow();
+    InitPlayer();
     InitEnemies();
 }
 
@@ -59,31 +60,9 @@ void GameManager::Update()
         float(relativeMousePos.y) - spriteSize.y / 2.0f
     ));
 #endif
-    // Get the mouse position relative to the window
-    auto relativeMousePos = sf::Mouse::getPosition(*mpWindow);
 
-    // Convert to world coordinates (if you're using a view, this adjusts for it)
-    sf::Vector2f worldMousePos = mpWindow->mapPixelToCoords(relativeMousePos);
-
-    // Get the player's position
-    sf::Vector2f playerPos = mPlayer.GetPosition(); // Assuming GetPosition() gets the sprite's center
-
-    // Calculate the difference
-    sf::Vector2f direction = worldMousePos - playerPos;
-
-    // Calculate the angle in radians
-    float angle = atan2(direction.y, direction.x);
-
-    // Convert to degrees (SFML uses degrees for rotation)
-    float angleInDegrees = angle * 180.0f / 3.14159f;
-
-    // Set the player's rotation
-    mPlayer.SetRotation(angleInDegrees);
-
-    // Center the player in the window
-    sf::Vector2u windowSize = mpWindow->getSize();
-    sf::Vector2f centerPosition(float(windowSize.x) / 2.0f, float(windowSize.y) / 2.0f);
-    mPlayer.SetPosition(centerPosition);
+    mPlayer.Update();
+    
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -117,6 +96,15 @@ void GameManager::Render()
 void GameManager::InitEnemies()
 {
     mEnemyManager.AddEnemies(1, EEnemy::Ship, sf::Vector2f(100.f, 100.f));
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameManager::InitPlayer()
+{
+    sf::Vector2u windowSize = mpWindow->getSize();
+    sf::Vector2f centerPosition(float(windowSize.x) / 2.0f, float(windowSize.y) / 2.0f);
+    mPlayer.SetPosition(centerPosition);
 }
 
 //------------------------------------------------------------------------------------------------------------------------

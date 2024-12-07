@@ -22,7 +22,9 @@ public:
 
 private:
 	void PollEvents();
+
 	void InitEnemies();
+	void InitPlayer();
 	void InitWindow();
 
 	EnemyAIManager mEnemyManager;

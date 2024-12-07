@@ -1,32 +1,21 @@
 #pragma once
-
-#include <SFML/Graphics.hpp>
-#include <string>
+#include "Entity.h"
 
 enum class EEnemy
 {
-    Ship,
-    Ufo,
+    Ship, 
+    Ufo
 };
 
-class EnemyAI : public sf::Drawable
+class EnemyAI : public Entity
 {
 public:
-    EnemyAI(const EEnemy & enemyType);
+    EnemyAI(EEnemy enemyType);
     ~EnemyAI();
 
-    void InitEnemy();
-    void SetTexture(const std::string & file);
-    void SetTexture();
-    void SetPosition(const sf::Vector2f & vec);
-    void SetPosition(const float x, const float y);
-
-protected:
-    void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
+    void Update() override;
 
 private:
-    sf::Texture mTexture;
-    sf::Sprite mSprite;
+    void InitEnemy();
     EEnemy mEnemyType;
 };
-

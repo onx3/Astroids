@@ -1,21 +1,11 @@
 #include "Player.h"
-#include "cassert"
 
 Player::Player()
-	: mTexture()
-	, mSprite()
-	, mVelocityX(3.f)
-	, mVelocityY(3.f)
+    : Entity(), mVelocityX(3.f), mVelocityY(3.f)
 {
-	std::string file = "Art/player.png";
-	assert(mTexture.loadFromFile(file), "Can't load file: %s", file.c_str());
-
-	mSprite.setTexture(mTexture);
-
-	SetOriginToCenter();
+    SetTexture("Art/player.png");
+    SetOriginToCenter();
 }
-
-//------------------------------------------------------------------------------------------------------------------------
 
 Player::~Player()
 {
@@ -23,62 +13,27 @@ Player::~Player()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-sf::Vector2f Player::GetPosition() const
+void Player::Update()
 {
-	return mSprite.getPosition();
+    for (auto & component : mComponents)
+    {
+        component->Update();
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+    {
+        Move(0, -mVelocityY);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+    {
+        Move(0, mVelocityY);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+    {
+        Move(mVelocityX, 0);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+    {
+        Move(-mVelocityX, 0);
+    }
 }
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void Player::SetPosition(const sf::Vector2f & pos)
-{
-	mSprite.setPosition(pos);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-float Player::GetWidth()
-{
-	return mSprite.getGlobalBounds().width;
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-float Player::GetHeight()
-{
-	return mSprite.getGlobalBounds().height;
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void Player::Move(const sf::Vector2f & offset)
-{
-	mSprite.move(offset);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void Player::SetRotation(float angle)
-{
-	mSprite.setRotation(angle);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void Player::SetOriginToCenter()
-{
-	mSprite.setOrigin(
-		mSprite.getGlobalBounds().width / 2.0f,
-		mSprite.getGlobalBounds().height / 2.0f);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void Player::draw(sf::RenderTarget & target, sf::RenderStates states) const
-{
-	target.draw(mSprite, states);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-// EOF
-//------------------------------------------------------------------------------------------------------------------------

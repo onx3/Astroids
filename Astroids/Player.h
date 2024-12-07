@@ -1,34 +1,21 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
+#include "Entity.h"
+#include <SFML/Window/Keyboard.hpp>
+#include <vector>
+#include <memory>
+#include "GameComponent.h"
 
-class Player : public sf::Drawable
+class Player : public Entity
 {
 public:
-	Player();
-	~Player();
+    Player();
+    ~Player();
 
-	sf::Vector2f GetPosition() const;
-
-	void SetPosition(const sf::Vector2f & pos);
-
-	float GetWidth();
-	float GetHeight();
-
-	void Move(const sf::Vector2f & offset);
-
-	void SetRotation(float angle);
-
-	void SetOriginToCenter();
-
-protected:
-	void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
+    void Update() override;
 
 private:
-	sf::Texture mTexture;
-	sf::Sprite mSprite;
-
-	float mVelocityX;
-	float mVelocityY;
+    float mVelocityX;
+    float mVelocityY;
+    std::vector<std::shared_ptr<GameComponent>> mComponents;
 };
-
