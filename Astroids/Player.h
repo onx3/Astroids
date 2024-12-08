@@ -1,12 +1,9 @@
 #pragma once
 
-#include "Entity.h"
-#include <SFML/Window/Keyboard.hpp>
-#include <vector>
-#include <memory>
-#include "GameComponent.h"
+#include "GameObject.h"
+#include <SFML/Graphics.hpp>
 
-class Player : public Entity
+class Player : public GameObject
 {
 public:
     Player();
@@ -17,5 +14,6 @@ public:
 private:
     float mVelocityX;
     float mVelocityY;
-    std::vector<std::shared_ptr<GameComponent>> mComponents;
+    sf::Sprite mSprite;
+    sf::Texture mTexture;
 };

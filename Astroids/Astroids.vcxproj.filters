@@ -12,7 +12,7 @@
     <Filter Include="Source Files\GameComponents">
       <UniqueIdentifier>{0cc251b4-c1f8-40b5-8b31-7effda1081d2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity">
+    <Filter Include="Source Files\GameObject">
       <UniqueIdentifier>{743445aa-e9b6-40b9-9406-18a677505e0a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -33,16 +33,19 @@
       <Filter>Source Files\GameComponents</Filter>
     </ClCompile>
     <ClCompile Include="EnemyAI.cpp">
-      <Filter>Source Files\Entity</Filter>
+      <Filter>Source Files\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="EnemyAIManager.cpp">
-      <Filter>Source Files\Entity</Filter>
+      <Filter>Source Files\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>Source Files\Entity</Filter>
+      <Filter>Source Files\GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="Entity.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlledMovementComponent.cpp">
+      <Filter>Source Files\GameComponents</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -59,16 +62,19 @@
       <Filter>Source Files\GameComponents</Filter>
     </ClInclude>
     <ClInclude Include="EnemyAI.h">
-      <Filter>Source Files\Entity</Filter>
+      <Filter>Source Files\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="EnemyAIManager.h">
-      <Filter>Source Files\Entity</Filter>
+      <Filter>Source Files\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>Source Files\Entity</Filter>
+      <Filter>Source Files\GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="Entity.h">
-      <Filter>Source Files\Entity</Filter>
+    <ClInclude Include="GameObject.h">
+      <Filter>Source Files\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlledMovementComponent.h">
+      <Filter>Source Files\GameComponents</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

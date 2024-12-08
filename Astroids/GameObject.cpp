@@ -1,68 +1,69 @@
-#include "Entity.h"
+#include "GameObject.h"
+#include "cassert"
 
-Entity::Entity() : mTexture(), mSprite()
+GameObject::GameObject() : mTexture(), mSprite()
 {
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-sf::Vector2f Entity::GetPosition() const
+sf::Vector2f GameObject::GetPosition() const
 {
     return mSprite.getPosition();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void Entity::SetPosition(const sf::Vector2f & position)
+void GameObject::SetPosition(const sf::Vector2f & position)
 {
     mSprite.setPosition(position);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void Entity::SetPosition(float x, float y)
+void GameObject::SetPosition(float x, float y)
 {
     mSprite.setPosition(sf::Vector2f(x, y));
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-float Entity::GetWidth() const
+float GameObject::GetWidth() const
 {
     return mSprite.getGlobalBounds().width;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-float Entity::GetHeight() const
+float GameObject::GetHeight() const
 {
     return mSprite.getGlobalBounds().height;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void Entity::Move(const sf::Vector2f & offset)
+void GameObject::Move(const sf::Vector2f & offset)
 {
     mSprite.move(offset);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void Entity::Move(float x, float y)
+void GameObject::Move(float x, float y)
 {
     mSprite.move(sf::Vector2f(x, y));
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void Entity::SetRotation(float angle)
+void GameObject::SetRotation(float angle)
 {
     mSprite.setRotation(angle);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void Entity::SetOriginToCenter()
+void GameObject::SetOriginToCenter()
 {
     mSprite.setOrigin(
         mSprite.getGlobalBounds().width / 2.0f,
@@ -72,7 +73,14 @@ void Entity::SetOriginToCenter()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void Entity::SetTexture(const std::string & file)
+void GameObject::AddComponent(std::shared_ptr<GameComponent> component)
+{
+
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::SetTexture(const std::string & file)
 {
     if (!mTexture.loadFromFile(file))
     {
@@ -83,7 +91,7 @@ void Entity::SetTexture(const std::string & file)
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void Entity::draw(sf::RenderTarget & target, sf::RenderStates states) const
+void GameObject::draw(sf::RenderTarget & target, sf::RenderStates states) const
 {
     target.draw(mSprite, states);
 }

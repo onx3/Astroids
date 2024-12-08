@@ -133,7 +133,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="ControlledMovementComponent.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameComponent.cpp" />
     <ClCompile Include="EnemyAI.cpp" />
     <ClCompile Include="EnemyAIManager.cpp" />
@@ -144,7 +145,8 @@
     <ClCompile Include="ProjectileComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Entity.h" />
+    <ClInclude Include="ControlledMovementComponent.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="EnemyAI.h" />
     <ClInclude Include="EnemyAIManager.h" />

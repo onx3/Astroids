@@ -1,5 +1,5 @@
 #pragma once
-#include "Entity.h"
+#include "GameObject.h"
 
 enum class EEnemy
 {
@@ -7,7 +7,7 @@ enum class EEnemy
     Ufo
 };
 
-class EnemyAI : public Entity
+class EnemyAI : public GameObject
 {
 public:
     EnemyAI(EEnemy enemyType);

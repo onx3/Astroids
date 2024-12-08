@@ -1,13 +1,17 @@
 #include "EnemyAI.h"
 
-EnemyAI::EnemyAI(EEnemy enemyType) : Entity(), mEnemyType(enemyType)
+EnemyAI::EnemyAI(EEnemy enemyType) : GameObject(), mEnemyType(enemyType)
 {
     InitEnemy();
 }
 
+//------------------------------------------------------------------------------------------------------------------------
+
 EnemyAI::~EnemyAI()
 {
 }
+
+//------------------------------------------------------------------------------------------------------------------------
 
 void EnemyAI::InitEnemy()
 {
@@ -21,6 +25,8 @@ void EnemyAI::InitEnemy()
             break;
     }
 }
+
+//------------------------------------------------------------------------------------------------------------------------
 
 void EnemyAI::Update()
 {
