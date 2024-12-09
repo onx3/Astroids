@@ -5,7 +5,7 @@ class GameObject;
 class GameComponent
 {
 public:
-    GameComponent();
+    explicit GameComponent(GameObject * pOwner);
     virtual ~GameComponent() = default;
 
     void SetOwner(GameObject * owner);

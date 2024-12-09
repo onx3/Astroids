@@ -3,7 +3,7 @@
 class HealthComponent : public GameComponent
 {
 public:
-	HealthComponent(int initialHealth);
+	HealthComponent(GameObject * pOwner, int initialHealth);
 
 	void TakeDamage(int amount);
 

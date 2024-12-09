@@ -1,11 +1,11 @@
 #include "GameObject.h"
-#include "cassert"
+#include <cassert>
 #include "SpriteComponent.h"
 
 GameObject::GameObject()
 {
-    auto spriteComp = std::make_shared<SpriteComponent>();
-    AddComponent(spriteComp);
+    auto spriteComp = std::make_shared<SpriteComponent>(this);
+    AddComponent(spriteComp); // Add a single instance of SpriteComponent
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -16,41 +16,11 @@ GameObject::~GameObject()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-template <typename T>
-void GameObject::AddComponent(std::shared_ptr<T> component)
-{
-    static_assert(std::is_base_of<GameComponent, T>::value, "T must derive from GameComponent");
-    mComponents[typeid(T)].push_back(component);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-template <typename T>
-std::vector<std::shared_ptr<T>> GameObject::GetComponents() const
-{
-    std::vector<std::shared_ptr<T>> components;
-    auto it = mComponents.find(typeid(T));
-    if (it != mComponents.end())
-    {
-        for (const auto & component : it->second)
-        {
-            components.push_back(std::static_pointer_cast<T>(component));
-        }
-    }
-    return components;
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
 void GameObject::Update()
 {
-    for (auto & pair : mComponents)
+    for (auto & component : mComponents)
     {
-        auto & components = pair.second;
-        for (auto & component : components)
-        {
-            component->Update();
-        }
+        component.second->Update(); // Update each component
     }
 }
 
@@ -58,15 +28,12 @@ void GameObject::Update()
 
 void GameObject::draw(sf::RenderTarget & target, sf::RenderStates states) const
 {
-    auto spriteComponents = GetComponents<SpriteComponent>();
-    assert(spriteComponents.size() == 1);
-
-    for (const auto & sprite : spriteComponents)
+    auto spriteComponent = GetComponent<SpriteComponent>().lock();
+    if (spriteComponent)
     {
-        target.draw(sprite->GetSprite(), states);
+        target.draw(spriteComponent->GetSprite(), states);
     }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 //EOF
-//------------------------------------------------------------------------------------------------------------------------

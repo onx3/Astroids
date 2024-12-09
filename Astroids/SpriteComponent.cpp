@@ -1,7 +1,8 @@
 #include "SpriteComponent.h"
 #include "cassert"
 
-SpriteComponent::SpriteComponent()
+SpriteComponent::SpriteComponent(GameObject * pOwner)
+    : GameComponent(pOwner)
 {
 }
 

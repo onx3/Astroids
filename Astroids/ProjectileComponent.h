@@ -4,6 +4,7 @@
 
 class ProjectileComponent : public GameComponent
 {
+	ProjectileComponent(GameObject * pOwner);
 	void Shoot(sf::Vector2f direction);
 
 	void Update() override;

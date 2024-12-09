@@ -5,8 +5,8 @@
 class ControlledMovementComponent : public GameComponent
 {
 public:
-	ControlledMovementComponent();
-	ControlledMovementComponent(float veloX, float veloY);
+	ControlledMovementComponent(GameObject * pOwner);
+	ControlledMovementComponent(GameObject * pOwner, float veloX, float veloY);
 
 	~ControlledMovementComponent();
 

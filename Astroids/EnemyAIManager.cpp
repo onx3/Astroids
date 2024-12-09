@@ -18,7 +18,7 @@ EnemyAIManager::EnemyAIManager(int enemyCount)
 	for (int ii = 0; ii < enemyCount; ++ii)
 	{
 		GameObject * gameObj = new GameObject();
-		auto spriteComp = std::make_shared<SpriteComponent>();
+		auto spriteComp = std::make_shared<SpriteComponent>(gameObj);
 
 		std::string file = "Art/EnemyShip.png";
 
@@ -47,7 +47,7 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
 	for (int ii = 0; ii < count; ++ii)
 	{
 		GameObject * gameObj = new GameObject();
-		auto spriteComp = std::make_shared<SpriteComponent>();
+		auto spriteComp = std::make_shared<SpriteComponent>(gameObj);
 
 		std::string file;
 		switch (type)

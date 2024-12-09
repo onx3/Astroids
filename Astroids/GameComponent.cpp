@@ -1,7 +1,7 @@
 #include "GameComponent.h"
 
-GameComponent::GameComponent()
-    : mpOwner(nullptr)
+GameComponent::GameComponent(GameObject * pOwner)
+    : mpOwner(pOwner)
 {
 }
 

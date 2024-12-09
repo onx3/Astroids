@@ -1,6 +1,7 @@
 #include "GameManager.h"
+#include <cassert>
 #include "SpriteComponent.h"
-#include "cassert"
+#include "ControlledMovementComponent.h"
 
 GameManager::GameManager()
     : mpWindow(nullptr)
@@ -103,15 +104,31 @@ void GameManager::InitEnemies()
 
 void GameManager::InitPlayer()
 {
-    sf::Vector2u windowSize = mpWindow->getSize();
-    sf::Vector2f centerPosition(float(windowSize.x) / 2.0f, float(windowSize.y) / 2.0f);
+    // Sprite Component
+    {
+        sf::Vector2u windowSize = mpWindow->getSize();
+        sf::Vector2f centerPosition(float(windowSize.x) / 2.0f, float(windowSize.y) / 2.0f);
 
-    auto spriteComponents = mPlayer.GetComponents<SpriteComponent>();
-    assert(spriteComponents.size() == 1);
+        auto spriteComponent = mPlayer.GetComponent<SpriteComponent>().lock();
 
-    std::string file = "Art/player.png";
-    spriteComponents[0]->SetSprite(file);
-    spriteComponents[0]->SetPosition(centerPosition);
+        if (spriteComponent)
+        {
+            std::string file = "Art/player.png";
+            spriteComponent->SetSprite(file);
+            spriteComponent->SetPosition(centerPosition);
+        }
+    }
+
+    // Controlled Movement Component
+    {
+        auto movementComponent = mPlayer.GetComponent<ControlledMovementComponent>().lock();
+        if (!movementComponent)
+        {
+            auto movementComp = std::make_shared<ControlledMovementComponent>(&mPlayer);
+            mPlayer.AddComponent(movementComp);
+        }
+    }
+    
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -122,11 +139,7 @@ void GameManager::InitWindow()
     mpWindow->setFramerateLimit(240);
 
     std::string file = "Art/Background/background2.png";
-    if (!mBackgroundTexture.loadFromFile(file))
-    {
-        // Handle error
-        std::cout << "Can't load the file : " << file;
-    }
+    assert(mBackgroundTexture.loadFromFile(file));
     mBackgroundSprite.setTexture(mBackgroundTexture);
 
     // Scale to window size

@@ -4,8 +4,9 @@
 #include "GameObject.h"
 #include "SpriteComponent.h"
 
-ControlledMovementComponent::ControlledMovementComponent()
-	: mVelocityX(3.f)
+ControlledMovementComponent::ControlledMovementComponent(GameObject * pOwner)
+	: GameComponent(pOwner)
+    , mVelocityX(3.f)
 	, mVelocityY(3.f)
 {
 
@@ -13,8 +14,9 @@ ControlledMovementComponent::ControlledMovementComponent()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-ControlledMovementComponent::ControlledMovementComponent(float veloX, float veloY)
-	: mVelocityX(veloX)
+ControlledMovementComponent::ControlledMovementComponent(GameObject * pOwner, float veloX, float veloY)
+	: GameComponent(pOwner)
+    , mVelocityX(veloX)
 	, mVelocityY(veloY)
 {
 }
@@ -29,24 +31,26 @@ ControlledMovementComponent::~ControlledMovementComponent()
 
 void ControlledMovementComponent::Update()
 {
-    auto spriteComponent = GetGameObject().GetComponents<SpriteComponent>();
-    assert(spriteComponent.size() == 1);
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+    auto spriteComponent = GetGameObject().GetComponent<SpriteComponent>().lock();
+    
+    if (spriteComponent)
     {
-        spriteComponent[0]->Move(0, -mVelocityY);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-    {
-        spriteComponent[0]->Move(0, mVelocityY);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-    {
-        spriteComponent[0]->Move(mVelocityX, 0);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-    {
-        spriteComponent[0]->Move(-mVelocityX, 0);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        {
+            spriteComponent->Move(0, -mVelocityY);
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        {
+            spriteComponent->Move(0, mVelocityY);
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        {
+            spriteComponent->Move(mVelocityX, 0);
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        {
+            spriteComponent->Move(-mVelocityX, 0);
+        }
     }
 }
 

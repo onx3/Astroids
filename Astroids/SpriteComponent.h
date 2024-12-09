@@ -6,7 +6,7 @@
 class SpriteComponent : public GameComponent
 {
 public:
-	SpriteComponent();
+	SpriteComponent(GameObject * pOwner);
 	~SpriteComponent();
 
 	void SetSprite(const std::string & file);
