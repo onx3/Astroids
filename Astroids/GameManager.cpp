@@ -1,5 +1,6 @@
 #include "GameManager.h"
-#include "EnemyAI.h"
+#include "SpriteComponent.h"
+#include "cassert"
 
 GameManager::GameManager()
     : mpWindow(nullptr)
@@ -104,7 +105,13 @@ void GameManager::InitPlayer()
 {
     sf::Vector2u windowSize = mpWindow->getSize();
     sf::Vector2f centerPosition(float(windowSize.x) / 2.0f, float(windowSize.y) / 2.0f);
-    mPlayer.SetPosition(centerPosition);
+
+    auto spriteComponents = mPlayer.GetComponents<SpriteComponent>();
+    assert(spriteComponents.size() == 1);
+
+    std::string file = "Art/player.png";
+    spriteComponents[0]->SetSprite(file);
+    spriteComponents[0]->SetPosition(centerPosition);
 }
 
 //------------------------------------------------------------------------------------------------------------------------

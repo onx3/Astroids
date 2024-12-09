@@ -1,6 +1,8 @@
 #include "ControlledMovementComponent.h"
 #include <SFML/Graphics.hpp>
+#include <cassert>
 #include "GameObject.h"
+#include "SpriteComponent.h"
 
 ControlledMovementComponent::ControlledMovementComponent()
 	: mVelocityX(3.f)
@@ -27,21 +29,24 @@ ControlledMovementComponent::~ControlledMovementComponent()
 
 void ControlledMovementComponent::Update()
 {
+    auto spriteComponent = GetGameObject().GetComponents<SpriteComponent>();
+    assert(spriteComponent.size() == 1);
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
     {
-        GetGameObject().Move(0, -mVelocityY);
+        spriteComponent[0]->Move(0, -mVelocityY);
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
     {
-        GetGameObject().Move(0, mVelocityY);
+        spriteComponent[0]->Move(0, mVelocityY);
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
     {
-        GetGameObject().Move(mVelocityX, 0);
+        spriteComponent[0]->Move(mVelocityX, 0);
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
     {
-        GetGameObject().Move(-mVelocityX, 0);
+        spriteComponent[0]->Move(-mVelocityX, 0);
     }
 }
 

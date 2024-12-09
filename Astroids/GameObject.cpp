@@ -1,99 +1,70 @@
 #include "GameObject.h"
 #include "cassert"
+#include "SpriteComponent.h"
 
-GameObject::GameObject() : mTexture(), mSprite()
+GameObject::GameObject()
+{
+    auto spriteComp = std::make_shared<SpriteComponent>();
+    AddComponent(spriteComp);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+GameObject::~GameObject()
 {
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-sf::Vector2f GameObject::GetPosition() const
+template <typename T>
+void GameObject::AddComponent(std::shared_ptr<T> component)
 {
-    return mSprite.getPosition();
+    static_assert(std::is_base_of<GameComponent, T>::value, "T must derive from GameComponent");
+    mComponents[typeid(T)].push_back(component);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void GameObject::SetPosition(const sf::Vector2f & position)
+template <typename T>
+std::vector<std::shared_ptr<T>> GameObject::GetComponents() const
 {
-    mSprite.setPosition(position);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::SetPosition(float x, float y)
-{
-    mSprite.setPosition(sf::Vector2f(x, y));
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-float GameObject::GetWidth() const
-{
-    return mSprite.getGlobalBounds().width;
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-float GameObject::GetHeight() const
-{
-    return mSprite.getGlobalBounds().height;
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::Move(const sf::Vector2f & offset)
-{
-    mSprite.move(offset);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::Move(float x, float y)
-{
-    mSprite.move(sf::Vector2f(x, y));
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::SetRotation(float angle)
-{
-    mSprite.setRotation(angle);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::SetOriginToCenter()
-{
-    mSprite.setOrigin(
-        mSprite.getGlobalBounds().width / 2.0f,
-        mSprite.getGlobalBounds().height / 2.0f
-    );
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::AddComponent(std::shared_ptr<GameComponent> component)
-{
-
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::SetTexture(const std::string & file)
-{
-    if (!mTexture.loadFromFile(file))
+    std::vector<std::shared_ptr<T>> components;
+    auto it = mComponents.find(typeid(T));
+    if (it != mComponents.end())
     {
-        assert(false && "Failed to load texture");
+        for (const auto & component : it->second)
+        {
+            components.push_back(std::static_pointer_cast<T>(component));
+        }
     }
-    mSprite.setTexture(mTexture);
+    return components;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::Update()
+{
+    for (auto & pair : mComponents)
+    {
+        auto & components = pair.second;
+        for (auto & component : components)
+        {
+            component->Update();
+        }
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 void GameObject::draw(sf::RenderTarget & target, sf::RenderStates states) const
 {
-    target.draw(mSprite, states);
+    auto spriteComponents = GetComponents<SpriteComponent>();
+    assert(spriteComponents.size() == 1);
+
+    for (const auto & sprite : spriteComponents)
+    {
+        target.draw(sprite->GetSprite(), states);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------

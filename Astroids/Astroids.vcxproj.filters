@@ -32,13 +32,7 @@
     <ClCompile Include="ProjectileComponent.cpp">
       <Filter>Source Files\GameComponents</Filter>
     </ClCompile>
-    <ClCompile Include="EnemyAI.cpp">
-      <Filter>Source Files\GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="EnemyAIManager.cpp">
-      <Filter>Source Files\GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
       <Filter>Source Files\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
@@ -47,8 +41,8 @@
     <ClCompile Include="ControlledMovementComponent.cpp">
       <Filter>Source Files\GameComponents</Filter>
     </ClCompile>
-    <ClCompile Include="Sprite.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="SpriteComponent.cpp">
+      <Filter>Source Files\GameComponents</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -64,13 +58,7 @@
     <ClInclude Include="ProjectileComponent.h">
       <Filter>Source Files\GameComponents</Filter>
     </ClInclude>
-    <ClInclude Include="EnemyAI.h">
-      <Filter>Source Files\GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="EnemyAIManager.h">
-      <Filter>Source Files\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
       <Filter>Source Files\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
@@ -79,6 +67,8 @@
     <ClInclude Include="ControlledMovementComponent.h">
       <Filter>Source Files\GameComponents</Filter>
     </ClInclude>
-    <ClInclude Include="Sprite.h" />
+    <ClInclude Include="SpriteComponent.h">
+      <Filter>Source Files\GameComponents</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
