@@ -26,6 +26,8 @@ public:
 
 	void Update() override;
 
+	void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
+
 private:
 	sf::Texture mTexture;
 	sf::Sprite mSprite;

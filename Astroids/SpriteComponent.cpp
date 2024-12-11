@@ -90,6 +90,13 @@ void SpriteComponent::Update()
 
 //------------------------------------------------------------------------------------------------------------------------
 
+void SpriteComponent::draw(sf::RenderTarget & target, sf::RenderStates states) const
+{
+    target.draw(mSprite, states);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
 sf::Sprite SpriteComponent::GetSprite()
 {
     return mSprite;

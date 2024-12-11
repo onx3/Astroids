@@ -2,6 +2,7 @@
 #include <cassert>
 #include "SpriteComponent.h"
 #include "ControlledMovementComponent.h"
+#include "ProjectileComponent.h"
 
 GameManager::GameManager()
     : mpWindow(nullptr)
@@ -64,6 +65,7 @@ void GameManager::Update()
 #endif
 
     mPlayer.Update();
+    mEnemyManager.UpdateEnemies();
     
 }
 
@@ -126,6 +128,15 @@ void GameManager::InitPlayer()
         {
             auto movementComp = std::make_shared<ControlledMovementComponent>(&mPlayer);
             mPlayer.AddComponent(movementComp);
+        }
+    }
+
+    // Projectile Component
+    {
+        auto projectileComponent = mPlayer.GetComponent<ProjectileComponent>().lock();
+        if (!projectileComponent)
+        {
+            mPlayer.AddComponent(std::make_shared<ProjectileComponent>(&mPlayer));
         }
     }
     

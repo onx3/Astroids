@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SFML/Graphics.hpp"
+
 class GameObject;
 
 class GameComponent
@@ -14,6 +16,8 @@ public:
 
     virtual void Update() = 0;
 
+    virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const;
 protected:
+
     GameObject * mpOwner = nullptr;
 };

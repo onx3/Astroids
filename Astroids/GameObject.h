@@ -35,9 +35,20 @@ public:
 
     void Update();
 
+    float GetDeltaTime() const;
+
+    sf::Vector2f GetPosition() const;
+    void SetPosition(const sf::Vector2f & position);
+
+    sf::Vector2f GetSize() const;
+
 protected:
     virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
 
     // Store shared ownership of components
     std::unordered_map<std::type_index, std::shared_ptr<GameComponent>> mComponents;
+
+private:
+    sf::Clock mClock;
+    float mDeltaTime;
 };
