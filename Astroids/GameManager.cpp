@@ -1,5 +1,8 @@
 #include "GameManager.h"
-#include "EnemyAI.h"
+#include <cassert>
+#include "SpriteComponent.h"
+#include "ControlledMovementComponent.h"
+#include "ProjectileComponent.h"
 
 GameManager::GameManager()
     : mpWindow(nullptr)
@@ -62,6 +65,7 @@ void GameManager::Update()
 #endif
 
     mPlayer.Update();
+    mEnemyManager.UpdateEnemies();
     
 }
 
@@ -102,9 +106,40 @@ void GameManager::InitEnemies()
 
 void GameManager::InitPlayer()
 {
-    sf::Vector2u windowSize = mpWindow->getSize();
-    sf::Vector2f centerPosition(float(windowSize.x) / 2.0f, float(windowSize.y) / 2.0f);
-    mPlayer.SetPosition(centerPosition);
+    // Sprite Component
+    {
+        sf::Vector2u windowSize = mpWindow->getSize();
+        sf::Vector2f centerPosition(float(windowSize.x) / 2.0f, float(windowSize.y) / 2.0f);
+
+        auto spriteComponent = mPlayer.GetComponent<SpriteComponent>().lock();
+
+        if (spriteComponent)
+        {
+            std::string file = "Art/player.png";
+            spriteComponent->SetSprite(file);
+            spriteComponent->SetPosition(centerPosition);
+        }
+    }
+
+    // Controlled Movement Component
+    {
+        auto movementComponent = mPlayer.GetComponent<ControlledMovementComponent>().lock();
+        if (!movementComponent)
+        {
+            auto movementComp = std::make_shared<ControlledMovementComponent>(&mPlayer);
+            mPlayer.AddComponent(movementComp);
+        }
+    }
+
+    // Projectile Component
+    {
+        auto projectileComponent = mPlayer.GetComponent<ProjectileComponent>().lock();
+        if (!projectileComponent)
+        {
+            mPlayer.AddComponent(std::make_shared<ProjectileComponent>(&mPlayer));
+        }
+    }
+    
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -115,11 +150,7 @@ void GameManager::InitWindow()
     mpWindow->setFramerateLimit(240);
 
     std::string file = "Art/Background/background2.png";
-    if (!mBackgroundTexture.loadFromFile(file))
-    {
-        // Handle error
-        std::cout << "Can't load the file : " << file;
-    }
+    assert(mBackgroundTexture.loadFromFile(file));
     mBackgroundSprite.setTexture(mBackgroundTexture);
 
     // Scale to window size

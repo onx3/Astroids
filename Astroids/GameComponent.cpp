@@ -1,7 +1,7 @@
 #include "GameComponent.h"
 
-GameComponent::GameComponent()
-    : mpOwner(nullptr)
+GameComponent::GameComponent(GameObject * pOwner)
+    : mpOwner(pOwner)
 {
 }
 
@@ -17,6 +17,13 @@ void GameComponent::SetOwner(GameObject * pOwner)
 GameObject & GameComponent::GetGameObject() const
 {
     return *mpOwner;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameComponent::draw(sf::RenderTarget & target, sf::RenderStates states) const
+{
+
 }
 
 //------------------------------------------------------------------------------------------------------------------------

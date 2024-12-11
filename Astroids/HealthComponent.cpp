@@ -1,7 +1,8 @@
 #include "HealthComponent.h"
 
-HealthComponent::HealthComponent(int initialHealth)
-	: mHealth(initialHealth)
+HealthComponent::HealthComponent(GameObject * pOwner, int initialHealth)
+	: GameComponent(mpOwner)
+	, mHealth(initialHealth)
 {
 
 }

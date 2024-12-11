@@ -1,101 +1,81 @@
 #include "GameObject.h"
-#include "cassert"
+#include <cassert>
+#include "SpriteComponent.h"
 
-GameObject::GameObject() : mTexture(), mSprite()
+GameObject::GameObject()
+    : mDeltaTime(0.f)
+{
+    mClock.restart();
+    auto spriteComp = std::make_shared<SpriteComponent>(this);
+    AddComponent(spriteComp); // Add a single instance of SpriteComponent
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+GameObject::~GameObject()
 {
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
+void GameObject::Update()
+{
+    mDeltaTime = mClock.restart().asSeconds();
+    for (auto & component : mComponents)
+    {
+        component.second->Update(); // Update each component
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+float GameObject::GetDeltaTime() const
+{
+    return mDeltaTime;
+}
+
 sf::Vector2f GameObject::GetPosition() const
 {
-    return mSprite.getPosition();
+    auto pGameObjectSprite = GetComponent<SpriteComponent>().lock();
+    if (pGameObjectSprite)
+    {
+        return pGameObjectSprite->GetPosition();
+    }
+    return sf::Vector2f();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 void GameObject::SetPosition(const sf::Vector2f & position)
 {
-    mSprite.setPosition(position);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::SetPosition(float x, float y)
-{
-    mSprite.setPosition(sf::Vector2f(x, y));
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-float GameObject::GetWidth() const
-{
-    return mSprite.getGlobalBounds().width;
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-float GameObject::GetHeight() const
-{
-    return mSprite.getGlobalBounds().height;
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::Move(const sf::Vector2f & offset)
-{
-    mSprite.move(offset);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::Move(float x, float y)
-{
-    mSprite.move(sf::Vector2f(x, y));
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::SetRotation(float angle)
-{
-    mSprite.setRotation(angle);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::SetOriginToCenter()
-{
-    mSprite.setOrigin(
-        mSprite.getGlobalBounds().width / 2.0f,
-        mSprite.getGlobalBounds().height / 2.0f
-    );
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::AddComponent(std::shared_ptr<GameComponent> component)
-{
-
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameObject::SetTexture(const std::string & file)
-{
-    if (!mTexture.loadFromFile(file))
+    auto pGameObjectSprite = GetComponent<SpriteComponent>().lock();
+    if (pGameObjectSprite)
     {
-        assert(false && "Failed to load texture");
+        return pGameObjectSprite->SetPosition(position);
     }
-    mSprite.setTexture(mTexture);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+sf::Vector2f GameObject::GetSize() const
+{
+    auto pGameObjectSprite = GetComponent<SpriteComponent>().lock();
+    if (pGameObjectSprite)
+    {
+        return pGameObjectSprite->GetSprite().getGlobalBounds().getSize();
+    }
+    return sf::Vector2f();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 void GameObject::draw(sf::RenderTarget & target, sf::RenderStates states) const
 {
-    target.draw(mSprite, states);
+    for (auto & pComponent : mComponents)
+    {
+        pComponent.second->draw(target, states);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 //EOF
-//------------------------------------------------------------------------------------------------------------------------
