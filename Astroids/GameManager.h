@@ -33,5 +33,7 @@ private:
 	sf::Sprite mBackgroundSprite;
 
 	GameObject mPlayer;
+
+	sf::Clock mClock;
 };
 

@@ -1,5 +1,7 @@
 #include "GameManager.h"
 #include <cassert>
+#include <imgui.h>
+#include <imgui-SFML.h>
 #include "SpriteComponent.h"
 #include "ControlledMovementComponent.h"
 #include "ProjectileComponent.h"
@@ -11,6 +13,7 @@ GameManager::GameManager()
     , mBackgroundSprite()
     , mPlayer()
 {
+    mClock.restart();
     InitWindow();
     InitPlayer();
     InitEnemies();
@@ -21,6 +24,7 @@ GameManager::GameManager()
 GameManager::~GameManager()
 {
     delete mpWindow;
+    ImGui::SFML::Shutdown();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -29,6 +33,7 @@ void GameManager::PollEvents()
 {
     while (mpWindow->pollEvent(mEvent))
     {
+        ImGui::SFML::ProcessEvent(mEvent);
         switch (mEvent.type)
         {
             case sf::Event::Closed:
@@ -75,6 +80,10 @@ void GameManager::Render()
 {
     mpWindow->clear();
 
+    ImGui::SFML::Update(*mpWindow, mClock.restart());
+    ImGui::Begin("Debug Window");
+    ImGui::Text("This is an ImGui Window");
+    ImGui::End();
     // Draw the Game
     {
         // Draw Background
@@ -92,6 +101,7 @@ void GameManager::Render()
         }
     }
 
+    ImGui::SFML::Render(*mpWindow);
     mpWindow->display(); // Renderer is done keep at the end.
 }
 
@@ -156,7 +166,7 @@ void GameManager::InitWindow()
     // Scale to window size
     mBackgroundSprite.setScale(float(mpWindow->getSize().x) / mBackgroundTexture.getSize().x, float(mpWindow->getSize().y) / mBackgroundTexture.getSize().y);
 
-    //mpWindow->setMouseCursorVisible(false);
+    ImGui::SFML::Init(*mpWindow);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
