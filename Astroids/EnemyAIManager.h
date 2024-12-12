@@ -12,8 +12,8 @@ enum class EEnemy
 class EnemyAIManager
 {
 public:
-	EnemyAIManager();
-	EnemyAIManager(int enemyCount);
+	EnemyAIManager(GameManager * pGameManager);
+	EnemyAIManager(GameManager * pGameManager, int enemyCount);
 	~EnemyAIManager();
 
 	void UpdateEnemies();
@@ -31,4 +31,5 @@ private:
 
 	std::vector<GameObject *> mEnemies;
 	const int mMaxEnemies = 3;
+	GameManager * mpGameManager;
 };

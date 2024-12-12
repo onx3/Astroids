@@ -5,13 +5,15 @@
 #include "SpriteComponent.h"
 #include "ControlledMovementComponent.h"
 #include "ProjectileComponent.h"
+#include "BDConfig.h"
 
 GameManager::GameManager()
     : mpWindow(nullptr)
     , mEvent()
     , mBackgroundTexture()
     , mBackgroundSprite()
-    , mPlayer()
+    , mPlayer(this)
+    , mEnemyManager(this)
 {
     mClock.restart();
     InitWindow();
@@ -31,9 +33,9 @@ GameManager::~GameManager()
 
 void GameManager::PollEvents()
 {
+    ImGui::SFML::ProcessEvent(mEvent);
     while (mpWindow->pollEvent(mEvent))
     {
-        ImGui::SFML::ProcessEvent(mEvent);
         switch (mEvent.type)
         {
             case sf::Event::Closed:
@@ -76,14 +78,39 @@ void GameManager::Update()
 
 //------------------------------------------------------------------------------------------------------------------------
 
+void GameManager::RenderImGui()
+{
+#if IMGUI_ENABLED()
+    static bool showWindow = false;
+    ImGui::SFML::Update(*mpWindow, mClock.restart());
+
+   
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::G))
+    {
+        showWindow = true;
+    }
+
+    if (showWindow)
+    {
+        ImGui::Begin("Player Components", &showWindow);
+
+        mPlayer.DebugImGuiInfo();
+        ImGui::End();
+    }
+
+    ImGui::SFML::Render(*mpWindow);
+#endif
+
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
 void GameManager::Render()
 {
-    mpWindow->clear();
+    // Order Matters
 
-    ImGui::SFML::Update(*mpWindow, mClock.restart());
-    ImGui::Begin("Debug Window");
-    ImGui::Text("This is an ImGui Window");
-    ImGui::End();
+    mpWindow->clear();
+   
     // Draw the Game
     {
         // Draw Background
@@ -96,12 +123,12 @@ void GameManager::Render()
         auto & enemies = mEnemyManager.GetAllEnemies();
         for (auto * pEnemy : enemies)
         {
-            //enemy.SetTexture();
             mpWindow->draw(*pEnemy);
         }
     }
 
-    ImGui::SFML::Render(*mpWindow);
+    RenderImGui();
+
     mpWindow->display(); // Renderer is done keep at the end.
 }
 
@@ -121,30 +148,30 @@ void GameManager::InitPlayer()
         sf::Vector2u windowSize = mpWindow->getSize();
         sf::Vector2f centerPosition(float(windowSize.x) / 2.0f, float(windowSize.y) / 2.0f);
 
-        auto spriteComponent = mPlayer.GetComponent<SpriteComponent>().lock();
+        auto pSpriteComponent = mPlayer.GetComponent<SpriteComponent>().lock();
 
-        if (spriteComponent)
+        if (pSpriteComponent)
         {
             std::string file = "Art/player.png";
-            spriteComponent->SetSprite(file);
-            spriteComponent->SetPosition(centerPosition);
+            pSpriteComponent->SetSprite(file);
+            pSpriteComponent->SetPosition(centerPosition);
         }
     }
 
     // Controlled Movement Component
     {
-        auto movementComponent = mPlayer.GetComponent<ControlledMovementComponent>().lock();
-        if (!movementComponent)
+        auto pMovementComponent = mPlayer.GetComponent<ControlledMovementComponent>().lock();
+        if (!pMovementComponent)
         {
-            auto movementComp = std::make_shared<ControlledMovementComponent>(&mPlayer);
-            mPlayer.AddComponent(movementComp);
+            auto pMovementComponent = std::make_shared<ControlledMovementComponent>(&mPlayer);
+            mPlayer.AddComponent(pMovementComponent);
         }
     }
 
     // Projectile Component
     {
-        auto projectileComponent = mPlayer.GetComponent<ProjectileComponent>().lock();
-        if (!projectileComponent)
+        auto pProjectileComponent = mPlayer.GetComponent<ProjectileComponent>().lock();
+        if (!pProjectileComponent)
         {
             mPlayer.AddComponent(std::make_shared<ProjectileComponent>(&mPlayer));
         }

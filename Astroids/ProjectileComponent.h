@@ -23,6 +23,8 @@ public:
 
 	void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
 
+	void DebugImGuiComponentInfo() override;
+
 private:
 	void UpdateProjectiles(float deltaTime);
 

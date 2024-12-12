@@ -3,6 +3,7 @@
 #include <cassert>
 #include "GameObject.h"
 #include "SpriteComponent.h"
+#include "BDConfig.h"
 
 ControlledMovementComponent::ControlledMovementComponent(GameObject * pOwner)
 	: GameComponent(pOwner)
@@ -31,25 +32,37 @@ ControlledMovementComponent::~ControlledMovementComponent()
 
 void ControlledMovementComponent::Update()
 {
-    auto spriteComponent = GetGameObject().GetComponent<SpriteComponent>().lock();
+    auto pSpriteComponent = GetGameObject().GetComponent<SpriteComponent>().lock();
     
-    if (spriteComponent)
+    if (pSpriteComponent)
     {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        auto position = pSpriteComponent->GetPosition();
+        sf::Vector2f size(pSpriteComponent->GetWidth(), pSpriteComponent->GetHeight());
+
+        sf::Vector2u windowSize = GetGameObject().GetGameManager().mpWindow->getSize();
+
+        // Move up
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && position.y > 0)
         {
-            spriteComponent->Move(0, -mVelocityY);
+            pSpriteComponent->Move(0, -mVelocityY);
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+
+        // Move down
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && position.y + size.y < windowSize.y)
         {
-            spriteComponent->Move(0, mVelocityY);
+            pSpriteComponent->Move(0, mVelocityY);
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+
+        // Move right
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && position.x + size.x < windowSize.x)
         {
-            spriteComponent->Move(mVelocityX, 0);
+            pSpriteComponent->Move(mVelocityX, 0);
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+
+        // Move left
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && position.x > 0)
         {
-            spriteComponent->Move(-mVelocityX, 0);
+            pSpriteComponent->Move(-mVelocityX, 0);
         }
     }
 }

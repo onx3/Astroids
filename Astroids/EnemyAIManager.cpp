@@ -4,20 +4,22 @@
 #include <cassert>
 #include "SpriteComponent.h"
 
-EnemyAIManager::EnemyAIManager()
+EnemyAIManager::EnemyAIManager(GameManager * pGameManager)
 	: mEnemies()
+	, mpGameManager(pGameManager)
 {
 
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-EnemyAIManager::EnemyAIManager(int enemyCount)
+EnemyAIManager::EnemyAIManager(GameManager * pGameManager, int enemyCount)
 	: mEnemies()
+	, mpGameManager(pGameManager)
 {
 	for (int ii = 0; ii < enemyCount; ++ii)
 	{
-		GameObject * gameObj = new GameObject();
+		GameObject * gameObj = new GameObject(mpGameManager);
 		auto spriteComp = std::make_shared<SpriteComponent>(gameObj);
 
 		std::string file = GetEnemyFile(EEnemy::Ship);
@@ -73,7 +75,7 @@ void EnemyAIManager::RemoveEnemy(GameObject * enemy)
 
 void EnemyAIManager::RespawnEnemy(EEnemy type, sf::Vector2f pos)
 {
-	GameObject * pEnemy = new GameObject;
+	GameObject * pEnemy = new GameObject(mpGameManager);
 	auto pSpriteComponent = pEnemy->GetComponent<SpriteComponent>().lock();
 	if (pSpriteComponent)
 	{
@@ -89,7 +91,7 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
 {
 	for (int ii = 0; ii < count; ++ii)
 	{
-		GameObject * gameObj = new GameObject();
+		GameObject * gameObj = new GameObject(mpGameManager);
 		auto spriteComp = std::make_shared<SpriteComponent>(gameObj);
 
 		std::string file = GetEnemyFile(type);

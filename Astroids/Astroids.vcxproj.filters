@@ -15,6 +15,9 @@
     <Filter Include="Source Files\GameObject">
       <UniqueIdentifier>{743445aa-e9b6-40b9-9406-18a677505e0a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ExternalLib">
+      <UniqueIdentifier>{20062894-4b43-4e1a-9ac8-ced5d7926b8f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameManager.cpp">
@@ -45,22 +48,22 @@
       <Filter>Source Files\GameComponents</Filter>
     </ClCompile>
     <ClCompile Include="imgui.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\ExternalLib</Filter>
     </ClCompile>
     <ClCompile Include="imgui_demo.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\ExternalLib</Filter>
     </ClCompile>
     <ClCompile Include="imgui_draw.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\ExternalLib</Filter>
     </ClCompile>
     <ClCompile Include="imgui_tables.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\ExternalLib</Filter>
     </ClCompile>
     <ClCompile Include="imgui_widgets.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\ExternalLib</Filter>
     </ClCompile>
     <ClCompile Include="imgui-SFML.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\ExternalLib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +90,9 @@
     </ClInclude>
     <ClInclude Include="SpriteComponent.h">
       <Filter>Source Files\GameComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="BDConfig.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

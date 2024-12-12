@@ -1,8 +1,12 @@
 #include "ProjectileComponent.h"
+
+#include <iostream>
 #include "SFML/Graphics.hpp"
+
+#include "imgui.h"
 #include "GameObject.h"
 #include "SpriteComponent.h"
-#include <iostream>
+#include "BDConfig.h"
 
 ProjectileComponent::ProjectileComponent(GameObject * pOwner)
 	: GameComponent(pOwner)
@@ -46,7 +50,7 @@ std::string ProjectileComponent::GetCorrectProjectileFile()
 
 void ProjectileComponent::Shoot(sf::Vector2f direction)
 {
-	auto * pProjectile = new GameObject();
+	auto * pProjectile = new GameObject(&GetGameObject().GetGameManager());
 	std::cout << "Created a new projectile\n";
 	sf::Vector2f playerPosition;
 	sf::Vector2f playerSize;
@@ -59,7 +63,7 @@ void ProjectileComponent::Shoot(sf::Vector2f direction)
 
 		playerPosition = mpOwner->GetPosition();
 		playerSize = mpOwner->GetSize();
-		projectilePosition = playerPosition + sf::Vector2f(0.0f, -playerSize.y / 2);
+		projectilePosition = playerPosition + sf::Vector2f(playerSize.x / 2, -playerSize.y / 2);
 
 		pProjectileSpriteComponent->SetPosition(projectilePosition);
 
@@ -94,6 +98,18 @@ void ProjectileComponent::draw(sf::RenderTarget & target, sf::RenderStates state
 		auto spriteComponentToDraw = projectile.pObject->GetComponent<SpriteComponent>().lock();
 		target.draw(spriteComponentToDraw->GetSprite());
 	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void ProjectileComponent::DebugImGuiComponentInfo()
+{
+#if IMGUI_ENABLED()
+	for (auto & projectile : mProjectiles)
+	{
+		ImGui::Text("This is a projectile game object");
+	}
+#endif
 }
 
 //------------------------------------------------------------------------------------------------------------------------

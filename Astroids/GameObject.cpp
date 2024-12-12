@@ -1,9 +1,15 @@
 #include "GameObject.h"
 #include <cassert>
+#include <imgui.h>
 #include "SpriteComponent.h"
+#include "BDConfig.h"
+#include "GameComponent.h"
+#include "GameManager.h"
 
-GameObject::GameObject()
+
+GameObject::GameObject(GameManager * pGameManager)
     : mDeltaTime(0.f)
+    , mpGameManager(pGameManager)
 {
     mClock.restart();
     auto spriteComp = std::make_shared<SpriteComponent>(this);
@@ -65,6 +71,26 @@ sf::Vector2f GameObject::GetSize() const
         return pGameObjectSprite->GetSprite().getGlobalBounds().getSize();
     }
     return sf::Vector2f();
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+GameManager & GameObject::GetGameManager() const
+{
+    return *mpGameManager;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::DebugImGuiInfo()
+{
+#if IMGUI_ENABLED()
+    // Show Game Object stuff
+    for (auto & component : mComponents)
+    {
+        component.second->DebugImGuiComponentInfo(); // Update each component
+    }
+#endif
 }
 
 //------------------------------------------------------------------------------------------------------------------------

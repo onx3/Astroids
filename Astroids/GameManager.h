@@ -23,6 +23,8 @@ public:
 private:
 	void PollEvents();
 
+	void RenderImGui();
+
 	void InitEnemies();
 	void InitPlayer();
 	void InitWindow();

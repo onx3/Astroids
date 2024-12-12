@@ -1,10 +1,10 @@
 #include "HealthComponent.h"
 
-HealthComponent::HealthComponent(GameObject * pOwner, int initialHealth)
+HealthComponent::HealthComponent(GameObject * pOwner, int initialHealth, int maxHealth)
 	: GameComponent(mpOwner)
 	, mHealth(initialHealth)
+	, mMaxHealth(maxHealth)
 {
-
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -19,6 +19,35 @@ void HealthComponent::TakeDamage(int amount)
 int HealthComponent::GetHealth() const
 {
 	return mHealth;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void HealthComponent::AddHealth(int amount)
+{
+	int newHealth = mHealth += amount;
+	if (mHealth += amount > mMaxHealth)
+	{
+		mHealth = mMaxHealth;
+	}
+	else
+	{
+		mHealth = newHealth;
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+int HealthComponent::GetMaxHealth() const
+{
+	return mMaxHealth;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void HealthComponent::AddMaxHealth(int amount)
+{
+	mMaxHealth += amount;
 }
 
 //------------------------------------------------------------------------------------------------------------------------

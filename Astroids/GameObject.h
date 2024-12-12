@@ -5,12 +5,14 @@
 #include <typeindex>
 #include <memory>
 #include <string>
-#include "GameComponent.h"
+
+class GameComponent;
+class GameManager;
 
 class GameObject : public sf::Drawable
 {
 public:
-    GameObject();
+    GameObject(GameManager * pGameManager);
     ~GameObject();
 
     // Add a single component of type T
@@ -42,6 +44,10 @@ public:
 
     sf::Vector2f GetSize() const;
 
+    GameManager & GetGameManager() const;
+
+    void DebugImGuiInfo();
+
 protected:
     virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
 
@@ -51,4 +57,6 @@ protected:
 private:
     sf::Clock mClock;
     float mDeltaTime;
+
+    GameManager * mpGameManager;
 };
