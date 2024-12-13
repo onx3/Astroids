@@ -3,6 +3,7 @@
 #include <memory>
 #include <cassert>
 #include "SpriteComponent.h"
+#include "RandomMovementComponent.h"
 
 EnemyAIManager::EnemyAIManager(GameManager * pGameManager)
 	: mEnemies()
@@ -75,14 +76,15 @@ void EnemyAIManager::RemoveEnemy(GameObject * enemy)
 
 void EnemyAIManager::RespawnEnemy(EEnemy type, sf::Vector2f pos)
 {
-	GameObject * pEnemy = new GameObject(mpGameManager);
+	AddEnemies(1, type, pos);
+	/*GameObject * pEnemy = new GameObject(mpGameManager);
 	auto pSpriteComponent = pEnemy->GetComponent<SpriteComponent>().lock();
 	if (pSpriteComponent)
 	{
 		pSpriteComponent->SetSprite(GetEnemyFile(type));
 	}
 
-	mEnemies.push_back(pEnemy);
+	mEnemies.push_back(pEnemy);*/
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -92,14 +94,20 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
 	for (int ii = 0; ii < count; ++ii)
 	{
 		GameObject * gameObj = new GameObject(mpGameManager);
-		auto spriteComp = std::make_shared<SpriteComponent>(gameObj);
+		auto pSpriteComp = gameObj->GetComponent<SpriteComponent>().lock();
 
-		std::string file = GetEnemyFile(type);
+		if (pSpriteComp)
+		{
+			std::string file = GetEnemyFile(type);
 
-		spriteComp->SetSprite(file);
-		gameObj->AddComponent(spriteComp);
+			pSpriteComp->SetSprite(file);
+			gameObj->AddComponent(pSpriteComp);
 
-		spriteComp->SetPosition(pos);
+			pSpriteComp->SetPosition(pos);
+
+			auto pRandomMovementComp = std::make_shared<RandomMovementComponent>(gameObj);
+			gameObj->AddComponent(pRandomMovementComp);
+		}
 		mEnemies.push_back(gameObj);
 	}
 }

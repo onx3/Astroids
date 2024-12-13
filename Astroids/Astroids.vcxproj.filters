@@ -65,6 +65,9 @@
     <ClCompile Include="imgui-SFML.cpp">
       <Filter>Source Files\ExternalLib</Filter>
     </ClCompile>
+    <ClCompile Include="RandomMovementComponent.cpp">
+      <Filter>Source Files\GameComponents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -93,6 +96,9 @@
     </ClInclude>
     <ClInclude Include="BDConfig.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RandomMovementComponent.h">
+      <Filter>Source Files\GameComponents</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

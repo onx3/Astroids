@@ -16,8 +16,6 @@ public:
 
     GameObject & GetGameObject() const;
 
-    GameManager & GetGameManager() const;
-
     virtual void Update() = 0;
 
     virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const;
