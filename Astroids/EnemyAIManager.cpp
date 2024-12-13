@@ -18,19 +18,7 @@ EnemyAIManager::EnemyAIManager(GameManager * pGameManager, int enemyCount)
 	: mEnemies()
 	, mpGameManager(pGameManager)
 {
-	for (int ii = 0; ii < enemyCount; ++ii)
-	{
-		GameObject * gameObj = new GameObject(mpGameManager);
-		auto spriteComp = std::make_shared<SpriteComponent>(gameObj);
-
-		std::string file = GetEnemyFile(EEnemy::Ship);
-
-		spriteComp->SetSprite(file);
-		gameObj->AddComponent(spriteComp);
-		
-		spriteComp->SetPosition(sf::Vector2f(100, 100));
-		mEnemies.push_back(gameObj);
-	}
+	AddEnemies(enemyCount, EEnemy::Ship, sf::Vector2f());
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -77,14 +65,6 @@ void EnemyAIManager::RemoveEnemy(GameObject * enemy)
 void EnemyAIManager::RespawnEnemy(EEnemy type, sf::Vector2f pos)
 {
 	AddEnemies(1, type, pos);
-	/*GameObject * pEnemy = new GameObject(mpGameManager);
-	auto pSpriteComponent = pEnemy->GetComponent<SpriteComponent>().lock();
-	if (pSpriteComponent)
-	{
-		pSpriteComponent->SetSprite(GetEnemyFile(type));
-	}
-
-	mEnemies.push_back(pEnemy);*/
 }
 
 //------------------------------------------------------------------------------------------------------------------------

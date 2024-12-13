@@ -32,6 +32,8 @@ private:
 	{
 		GameObject * pObject;
 		float lifespan;
+
+		int damage;
 	};
 
 	std::vector<Projectile> mProjectiles;

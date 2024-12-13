@@ -6,10 +6,10 @@
 
 RandomMovementComponent::RandomMovementComponent(GameObject * pOwner)
 	: GameComponent(pOwner)
-	, mVelocity(100.f)
+	, mVelocity(200.f)
 	, mDirection(1)
 	, mTimeToNextChange(1.0f)
-	, mSpeedDist(50.f, 200.f)
+	, mSpeedDist(150.f, 300.f)
 	, mTimeDist(1.f, 3.f)
 {
 	std::random_device rd; // Initialize random engine

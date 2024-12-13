@@ -40,6 +40,8 @@ float GameObject::GetDeltaTime() const
     return mDeltaTime;
 }
 
+//------------------------------------------------------------------------------------------------------------------------
+
 sf::Vector2f GameObject::GetPosition() const
 {
     auto pGameObjectSprite = GetComponent<SpriteComponent>().lock();
@@ -105,3 +107,4 @@ void GameObject::draw(sf::RenderTarget & target, sf::RenderStates states) const
 
 //------------------------------------------------------------------------------------------------------------------------
 //EOF
+//------------------------------------------------------------------------------------------------------------------------

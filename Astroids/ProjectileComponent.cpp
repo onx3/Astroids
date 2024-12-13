@@ -1,8 +1,6 @@
 #include "ProjectileComponent.h"
-
 #include <iostream>
 #include "SFML/Graphics.hpp"
-
 #include "imgui.h"
 #include "GameObject.h"
 #include "SpriteComponent.h"
@@ -67,7 +65,7 @@ void ProjectileComponent::Shoot(sf::Vector2f direction)
 
 		pProjectileSpriteComponent->SetPosition(projectilePosition);
 
-		mProjectiles.push_back({ pProjectile, 3.f });
+		mProjectiles.push_back({ pProjectile, 3.f, 15 });
 	}
 }
 
