@@ -3,6 +3,8 @@
 
 SpriteComponent::SpriteComponent(GameObject * pOwner)
     : GameComponent(pOwner)
+    , mRotationSpeed(3.f)
+    , mCurrentRotation(0.f)
 {
 }
 
@@ -14,13 +16,14 @@ SpriteComponent::~SpriteComponent()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void SpriteComponent::SetSprite(const std::string & file)
+void SpriteComponent::SetSprite(const std::string & file, const sf::Vector2f & scale)
 {
     if (!mTexture.loadFromFile(file))
     {
         assert(false && "Failed to load texture");
     }
     mSprite.setTexture(mTexture);
+    mSprite.setScale(scale);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -67,9 +70,36 @@ void SpriteComponent::Move(float x, float y)
 
 //------------------------------------------------------------------------------------------------------------------------
 
+void SpriteComponent::RotateClockwise()
+{
+    mCurrentRotation += mRotationSpeed;
+    if (mCurrentRotation >= 360.f)
+        mCurrentRotation -= 360.f; // Keep rotation in range
+   SetRotation(mCurrentRotation);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void SpriteComponent::RotateCounterClockwise()
+{
+    mCurrentRotation -= mRotationSpeed;
+    if (mCurrentRotation < 0.f)
+        mCurrentRotation += 360.f; // Keep rotation in range
+    SetRotation(mCurrentRotation);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
 void SpriteComponent::SetRotation(float angle)
 {
     mSprite.setRotation(angle);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+float SpriteComponent::GetRotation() const
+{
+    return mSprite.getRotation();
 }
 
 //------------------------------------------------------------------------------------------------------------------------

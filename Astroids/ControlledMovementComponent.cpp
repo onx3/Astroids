@@ -6,11 +6,10 @@
 #include "BDConfig.h"
 
 ControlledMovementComponent::ControlledMovementComponent(GameObject * pOwner)
-	: GameComponent(pOwner)
+    : GameComponent(pOwner)
     , mVelocityX(3.f)
-	, mVelocityY(3.f)
+    , mVelocityY(3.f)
 {
-
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -63,6 +62,18 @@ void ControlledMovementComponent::Update()
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && position.x > 0)
         {
             pSpriteComponent->Move(-mVelocityX, 0);
+        }
+
+        // Rotate right (clockwise)
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
+        {
+            pSpriteComponent->RotateClockwise();
+        }
+
+        // Rotate left (counter-clockwise)
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+        {
+            pSpriteComponent->RotateCounterClockwise();
         }
     }
 }

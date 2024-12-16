@@ -13,12 +13,6 @@ public:
 
 private:
 	float mVelocity;
-	int mDirection; // 1 is right -1 is left
-	sf::Clock mClock;
-	float mTimeToNextChange;
-
-	std::default_random_engine mRandomEngine; // Random number generator
-	std::uniform_real_distribution<float> mSpeedDist; // Random speed distribution
-	std::uniform_real_distribution<float> mTimeDist;  // Random time distribution
+	sf::Vector2f mDirection;
 };
 

@@ -15,7 +15,13 @@ public:
 	~GameManager();
 
 	void Update();
+	void UpdateGameObjects();
+
 	void Render();
+
+	EnemyAIManager & GetEnemyAiManager();
+
+	std::vector<GameObject *> & GetGameObjects();
 
 	sf::RenderWindow * mpWindow;
 	sf::Event mEvent;
@@ -34,7 +40,7 @@ private:
 	sf::Texture mBackgroundTexture;
 	sf::Sprite mBackgroundSprite;
 
-	GameObject mPlayer;
+	std::vector<GameObject *> mGameObjects;
 
 	sf::Clock mClock;
 };

@@ -9,6 +9,7 @@ public:
 
 	int GetHealth() const;
 	void AddHealth(int amount);
+	void LooseHealth(int amount);
 
 	int GetMaxHealth() const;
 	void AddMaxHealth(int amount);

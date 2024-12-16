@@ -3,11 +3,12 @@
 #include <memory>
 #include <cassert>
 #include "SpriteComponent.h"
+#include "CollisionComponent.h"
+#include "HealthComponent.h"
 #include "RandomMovementComponent.h"
 
 EnemyAIManager::EnemyAIManager(GameManager * pGameManager)
-	: mEnemies()
-	, mpGameManager(pGameManager)
+	: mpGameManager(pGameManager)
 {
 
 }
@@ -15,36 +16,27 @@ EnemyAIManager::EnemyAIManager(GameManager * pGameManager)
 //------------------------------------------------------------------------------------------------------------------------
 
 EnemyAIManager::EnemyAIManager(GameManager * pGameManager, int enemyCount)
-	: mEnemies()
-	, mpGameManager(pGameManager)
+	: mpGameManager(pGameManager)
 {
-	AddEnemies(enemyCount, EEnemy::Ship, sf::Vector2f());
+	AddEnemies(enemyCount, EEnemy::Asteroid, sf::Vector2f());
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 EnemyAIManager::~EnemyAIManager()
 {
-	for (auto * enemy : mEnemies)
-	{
-		delete enemy;
-	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 void EnemyAIManager::UpdateEnemies()
 {
-	for (auto * pEnemy : mEnemies)
-	{
-		pEnemy->Update();
-	}
-
 	CleanUpDeadEnemies();
-
-	while (mEnemies.size() < mMaxEnemies)
+	float rand = 100.f;
+	while (mpGameManager->GetGameObjects().size() < mMaxEnemies)
 	{
-		RespawnEnemy(EEnemy::Ship, sf::Vector2f(100.f, 0.f));
+		RespawnEnemy(EEnemy::Asteroid, sf::Vector2f(100.f + rand, 50.f + rand));
+		rand += 50;
 	}
 }
 
@@ -52,12 +44,7 @@ void EnemyAIManager::UpdateEnemies()
 
 void EnemyAIManager::RemoveEnemy(GameObject * enemy)
 {
-	auto it = std::find(mEnemies.begin(), mEnemies.end(), enemy);
-	if (it != mEnemies.end())
-	{
-		delete * it;
-		mEnemies.erase(it);
-	}
+	enemy->Destroy(); // Use GameObject's Destroy function
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -71,32 +58,41 @@ void EnemyAIManager::RespawnEnemy(EEnemy type, sf::Vector2f pos)
 
 void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
 {
-	for (int ii = 0; ii < count; ++ii)
-	{
-		GameObject * gameObj = new GameObject(mpGameManager);
-		auto pSpriteComp = gameObj->GetComponent<SpriteComponent>().lock();
+    for (int i = 0; i < count; ++i)
+    {
+        GameObject * pGameObj = new GameObject(mpGameManager, ETeam::Enemy);
+        auto pSpriteComp = pGameObj->GetComponent<SpriteComponent>().lock();
 
-		if (pSpriteComp)
-		{
-			std::string file = GetEnemyFile(type);
-
-			pSpriteComp->SetSprite(file);
-			gameObj->AddComponent(pSpriteComp);
-
+        if (pSpriteComp)
+        {
+            std::string file = GetEnemyFile(type);
+			auto scale = sf::Vector2f(.5, .5f);
+            pSpriteComp->SetSprite(file, scale);
 			pSpriteComp->SetPosition(pos);
+            pGameObj->AddComponent(pSpriteComp);
 
-			auto pRandomMovementComp = std::make_shared<RandomMovementComponent>(gameObj);
-			gameObj->AddComponent(pRandomMovementComp);
-		}
-		mEnemies.push_back(gameObj);
-	}
+            auto pRandomMovementComp = std::make_shared<RandomMovementComponent>(pGameObj);
+            pGameObj->AddComponent(pRandomMovementComp);
+
+            auto pHealthComponent = std::make_shared<HealthComponent>(pGameObj, 10, 100);
+            pGameObj->AddComponent(pHealthComponent);
+
+            auto pCollisionComp = std::make_shared<CollisionComponent>(pGameObj, pGameObj->GetSize());
+            pGameObj->AddComponent(pCollisionComp);
+        }
+
+        mpGameManager->GetGameObjects().push_back(pGameObj);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-const std::vector<GameObject *> & EnemyAIManager::GetAllEnemies()
+void EnemyAIManager::CleanUpDeadEnemies()
 {
-	return mEnemies;
+    auto & gameObjects = mpGameManager->GetGameObjects();
+    gameObjects.erase(std::remove_if(gameObjects.begin(), gameObjects.end(),
+        [](GameObject * obj) { return obj->IsDestroyed(); }),
+        gameObjects.end());
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -113,18 +109,15 @@ std::string EnemyAIManager::GetEnemyFile(EEnemy type)
 		{
 			return "Art/EnemyUFO.png";
 		}
+		case (EEnemy::Asteroid):
+		{
+			return "Art/meteorBig.png";
+		}
 		default:
 		{
-			return "meteorBig.png";
+			return "Art/meteorBig.png";
 		}
 	}
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void EnemyAIManager::CleanUpDeadEnemies()
-{
-
 }
 
 //------------------------------------------------------------------------------------------------------------------------
