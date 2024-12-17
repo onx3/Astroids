@@ -6,7 +6,8 @@
 enum class EEnemy
 {
 	Ship,
-	Ufo
+	Ufo,
+	Asteroid
 };
 
 class EnemyAIManager
@@ -23,13 +24,14 @@ public:
 
 	void AddEnemies(int count, EEnemy type, sf::Vector2f pos);
 
-	const std::vector<GameObject *> & GetAllEnemies();
-
 private:
 	std::string GetEnemyFile(EEnemy type);
 	void CleanUpDeadEnemies();
 
-	std::vector<GameObject *> mEnemies;
-	const int mMaxEnemies = 3;
+	const int mMaxEnemies = 10;
 	GameManager * mpGameManager;
 };
+
+//------------------------------------------------------------------------------------------------------------------------
+// EOF
+//------------------------------------------------------------------------------------------------------------------------

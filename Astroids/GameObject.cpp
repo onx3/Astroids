@@ -7,9 +7,11 @@
 #include "GameManager.h"
 
 
-GameObject::GameObject(GameManager * pGameManager)
+GameObject::GameObject(GameManager * pGameManager, ETeam team)
     : mDeltaTime(0.f)
     , mpGameManager(pGameManager)
+    , mIsDestroyed(false)
+    , mTeam(team)
 {
     mClock.restart();
     auto spriteComp = std::make_shared<SpriteComponent>(this);
@@ -24,12 +26,33 @@ GameObject::~GameObject()
 
 //------------------------------------------------------------------------------------------------------------------------
 
+void GameObject::Destroy()
+{
+    std::cout << "Game Object Destroy called\n";
+    mIsDestroyed = true;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+bool GameObject::IsDestroyed() const
+{
+    return mIsDestroyed;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
 void GameObject::Update()
 {
-    mDeltaTime = mClock.restart().asSeconds();
-    for (auto & component : mComponents)
+    if (!mIsDestroyed)
     {
-        component.second->Update(); // Update each component
+        mDeltaTime = mClock.restart().asSeconds();
+        for (auto & component : mComponents)
+        {
+            if (!mIsDestroyed)
+            {
+                component.second->Update(); // Update each component
+            }
+        }
     }
 }
 
@@ -38,6 +61,20 @@ void GameObject::Update()
 float GameObject::GetDeltaTime() const
 {
     return mDeltaTime;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+ETeam GameObject::GetTeam() const
+{
+    return mTeam;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::SetTeam(ETeam team)
+{
+    mTeam = team;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -61,6 +98,18 @@ void GameObject::SetPosition(const sf::Vector2f & position)
     {
         return pGameObjectSprite->SetPosition(position);
     }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+float GameObject::GetRotation() const
+{
+    auto pGameObjectSprite = GetComponent<SpriteComponent>().lock();
+    if (pGameObjectSprite)
+    {
+        return pGameObjectSprite->GetRotation();
+    }
+    return 0.0f;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -90,7 +139,12 @@ void GameObject::DebugImGuiInfo()
     // Show Game Object stuff
     for (auto & component : mComponents)
     {
-        component.second->DebugImGuiComponentInfo(); // Update each component
+        // Update each component
+        if (ImGui::CollapsingHeader(component.first.name()))
+        {
+            component.second->DebugImGuiComponentInfo();
+        }
+         
     }
 #endif
 }

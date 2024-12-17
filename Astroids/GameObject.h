@@ -9,11 +9,22 @@
 class GameComponent;
 class GameManager;
 
+enum class ETeam
+{
+    Player,
+    Friendly,
+    Enemy,
+    Neutral
+};
+
 class GameObject : public sf::Drawable
 {
 public:
-    GameObject(GameManager * pGameManager);
+    GameObject(GameManager * pGameManager, ETeam team = ETeam::Neutral);
     ~GameObject();
+
+    void Destroy();
+    bool IsDestroyed() const;
 
     // Add a single component of type T
     template <typename T>
@@ -39,9 +50,13 @@ public:
 
     float GetDeltaTime() const;
 
+    ETeam GetTeam() const;
+    void SetTeam(ETeam team);
+
     sf::Vector2f GetPosition() const;
     void SetPosition(const sf::Vector2f & position);
 
+    float GetRotation() const;
     sf::Vector2f GetSize() const;
 
     GameManager & GetGameManager() const;
@@ -57,6 +72,11 @@ protected:
 private:
     sf::Clock mClock;
     float mDeltaTime;
-
+    bool mIsDestroyed;
     GameManager * mpGameManager;
+    ETeam mTeam;
 };
+
+//------------------------------------------------------------------------------------------------------------------------
+// EOF
+//------------------------------------------------------------------------------------------------------------------------

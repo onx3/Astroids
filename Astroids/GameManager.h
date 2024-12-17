@@ -7,6 +7,7 @@
 #include <SFML/Window.hpp>
 #include "EnemyAIManager.h"
 #include "GameObject.h"
+#include "ScoreManager.h"
 
 class GameManager
 {
@@ -15,7 +16,17 @@ public:
 	~GameManager();
 
 	void Update();
+	void UpdateGameObjects();
+
 	void Render();
+
+	sf::Time GetDeltaTime();
+
+	ScoreManager & GetScoreManager();
+
+	EnemyAIManager & GetEnemyAiManager();
+
+	std::vector<GameObject *> & GetGameObjects();
 
 	sf::RenderWindow * mpWindow;
 	sf::Event mEvent;
@@ -34,8 +45,10 @@ private:
 	sf::Texture mBackgroundTexture;
 	sf::Sprite mBackgroundSprite;
 
-	GameObject mPlayer;
+	std::vector<GameObject *> mGameObjects;
 
 	sf::Clock mClock;
+
+	ScoreManager mScoreManager;
 };
 

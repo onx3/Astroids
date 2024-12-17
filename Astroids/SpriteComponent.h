@@ -9,7 +9,7 @@ public:
 	SpriteComponent(GameObject * pOwner);
 	~SpriteComponent();
 
-	void SetSprite(const std::string & file);
+	void SetSprite(const std::string & file, const sf::Vector2f & scale = {1.f, 1.f});
 	sf::Sprite GetSprite();
 
 	sf::Vector2f GetPosition() const;
@@ -21,7 +21,12 @@ public:
 	void Move(const sf::Vector2f & offset);
 	void Move(float x, float y);
 
+	void RotateClockwise();
+	void RotateCounterClockwise();
+
 	void SetRotation(float angle);
+	float GetRotation() const;
+
 	void SetOriginToCenter();
 
 	void Update() override;
@@ -31,5 +36,11 @@ public:
 private:
 	sf::Texture mTexture;
 	sf::Sprite mSprite;
+
+	float mRotationSpeed;
+	float mCurrentRotation;
 };
 
+//------------------------------------------------------------------------------------------------------------------------
+// EOF
+//------------------------------------------------------------------------------------------------------------------------

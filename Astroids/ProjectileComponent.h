@@ -32,12 +32,11 @@ private:
 	{
 		GameObject * pObject;
 		float lifespan;
-
 		int damage;
+		sf::Vector2f direction;
 	};
 
 	std::vector<Projectile> mProjectiles;
-	sf::Vector2f mDirection;
 
 	float mSpeed;
 	float mCooldown;

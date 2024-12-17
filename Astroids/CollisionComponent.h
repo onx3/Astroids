@@ -1,19 +1,21 @@
 #pragma once
 #include "GameComponent.h"
-#include <SFML/System.hpp>
-#include <random>
+#include <SFML/Graphics.hpp>
 
-class RandomMovementComponent : public GameComponent
+class CollisionComponent : public GameComponent
 {
 public:
-	RandomMovementComponent(GameObject * pOwner);
-	virtual ~RandomMovementComponent();
+	CollisionComponent(GameObject * pOwner, sf::Vector2f size);
+	~CollisionComponent();
+
+	sf::FloatRect GetBounds() const;
+
+	bool CheckCollision(const CollisionComponent & other) const;
 
 	void Update() override;
 
 private:
-	float mVelocity;
-	sf::Vector2f mDirection;
+	sf::Vector2f mSize;
 };
 
 //------------------------------------------------------------------------------------------------------------------------

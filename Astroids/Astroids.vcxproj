@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="ControlledMovementComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameComponent.cpp" />
@@ -150,10 +151,12 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ProjectileComponent.cpp" />
     <ClCompile Include="RandomMovementComponent.cpp" />
+    <ClCompile Include="ScoreManager.cpp" />
     <ClCompile Include="SpriteComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BDConfig.h" />
+    <ClInclude Include="CollisionComponent.h" />
     <ClInclude Include="ControlledMovementComponent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameComponent.h" />
@@ -162,6 +165,7 @@
     <ClInclude Include="HealthComponent.h" />
     <ClInclude Include="ProjectileComponent.h" />
     <ClInclude Include="RandomMovementComponent.h" />
+    <ClInclude Include="ScoreManager.h" />
     <ClInclude Include="SpriteComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

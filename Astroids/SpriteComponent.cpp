@@ -3,6 +3,8 @@
 
 SpriteComponent::SpriteComponent(GameObject * pOwner)
     : GameComponent(pOwner)
+    , mRotationSpeed(3.f)
+    , mCurrentRotation(0.f)
 {
 }
 
@@ -14,13 +16,15 @@ SpriteComponent::~SpriteComponent()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void SpriteComponent::SetSprite(const std::string & file)
+void SpriteComponent::SetSprite(const std::string & file, const sf::Vector2f & scale)
 {
     if (!mTexture.loadFromFile(file))
     {
         assert(false && "Failed to load texture");
     }
     mSprite.setTexture(mTexture);
+    mSprite.setScale(scale);
+    SetOriginToCenter();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -67,6 +71,26 @@ void SpriteComponent::Move(float x, float y)
 
 //------------------------------------------------------------------------------------------------------------------------
 
+void SpriteComponent::RotateClockwise()
+{
+    mCurrentRotation += mRotationSpeed;
+    if (mCurrentRotation >= 360.f)
+        mCurrentRotation -= 360.f; // Keep rotation in range
+   SetRotation(mCurrentRotation);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void SpriteComponent::RotateCounterClockwise()
+{
+    mCurrentRotation -= mRotationSpeed;
+    if (mCurrentRotation < 0.f)
+        mCurrentRotation += 360.f; // Keep rotation in range
+    SetRotation(mCurrentRotation);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
 void SpriteComponent::SetRotation(float angle)
 {
     mSprite.setRotation(angle);
@@ -74,11 +98,19 @@ void SpriteComponent::SetRotation(float angle)
 
 //------------------------------------------------------------------------------------------------------------------------
 
+float SpriteComponent::GetRotation() const
+{
+    return mSprite.getRotation();
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
 void SpriteComponent::SetOriginToCenter()
 {
+    sf::FloatRect localBounds = mSprite.getLocalBounds(); // Unscaled, uncropped size of the sprite
     mSprite.setOrigin(
-        mSprite.getGlobalBounds().width / 2.0f,
-        mSprite.getGlobalBounds().height / 2.0f
+        localBounds.width / 2.0f,
+        localBounds.height / 2.0f
     );
 }
 
