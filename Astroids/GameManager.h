@@ -21,6 +21,8 @@ public:
 
 	void Render();
 
+	void CheckCollision();
+
 	template <typename T>
 	void AddManager();
 
@@ -37,7 +39,6 @@ private:
 
 	void RenderImGui();
 
-	void InitPlayer();
 	void InitWindow();
 
 	std::unordered_map<std::type_index, BaseManager *> mManagers;

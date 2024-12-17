@@ -1,6 +1,7 @@
 #include "BaseManager.h"
 
-BaseManager::BaseManager()
+BaseManager::BaseManager(GameManager * pGameManager)
+	: mpGameManager(pGameManager)
 {
 	
 }
@@ -16,6 +17,7 @@ BaseManager::~BaseManager()
 
 void BaseManager::Update()
 {
+
 }
 
 //------------------------------------------------------------------------------------------------------------------------

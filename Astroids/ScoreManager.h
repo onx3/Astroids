@@ -22,8 +22,6 @@ private:
 	sf::Texture mLifeTexture;
 	sf::Sprite mLifeSprite;
 	std::vector<sf::Sprite> mSpriteLives;
-
-	GameManager * mpGameManager;
 };
 
 //------------------------------------------------------------------------------------------------------------------------

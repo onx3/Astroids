@@ -1,8 +1,10 @@
 #pragma once
+
+#include "BaseManager.h"
+#include "GameManager.h"
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "GameObject.h"
-#include "BaseManager.h"
 
 enum class EEnemy
 {
@@ -34,7 +36,6 @@ private:
 	sf::Vector2f GetRandomSpawnPosition();
 
 	const int mMaxEnemies = 10;
-	GameManager * mpGameManager;
 	std::vector<GameObject *> mEnemyObjects;
 };
 

@@ -75,6 +75,8 @@ private:
     bool mIsDestroyed;
     GameManager * mpGameManager;
     ETeam mTeam;
+
+    friend class GameManager;
 };
 
 //------------------------------------------------------------------------------------------------------------------------

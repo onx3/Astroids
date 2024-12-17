@@ -28,7 +28,6 @@ GameObject::~GameObject()
 
 void GameObject::Destroy()
 {
-    std::cout << "Game Object Destroy called\n";
     mIsDestroyed = true;
 }
 

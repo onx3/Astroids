@@ -4,9 +4,9 @@
 #include <cassert>
 
 ScoreManager::ScoreManager(GameManager * pGameManager)
-	: mScore(0)
+	: BaseManager(pGameManager)
+    , mScore(0)
 	, mSpriteLives()
-	, mpGameManager(pGameManager)
 {
 	if (!mFont.loadFromFile("Art/font.ttf")) // Replace with your font path
 	{

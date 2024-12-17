@@ -175,8 +175,6 @@ void ProjectileComponent::UpdateProjectiles(float deltaTime)
 					auto targetCollision = pGameObject->GetComponent<CollisionComponent>().lock();
 					if (targetCollision && pCollisionComponent->CheckCollision(*targetCollision))
 					{
-						std::cout << "Projectile hit an object!\n";
-
 						auto pHealthComponent = pGameObject->GetComponent<HealthComponent>().lock();
 						if (pHealthComponent)
 						{

@@ -1,12 +1,17 @@
 #pragma once
 
+class GameManager;
+
 class BaseManager
 {
 public:
-	BaseManager();
+	explicit BaseManager(GameManager * pGameManager);
 	~BaseManager();
 
 	virtual void Update();
+
+protected:
+	GameManager * mpGameManager;
 };
 
 //------------------------------------------------------------------------------------------------------------------------
