@@ -18,6 +18,9 @@
     <Filter Include="Source Files\ExternalLib">
       <UniqueIdentifier>{20062894-4b43-4e1a-9ac8-ced5d7926b8f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Managers">
+      <UniqueIdentifier>{3ad0fd14-835e-46e3-bdaf-c6cc75962630}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameManager.cpp">
@@ -71,8 +74,11 @@
     <ClCompile Include="CollisionComponent.cpp">
       <Filter>Source Files\GameComponents</Filter>
     </ClCompile>
+    <ClCompile Include="BaseManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
     <ClCompile Include="ScoreManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Managers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -109,8 +115,11 @@
     <ClInclude Include="CollisionComponent.h">
       <Filter>Source Files\GameComponents</Filter>
     </ClInclude>
+    <ClInclude Include="BaseManager.h">
+      <Filter>Source Files\Managers</Filter>
+    </ClInclude>
     <ClInclude Include="ScoreManager.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Managers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

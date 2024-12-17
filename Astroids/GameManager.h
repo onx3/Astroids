@@ -8,6 +8,7 @@
 #include "EnemyAIManager.h"
 #include "GameObject.h"
 #include "ScoreManager.h"
+#include "BaseManager.h"
 
 class GameManager
 {
@@ -20,11 +21,11 @@ public:
 
 	void Render();
 
-	sf::Time GetDeltaTime();
+	template <typename T>
+	void AddManager();
 
-	ScoreManager & GetScoreManager();
-
-	EnemyAIManager & GetEnemyAiManager();
+	template <typename T>
+	T * GetManager();
 
 	std::vector<GameObject *> & GetGameObjects();
 
@@ -36,11 +37,10 @@ private:
 
 	void RenderImGui();
 
-	void InitEnemies();
 	void InitPlayer();
 	void InitWindow();
 
-	EnemyAIManager mEnemyManager;
+	std::unordered_map<std::type_index, BaseManager *> mManagers;
 
 	sf::Texture mBackgroundTexture;
 	sf::Sprite mBackgroundSprite;
@@ -48,7 +48,5 @@ private:
 	std::vector<GameObject *> mGameObjects;
 
 	sf::Clock mClock;
-
-	ScoreManager mScoreManager;
 };
 

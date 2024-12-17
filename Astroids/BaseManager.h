@@ -1,11 +1,13 @@
 #pragma once
 
-#ifndef BDConfig
-#define BDConfig
+class BaseManager
+{
+public:
+	BaseManager();
+	~BaseManager();
 
-#define IMGUI_ENABLED() (1) // Always true for now; can be updated later
-
-#endif
+	virtual void Update();
+};
 
 //------------------------------------------------------------------------------------------------------------------------
 // EOF

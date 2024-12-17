@@ -17,7 +17,7 @@ public:
 
 	std::string GetCorrectProjectileFile();
 
-	void Shoot(sf::Vector2f direction);
+	void Shoot();
 
 	void Update() override;
 

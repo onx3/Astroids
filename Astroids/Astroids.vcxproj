@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseManager.cpp" />
     <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="ControlledMovementComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="SpriteComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseManager.h" />
     <ClInclude Include="BDConfig.h" />
     <ClInclude Include="CollisionComponent.h" />
     <ClInclude Include="ControlledMovementComponent.h" />

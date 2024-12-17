@@ -1,9 +1,10 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "BaseManager.h"
 
 class GameManager;
-class ScoreManager
+class ScoreManager : public BaseManager
 {
 public:
 	ScoreManager(GameManager * pGameManager);

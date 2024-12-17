@@ -14,20 +14,31 @@ GameManager::GameManager()
     , mEvent()
     , mBackgroundTexture()
     , mBackgroundSprite()
-    , mEnemyManager(this)
     , mGameObjects()
-    , mScoreManager(this)
+    , mManagers()
 {
     mClock.restart();
     InitWindow();
     InitPlayer();
-    InitEnemies();
+
+    AddManager<EnemyAIManager>();
+    AddManager<ScoreManager>();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 GameManager::~GameManager()
 {
+    for (auto & obj : mGameObjects)
+    {
+        delete obj; // Delete each GameObject
+    }
+
+    for (auto & manager : mManagers)
+    {
+        delete manager.second; // Delete each Manager
+    }
+
     delete mpWindow;
     ImGui::SFML::Shutdown();
 }
@@ -65,7 +76,11 @@ void GameManager::Update()
     PollEvents();
 
     UpdateGameObjects();
-    mEnemyManager.UpdateEnemies();
+
+    for (auto & manager : mManagers)
+    {
+        manager.second->Update();
+    }
 
     // Checks for player collision
     for (int ii = 0; ii < mGameObjects.size(); ++ii)
@@ -189,9 +204,10 @@ void GameManager::Render()
         mpWindow->draw(*pGameObj);
     }
 
-    mpWindow->draw(mScoreManager.GetScoreText());
+    auto * pScoreManager = GetManager<ScoreManager>();
+    mpWindow->draw(pScoreManager->GetScoreText());
 
-    auto & spriteLives = mScoreManager.GetSpriteLives();
+    auto & spriteLives = pScoreManager->GetSpriteLives();
     for (auto & life : spriteLives)
     {
         mpWindow->draw(life);
@@ -204,16 +220,24 @@ void GameManager::Render()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-ScoreManager & GameManager::GetScoreManager()
+template <typename T>
+void GameManager::AddManager()
 {
-    return mScoreManager;
+    static_assert(std::is_base_of<BaseManager, T>::value, "T must inherit from BaseManager");
+    mManagers[typeid(T)] = new T(this);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-EnemyAIManager & GameManager::GetEnemyAiManager()
+template <typename T>
+T * GameManager::GetManager()
 {
-    return mEnemyManager;
+    auto it = mManagers.find(typeid(T));
+    if (it != mManagers.end())
+    {
+        return dynamic_cast<T *>(it->second);
+    }
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -221,13 +245,6 @@ EnemyAIManager & GameManager::GetEnemyAiManager()
 std::vector<GameObject *> & GameManager::GetGameObjects()
 {
     return mGameObjects;
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameManager::InitEnemies()
-{
-    mEnemyManager.AddEnemies(1, EEnemy::Asteroid, sf::Vector2f(100.f, 100.f));
 }
 
 //------------------------------------------------------------------------------------------------------------------------
