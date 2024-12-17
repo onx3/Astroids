@@ -1,5 +1,6 @@
 #include "HealthComponent.h"
 #include "iostream"
+#include "PlayerManager.h"
 
 HealthComponent::HealthComponent(GameObject * pOwner, int initialHealth, int maxHealth, int lifeCount, int maxLives, float hitCooldown)
 	: GameComponent(pOwner)
@@ -46,6 +47,11 @@ void HealthComponent::AddHealth(int amount)
 
 void HealthComponent::LooseHealth(int amount)
 {
+	if (mpOwner == mpOwner->GetGameManager().GetManager<PlayerManager>()->GetPlayers()[0])
+	{
+		int ii = 0;
+		++ii;
+	}
 	mTimeSinceLastHit = mClock.getElapsedTime().asSeconds();
 	if (mTimeSinceLastHit >= mHitCooldown)
 	{

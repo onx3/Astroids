@@ -8,6 +8,7 @@
 #include "CollisionComponent.h"
 #include "HealthComponent.h"
 #include "BDConfig.h"
+#include "PlayerManager.h"
 
 ProjectileComponent::ProjectileComponent(GameObject * pOwner)
 	: GameComponent(pOwner)
@@ -46,8 +47,8 @@ std::string ProjectileComponent::GetCorrectProjectileFile()
 
 void ProjectileComponent::Shoot()
 {
-	auto * pProjectile = new GameObject(&GetGameObject().GetGameManager());
-	pProjectile->SetTeam(mpOwner->GetTeam()); // Optional, match team if implemented
+	auto * pProjectile = mpOwner->GetGameManager().CreateNewGameObject(mpOwner->GetTeam());
+	mpOwner->AddChild(pProjectile);
 
 	auto pProjectileSpriteComponent = pProjectile->GetComponent<SpriteComponent>().lock();
 	if (pProjectileSpriteComponent)
@@ -100,9 +101,6 @@ void ProjectileComponent::Shoot()
 		// Add the projectile to the projectiles list
 		mProjectiles.push_back({ pProjectile, 3.f, 15, direction });
 	}
-
-	// Add the projectile to the GameManager's object list
-	GetGameObject().GetGameManager().GetGameObjects().push_back(pProjectile);
 }
 
 
@@ -170,6 +168,7 @@ void ProjectileComponent::UpdateProjectiles(float deltaTime)
 			auto & gameObjects = GetGameObject().GetGameManager().GetGameObjects();
 			for (auto * pGameObject : gameObjects)
 			{
+				auto * pPlayerManager = mpOwner->GetGameManager().GetManager<PlayerManager>();
 				if (pGameObject != projectile.pObject && pGameObject->GetTeam() != projectile.pObject->GetTeam())
 				{
 					auto targetCollision = pGameObject->GetComponent<CollisionComponent>().lock();
@@ -179,7 +178,12 @@ void ProjectileComponent::UpdateProjectiles(float deltaTime)
 						if (pHealthComponent)
 						{
 							pHealthComponent->LooseHealth(projectile.damage);
-							if (mpOwner->GetTeam() == ETeam::Player)
+							auto * pPlayer = pPlayerManager->GetPlayers()[0];
+							if (!pPlayer)
+							{
+								break;
+							}
+							if (mpOwner == pPlayer)
 							{
 								mpOwner->GetGameManager().GetManager<ScoreManager>()->AddScore(1000);
 							}

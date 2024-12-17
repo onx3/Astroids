@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <typeindex>
 #include <memory>
+#include <vector>
 #include <string>
 
 class GameComponent;
@@ -11,7 +12,6 @@ class GameManager;
 
 enum class ETeam
 {
-    Player,
     Friendly,
     Enemy,
     Neutral
@@ -20,9 +20,6 @@ enum class ETeam
 class GameObject : public sf::Drawable
 {
 public:
-    GameObject(GameManager * pGameManager, ETeam team = ETeam::Neutral);
-    ~GameObject();
-
     void Destroy();
     bool IsDestroyed() const;
 
@@ -61,12 +58,19 @@ public:
 
     GameManager & GetGameManager() const;
 
+    void AddChild(GameObject * pChild);
+    std::vector<GameObject *> GetChildren();
+
     void DebugImGuiInfo();
 
 protected:
+    GameObject(GameManager * pGameManager, ETeam team);
+    ~GameObject();
+
+    void CleanUpChildren();
+
     virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
 
-    // Store shared ownership of components
     std::unordered_map<std::type_index, std::shared_ptr<GameComponent>> mComponents;
 
 private:
@@ -75,6 +79,7 @@ private:
     bool mIsDestroyed;
     GameManager * mpGameManager;
     ETeam mTeam;
+    std::vector<GameObject *> mChildGameObjects;
 
     friend class GameManager;
 };

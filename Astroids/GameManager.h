@@ -16,6 +16,8 @@ public:
 	GameManager();
 	~GameManager();
 
+	void EndGame();
+
 	void Update();
 	void UpdateGameObjects();
 
@@ -28,6 +30,8 @@ public:
 
 	template <typename T>
 	T * GetManager();
+
+	GameObject * CreateNewGameObject(ETeam team = ETeam::Neutral);
 
 	std::vector<GameObject *> & GetGameObjects();
 

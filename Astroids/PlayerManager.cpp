@@ -21,8 +21,8 @@ PlayerManager::~PlayerManager()
 
 void PlayerManager::InitPlayer()
 {
-    auto * pPlayer = new GameObject(mpGameManager, ETeam::Player);
-    mpGameManager->GetGameObjects().push_back(pPlayer);
+    auto * pPlayer = mpGameManager->CreateNewGameObject(ETeam::Friendly);
+
     mPlayerObjects.push_back(pPlayer);
 
     // Sprite Component
@@ -84,17 +84,28 @@ void PlayerManager::InitPlayer()
 void PlayerManager::Update()
 {
     CleanUpDeadPlayers();
+
+    if (mPlayerObjects.empty())
+    {
+        // Call GameManager to end the game
+        mpGameManager->EndGame();
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 void PlayerManager::CleanUpDeadPlayers()
 {
-    // Clean up local enemy objects
-    mPlayerObjects.erase(std::remove_if(mPlayerObjects.begin(), mPlayerObjects.end(),
-        [](GameObject * obj) { return obj->IsDestroyed(); }),
-        mPlayerObjects.end());
+    auto newEnd = std::remove_if(mPlayerObjects.begin(), mPlayerObjects.end(),
+        [](GameObject * obj)
+        {
+            return obj->IsDestroyed();
+        });
+
+    mPlayerObjects.erase(newEnd, mPlayerObjects.end());
 }
+
+
 //------------------------------------------------------------------------------------------------------------------------
 
 const std::vector<GameObject *> & PlayerManager::GetPlayers() const

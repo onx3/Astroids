@@ -46,6 +46,18 @@ GameManager::~GameManager()
 
 //------------------------------------------------------------------------------------------------------------------------
 
+void GameManager::EndGame()
+{
+    for (auto * pGameObject : mGameObjects)
+    {
+        delete pGameObject;
+    }
+
+    mGameObjects.clear();
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
 void GameManager::PollEvents()
 {
     ImGui::SFML::ProcessEvent(mEvent);
@@ -90,18 +102,20 @@ void GameManager::Update()
 
 void GameManager::UpdateGameObjects()
 {
-    for (int i = 0; i < mGameObjects.size();)
+    for (int ii = 0; ii < mGameObjects.size();)
     {
-        if (mGameObjects[i]->IsDestroyed())
+        GameObject * pGameObject = mGameObjects[ii];
+
+        if (pGameObject->IsDestroyed())
         {
-            std::cout << "Deleting GameObject from GameManager list\n";
-            delete mGameObjects[i];                    // Clean up the destroyed object
-            mGameObjects.erase(mGameObjects.begin() + i); // Erase and stay at the same index
+            pGameObject->CleanUpChildren();
+            delete pGameObject;
+            mGameObjects.erase(mGameObjects.begin() + ii);
         }
         else
         {
-            mGameObjects[i]->Update(); // Update active objects
-            ++i;                       // Only increment if no erase was done
+            pGameObject->Update();
+            ++ii;
         }
     }
 }
@@ -179,47 +193,45 @@ void GameManager::Render()
 
 void GameManager::CheckCollision()
 {
-    // Checks for player collision
+    // Retrieve player manager and player object
+    auto * pPlayerManager = GetManager<PlayerManager>();
+    if (!pPlayerManager || pPlayerManager->GetPlayers().empty())
+    {
+        return; // No players to check collisions
+    }
+    GameObject * pPlayer = pPlayerManager->GetPlayers()[0];
+
+    // Iterate through all game objects
     for (int ii = 0; ii < mGameObjects.size(); ++ii)
     {
-        auto * pObjA = mGameObjects[ii];
+        GameObject * pObjA = mGameObjects[ii];
         auto pCollA = pObjA->GetComponent<CollisionComponent>().lock();
-        if (!pCollA)
-        {
-            continue;
-        }
+        if (!pCollA) continue;
 
         for (int jj = ii + 1; jj < mGameObjects.size(); ++jj)
         {
-            auto * pObjB = mGameObjects[jj];
+            GameObject * pObjB = mGameObjects[jj];
+            auto pCollB = pObjB->GetComponent<CollisionComponent>().lock();
+            if (!pCollB) continue;
 
-            // Make sure exactly one object is the player
-            if ((pObjA->GetTeam() == ETeam::Player) ^ (pObjB->GetTeam() == ETeam::Player))
+            // Ensure one object is the player and teams are different
+            if ((pObjA == pPlayer) ^ (pObjB == pPlayer))
             {
-                auto pCollB = pObjB->GetComponent<CollisionComponent>().lock();
-                if (!pCollB)
+                if (pObjA->GetTeam() == pObjB->GetTeam())
                 {
                     continue;
                 }
 
-                // Check collision
+                // Check for collision
                 if (pCollA->CheckCollision(*pCollB))
                 {
-                    if (pObjA->GetTeam() == ETeam::Player)
+                    auto pHealthComp = (pObjA == pPlayer ?
+                        pObjA->GetComponent<HealthComponent>().lock() :
+                        pObjB->GetComponent<HealthComponent>().lock());
+
+                    if (pHealthComp)
                     {
-                        auto pHealthComp = pObjA->GetComponent<HealthComponent>().lock();
-                        if (pHealthComp)
-                        {
-                            pHealthComp->LooseHealth(100);
-                        }
-                    }
-                    else if (pObjB->GetTeam() == ETeam::Player)
-                    {
-                        auto pHealthComp = pObjB->GetComponent<HealthComponent>().lock();
-                        if (pHealthComp)
-                        {
-                            pHealthComp->LooseHealth(100);
-                        }
+                        pHealthComp->LooseHealth(100);
                     }
                 }
             }
@@ -247,6 +259,15 @@ T * GameManager::GetManager()
         return dynamic_cast<T *>(it->second);
     }
     return nullptr;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+GameObject * GameManager::CreateNewGameObject(ETeam team)
+{
+    GameObject * pGameObj = new GameObject(this, team);
+    mGameObjects.push_back(pGameObj);
+    return pGameObj;
 }
 
 //------------------------------------------------------------------------------------------------------------------------

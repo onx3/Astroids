@@ -98,8 +98,10 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
 {
     for (int i = 0; i < count; ++i)
     {
-        GameObject * pGameObj = new GameObject(mpGameManager, ETeam::Enemy);
-        auto pSpriteComp = pGameObj->GetComponent<SpriteComponent>().lock();
+        auto * pEnemy = mpGameManager->CreateNewGameObject(ETeam::Enemy);
+        mEnemyObjects.push_back(pEnemy);
+
+        auto pSpriteComp = pEnemy->GetComponent<SpriteComponent>().lock();
 
         if (pSpriteComp)
         {
@@ -107,20 +109,18 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
 			auto scale = sf::Vector2f(.08f, .08f);
             pSpriteComp->SetSprite(file, scale);
 			pSpriteComp->SetPosition(pos);
-            pGameObj->AddComponent(pSpriteComp);
+            pEnemy->AddComponent(pSpriteComp);
 
-            auto pRandomMovementComp = std::make_shared<RandomMovementComponent>(pGameObj);
-            pGameObj->AddComponent(pRandomMovementComp);
+            auto pRandomMovementComp = std::make_shared<RandomMovementComponent>(pEnemy);
+            pEnemy->AddComponent(pRandomMovementComp);
 
-            auto pHealthComponent = std::make_shared<HealthComponent>(pGameObj, 10, 100, 1, 1);
-            pGameObj->AddComponent(pHealthComponent);
+            auto pHealthComponent = std::make_shared<HealthComponent>(pEnemy, 10, 100, 1, 1);
+            pEnemy->AddComponent(pHealthComponent);
 
-            auto pCollisionComp = std::make_shared<CollisionComponent>(pGameObj, pGameObj->GetSize());
-            pGameObj->AddComponent(pCollisionComp);
+            auto pCollisionComp = std::make_shared<CollisionComponent>(pEnemy, pEnemy->GetSize());
+            pEnemy->AddComponent(pCollisionComp);
         }
 
-        mpGameManager->GetGameObjects().push_back(pGameObj);
-		mEnemyObjects.push_back(pGameObj);
     }
 }
 

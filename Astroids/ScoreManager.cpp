@@ -2,6 +2,7 @@
 #include "GameManager.h"
 #include "HealthComponent.h"
 #include <cassert>
+#include "PlayerManager.h"
 
 ScoreManager::ScoreManager(GameManager * pGameManager)
 	: BaseManager(pGameManager)
@@ -48,18 +49,18 @@ std::vector<sf::Sprite> & ScoreManager::GetSpriteLives()
 
     // Find the player GameObject and get its HealthComponent
     int lives = 0;
-    for (const auto * gameObject : mpGameManager->GetGameObjects())
-    {
-        if (gameObject->GetTeam() == ETeam::Player) // Assuming GetTeam() returns a team enum
-        {
-            auto healthComponent = gameObject->GetComponent<HealthComponent>().lock();
-            if (healthComponent)
-            {
-                lives = healthComponent->GetLives(); // Fetch the player's current health
-            }
-            break; // Found the player, no need to check further
-        }
-    }
+    auto * pPlayerManager = mpGameManager->GetManager<PlayerManager>();
+	if (pPlayerManager->GetPlayers().empty())
+	{
+		return mSpriteLives;
+	}
+    auto * pPlayerObject = pPlayerManager->GetPlayers()[0];
+	
+	auto healthComponent = pPlayerObject->GetComponent<HealthComponent>().lock();
+	if (healthComponent)
+	{
+		lives = healthComponent->GetLives(); // Fetch the player's current health
+	}
 
     // Generate life sprites based on the player's current lives
     for (int ii = 0; ii < lives; ++ii)

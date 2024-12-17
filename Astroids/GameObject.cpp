@@ -12,6 +12,7 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team)
     , mpGameManager(pGameManager)
     , mIsDestroyed(false)
     , mTeam(team)
+    , mChildGameObjects()
 {
     mClock.restart();
     auto spriteComp = std::make_shared<SpriteComponent>(this);
@@ -22,6 +23,21 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team)
 
 GameObject::~GameObject()
 {
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::CleanUpChildren()
+{
+    for (auto * child : mChildGameObjects)
+    {
+        if (child)
+        {
+            child->CleanUpChildren(); // Recursively clean up children
+            delete child;
+        }
+    }
+    mChildGameObjects.clear();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -132,6 +148,20 @@ GameManager & GameObject::GetGameManager() const
 
 //------------------------------------------------------------------------------------------------------------------------
 
+void GameObject::AddChild(GameObject * pChild)
+{
+    mChildGameObjects.push_back(pChild);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+std::vector<GameObject *> GameObject::GetChildren()
+{
+    return mChildGameObjects;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
 void GameObject::DebugImGuiInfo()
 {
 #if IMGUI_ENABLED()
@@ -143,7 +173,6 @@ void GameObject::DebugImGuiInfo()
         {
             component.second->DebugImGuiComponentInfo();
         }
-         
     }
 #endif
 }
