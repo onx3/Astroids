@@ -15,7 +15,15 @@ public:
 	void SetVelocityX(float velo);
 	void SetVelocityY(float velo);
 private:
+
+	sf::Vector2f mVelocity;
 	float mVelocityX;
 	float mVelocityY;
+	float mAcceleration;
+	float mDeceleration;
+	float mMaxSpeed;
 };
 
+//------------------------------------------------------------------------------------------------------------------------
+// EOF
+//------------------------------------------------------------------------------------------------------------------------

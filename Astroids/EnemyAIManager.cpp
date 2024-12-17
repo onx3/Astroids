@@ -74,7 +74,7 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
             auto pRandomMovementComp = std::make_shared<RandomMovementComponent>(pGameObj);
             pGameObj->AddComponent(pRandomMovementComp);
 
-            auto pHealthComponent = std::make_shared<HealthComponent>(pGameObj, 10, 100);
+            auto pHealthComponent = std::make_shared<HealthComponent>(pGameObj, 10, 100, 1, 1);
             pGameObj->AddComponent(pHealthComponent);
 
             auto pCollisionComp = std::make_shared<CollisionComponent>(pGameObj, pGameObj->GetSize());

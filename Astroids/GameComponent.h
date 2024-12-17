@@ -12,7 +12,7 @@ public:
     explicit GameComponent(GameObject * pOwner);
     virtual ~GameComponent() = default;
 
-    void SetOwner(GameObject * owner);
+    void SetOwner(GameObject * pOwner);
 
     GameObject & GetGameObject() const;
 
@@ -25,3 +25,7 @@ protected:
 
     GameObject * mpOwner = nullptr;
 };
+
+//------------------------------------------------------------------------------------------------------------------------
+// EOF
+//------------------------------------------------------------------------------------------------------------------------

@@ -6,6 +6,8 @@
 #include "ControlledMovementComponent.h"
 #include "ProjectileComponent.h"
 #include "BDConfig.h"
+#include "CollisionComponent.h"
+#include "HealthComponent.h"
 
 GameManager::GameManager()
     : mpWindow(nullptr)
@@ -14,6 +16,7 @@ GameManager::GameManager()
     , mBackgroundSprite()
     , mEnemyManager(this)
     , mGameObjects()
+    , mScoreManager(this)
 {
     mClock.restart();
     InitWindow();
@@ -63,6 +66,53 @@ void GameManager::Update()
 
     UpdateGameObjects();
     mEnemyManager.UpdateEnemies();
+
+    // Checks for player collision
+    for (int ii = 0; ii < mGameObjects.size(); ++ii)
+    {
+        auto * pObjA = mGameObjects[ii];
+        auto pCollA = pObjA->GetComponent<CollisionComponent>().lock();
+        if (!pCollA)
+        {
+            continue;
+        }
+
+        for (int jj = ii + 1; jj < mGameObjects.size(); ++jj)
+        {
+            auto * pObjB = mGameObjects[jj];
+
+            // Make sure exactly one object is the player
+            if ((pObjA->GetTeam() == ETeam::Player) ^ (pObjB->GetTeam() == ETeam::Player))
+            {
+                auto pCollB = pObjB->GetComponent<CollisionComponent>().lock();
+                if (!pCollB)
+                {
+                    continue;
+                }
+
+                // Check collision
+                if (pCollA->CheckCollision(*pCollB))
+                {
+                    if (pObjA->GetTeam() == ETeam::Player)
+                    {
+                        auto pHealthComp = pObjA->GetComponent<HealthComponent>().lock();
+                        if (pHealthComp)
+                        {
+                            pHealthComp->LooseHealth(100);
+                        }
+                    }
+                    else if (pObjB->GetTeam() == ETeam::Player)
+                    {
+                        auto pHealthComp = pObjB->GetComponent<HealthComponent>().lock();
+                        if (pHealthComp)
+                        {
+                            pHealthComp->LooseHealth(100);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -139,9 +189,24 @@ void GameManager::Render()
         mpWindow->draw(*pGameObj);
     }
 
+    mpWindow->draw(mScoreManager.GetScoreText());
+
+    auto & spriteLives = mScoreManager.GetSpriteLives();
+    for (auto & life : spriteLives)
+    {
+        mpWindow->draw(life);
+    }
+
     RenderImGui();
 
     mpWindow->display(); // Renderer is done keep at the end.
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+ScoreManager & GameManager::GetScoreManager()
+{
+    return mScoreManager;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -169,7 +234,7 @@ void GameManager::InitEnemies()
 
 void GameManager::InitPlayer()
 {
-    auto * pPlayer = new GameObject(this, ETeam::Friendly);
+    auto * pPlayer = new GameObject(this, ETeam::Player);
     mGameObjects.push_back(pPlayer);
 
     // Sprite Component
@@ -185,7 +250,6 @@ void GameManager::InitPlayer()
             auto scale = sf::Vector2f(.5f, .5f);
             pSpriteComponent->SetSprite(file, scale);
             pSpriteComponent->SetPosition(centerPosition);
-            pSpriteComponent->SetOriginToCenter();
         }
     }
 
@@ -208,6 +272,23 @@ void GameManager::InitPlayer()
         }
     }
     
+    // Health Component
+    {
+        auto pHealthComponent = pPlayer->GetComponent<HealthComponent>().lock();
+        if (!pHealthComponent)
+        {
+            pPlayer->AddComponent(std::make_shared<HealthComponent>(pPlayer, 100, 100, 3, 3, 2.f));
+        }
+    }
+
+    // Collision Component
+    {
+        auto pCollisionComponent = pPlayer->GetComponent<CollisionComponent>().lock();
+        if (!pCollisionComponent)
+        {
+            pPlayer->AddComponent(std::make_shared<CollisionComponent>(pPlayer, pPlayer->GetSize()));
+        }
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------

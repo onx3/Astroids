@@ -151,6 +151,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ProjectileComponent.cpp" />
     <ClCompile Include="RandomMovementComponent.cpp" />
+    <ClCompile Include="ScoreManager.cpp" />
     <ClCompile Include="SpriteComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +165,7 @@
     <ClInclude Include="HealthComponent.h" />
     <ClInclude Include="ProjectileComponent.h" />
     <ClInclude Include="RandomMovementComponent.h" />
+    <ClInclude Include="ScoreManager.h" />
     <ClInclude Include="SpriteComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -142,6 +142,10 @@ void ProjectileComponent::UpdateProjectiles(float deltaTime)
 						if (pHealthComponent)
 						{
 							pHealthComponent->LooseHealth(projectile.damage);
+							if (mpOwner->GetTeam() == ETeam::Player)
+							{
+								mpOwner->GetGameManager().GetScoreManager().AddScore(1000);
+							}
 						}
 
 						if (!projectile.pObject->IsDestroyed())

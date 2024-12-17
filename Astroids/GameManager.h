@@ -7,6 +7,7 @@
 #include <SFML/Window.hpp>
 #include "EnemyAIManager.h"
 #include "GameObject.h"
+#include "ScoreManager.h"
 
 class GameManager
 {
@@ -18,6 +19,10 @@ public:
 	void UpdateGameObjects();
 
 	void Render();
+
+	sf::Time GetDeltaTime();
+
+	ScoreManager & GetScoreManager();
 
 	EnemyAIManager & GetEnemyAiManager();
 
@@ -43,5 +48,7 @@ private:
 	std::vector<GameObject *> mGameObjects;
 
 	sf::Clock mClock;
+
+	ScoreManager mScoreManager;
 };
 

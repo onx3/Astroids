@@ -24,6 +24,7 @@ void SpriteComponent::SetSprite(const std::string & file, const sf::Vector2f & s
     }
     mSprite.setTexture(mTexture);
     mSprite.setScale(scale);
+    SetOriginToCenter();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -106,9 +107,10 @@ float SpriteComponent::GetRotation() const
 
 void SpriteComponent::SetOriginToCenter()
 {
+    sf::FloatRect localBounds = mSprite.getLocalBounds(); // Unscaled, uncropped size of the sprite
     mSprite.setOrigin(
-        mSprite.getGlobalBounds().width / 2.0f,
-        mSprite.getGlobalBounds().height / 2.0f
+        localBounds.width / 2.0f,
+        localBounds.height / 2.0f
     );
 }
 
