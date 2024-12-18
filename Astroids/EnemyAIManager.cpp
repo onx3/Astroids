@@ -47,30 +47,31 @@ sf::Vector2f EnemyAIManager::GetRandomSpawnPosition()
     const int screenWidth = mpGameManager->mpWindow->getSize().x;
     const int screenHeight = mpGameManager->mpWindow->getSize().y;
 
+    const float spawnOffset = 500.0f; // Increased offset for smoother appearance
+
     sf::Vector2f spawnPosition;
 
-    // Randomly decide which edge the enemy spawns outside of
-    int edge = rand() % 4; // 0 = Top, 1 = Bottom, 2 = Left, 3 = Right
+    int edge = rand() % 4;
 
     switch (edge)
     {
         case 0: // Top (above screen)
             spawnPosition.x = static_cast<float>(rand() % screenWidth);
-            spawnPosition.y = -50.0f; // Slightly above the screen
+            spawnPosition.y = -spawnOffset; // Further above the screen
             break;
 
         case 1: // Bottom (below screen)
             spawnPosition.x = static_cast<float>(rand() % screenWidth);
-            spawnPosition.y = static_cast<float>(screenHeight) + 50.0f; // Slightly below the screen
+            spawnPosition.y = static_cast<float>(screenHeight) + spawnOffset; // Further below the screen
             break;
 
         case 2: // Left (left of screen)
-            spawnPosition.x = -50.0f; // Slightly left of the screen
+            spawnPosition.x = -spawnOffset; // Further left of the screen
             spawnPosition.y = static_cast<float>(rand() % screenHeight);
             break;
 
         case 3: // Right (right of screen)
-            spawnPosition.x = static_cast<float>(screenWidth) + 50.0f; // Slightly right of the screen
+            spawnPosition.x = static_cast<float>(screenWidth) + spawnOffset; // Further right of the screen
             spawnPosition.y = static_cast<float>(rand() % screenHeight);
             break;
     }
@@ -106,11 +107,12 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
         if (pSpriteComp)
         {
             std::string file = GetEnemyFile(type);
-			auto scale = sf::Vector2f(.08f, .08f);
+            auto scale = sf::Vector2f(.08f, .08f);
             pSpriteComp->SetSprite(file, scale);
-			pSpriteComp->SetPosition(pos);
+            pSpriteComp->SetPosition(pos);
             pEnemy->AddComponent(pSpriteComp);
 
+            // Add random movement AFTER smooth intro
             auto pRandomMovementComp = std::make_shared<RandomMovementComponent>(pEnemy);
             pEnemy->AddComponent(pRandomMovementComp);
 
@@ -120,7 +122,6 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
             auto pCollisionComp = std::make_shared<CollisionComponent>(pEnemy, pEnemy->GetSize());
             pEnemy->AddComponent(pCollisionComp);
         }
-
     }
 }
 

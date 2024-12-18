@@ -9,24 +9,48 @@
 
 RandomMovementComponent::RandomMovementComponent(GameObject * pOwner)
     : GameComponent(pOwner)
-    , mVelocity(200.f)
+    , mVelocity(300.f)
+    , mIsEntering(true)
+    , mSkipBoundaryCheck(true)
+    , mHasEnteredScreen(false)
 {
-    // Random number generator setup
     static std::random_device rd;
     static std::mt19937 rng(rd());
     static std::uniform_real_distribution<float> randomDirection(-1.0f, 1.0f);
+    static std::uniform_int_distribution<int> randomEdge(0, 3);
 
     auto pSpriteComponent = GetGameObject().GetComponent<SpriteComponent>().lock();
     if (pSpriteComponent)
     {
-        // Generate a random direction vector
+        // Generate a random direction vector for later movement
         sf::Vector2f randomVector(randomDirection(rng), randomDirection(rng));
-
-        // Normalize the random direction to make it a unit vector
         float magnitude = std::sqrt(randomVector.x * randomVector.x + randomVector.y * randomVector.y);
         if (magnitude != 0)
         {
-            mDirection = randomVector / magnitude; // Set normalized direction
+            mDirection = randomVector / magnitude; // Normalize for random movement
+        }
+
+        // Initialize intro movement
+        mStartPosition = pSpriteComponent->GetPosition(); // The off-screen spawn position
+
+        // Set target position to a random edge of the screen
+        sf::Vector2u windowSize = GetGameObject().GetGameManager().mpWindow->getSize();
+        int edge = randomEdge(rng);
+
+        switch (edge)
+        {
+            case 0: // Top
+                mTargetPosition = { static_cast<float>(rand() % windowSize.x), 100.f };
+                break;
+            case 1: // Bottom
+                mTargetPosition = { static_cast<float>(rand() % windowSize.x), static_cast<float>(windowSize.y - 100.f) };
+                break;
+            case 2: // Left
+                mTargetPosition = { 100.f, static_cast<float>(rand() % windowSize.y) };
+                break;
+            case 3: // Right
+                mTargetPosition = { static_cast<float>(windowSize.x - 100.f), static_cast<float>(rand() % windowSize.y) };
+                break;
         }
     }
 }
@@ -35,7 +59,6 @@ RandomMovementComponent::RandomMovementComponent(GameObject * pOwner)
 
 RandomMovementComponent::~RandomMovementComponent()
 {
-    // Destructor logic (nothing to clean up here)
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -45,34 +68,50 @@ void RandomMovementComponent::Update()
     if (mpOwner->IsActive())
     {
         auto spriteComponent = GetGameObject().GetComponent<SpriteComponent>().lock();
-
         if (spriteComponent)
         {
-            // Get current position and window bounds
             sf::Vector2f position = spriteComponent->GetPosition();
             sf::Vector2u windowSize = GetGameObject().GetGameManager().mpWindow->getSize();
             sf::Vector2f size(spriteComponent->GetWidth(), spriteComponent->GetHeight());
 
-            // Update position based on direction and velocity
+            // Intro phase movement
+            if (mIsEntering)
+            {
+                sf::Vector2f direction = mTargetPosition - position;
+                float distance = std::hypot(direction.x, direction.y);
+
+                if (distance > 1.0f)
+                {
+                    direction /= distance;
+                    position += direction * mVelocity * GetGameObject().GetDeltaTime();
+                }
+                else
+                {
+                    position = mTargetPosition;
+                    mIsEntering = false;
+                    mHasEnteredScreen = true;
+                }
+
+                spriteComponent->SetPosition(position);
+                return;
+            }
             position += mDirection * mVelocity * GetGameObject().GetDeltaTime();
 
-            if (position.x < 0 || position.x + size.x > windowSize.x)
+            // Check for collisions with window bounds only after fully entering
+            if (mHasEnteredScreen)
             {
-                mDirection.x *= -1; // Reverse horizontal direction
-                position.x = std::max(0.f, std::min(position.x, windowSize.x - size.x)); // Clamp position to screen bounds
+                if (position.x < 0 || position.x + size.x > windowSize.x)
+                {
+                    mDirection.x *= -1;
+                    position.x = std::clamp(position.x, 0.f, windowSize.x - size.x);
+                }
+                if (position.y < 0 || position.y + size.y > windowSize.y)
+                {
+                    mDirection.y *= -1;
+                    position.y = std::clamp(position.y, 0.f, windowSize.y - size.y);
+                }
             }
-            if (position.y < 0 || position.y + size.y > windowSize.y)
-            {
-                mDirection.y *= -1; // Reverse vertical direction
-                position.y = std::max(0.f, std::min(position.y, windowSize.y - size.y)); // Clamp position to screen bounds
-            }
-
-            // Apply the updated position
             spriteComponent->SetPosition(position);
         }
     }
 }
-
-//------------------------------------------------------------------------------------------------------------------------
-// EOF
-//------------------------------------------------------------------------------------------------------------------------

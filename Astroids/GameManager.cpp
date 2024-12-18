@@ -112,7 +112,7 @@ void GameManager::Update()
 
     for (auto & manager : mManagers)
     {
-        if (manager.second) // Safety check
+        if (manager.second)
         {
             manager.second->Update();
         }
@@ -133,10 +133,8 @@ void GameManager::UpdateGameObjects()
     {
         mpRootGameObject->Update();
 
-        // Clean up destroyed objects
         CleanUpDestroyedGameObjects(mpRootGameObject);
 
-        // If the root itself is destroyed
         if (!mpRootGameObject)
         {
             EndGame();
@@ -153,19 +151,16 @@ void GameManager::CleanUpDestroyedGameObjects(GameObject * pRoot)
 
     auto & children = pRoot->GetChildren();
 
-    // Loop backwards to safely delete children
     for (int i = static_cast<int>(children.size()) - 1; i >= 0; --i)
     {
         GameObject * pChild = children[i];
 
-        // Recursively clean up the child
         CleanUpDestroyedGameObjects(pChild);
 
-        // Check if the child should be destroyed
         if (pChild && pChild->IsDestroyed())
         {
-            delete pChild;                         // Delete child
-            children.erase(children.begin() + i);  // Remove from vector
+            delete pChild;
+            children.erase(children.begin() + i);
         }
     }
 }
@@ -188,14 +183,12 @@ void GameManager::RenderImGui()
     {
         ImGui::Begin("Game Objects", &mShowImGuiWindow, ImGuiWindowFlags_NoCollapse);
 
-        // Split the window into two columns
         ImGui::Columns(2, "GameObjectsColumns", true);
 
         // LEFT SIDE: GameObject Tree
         ImGui::Text("GameObject Tree");
         ImGui::Separator();
 
-        // Use a stack to traverse the GameObject tree iteratively
         std::stack<std::pair<GameObject *, int>> stack; // GameObject* + Depth
         stack.push({ mpRootGameObject, 0 });
 
@@ -206,10 +199,8 @@ void GameManager::RenderImGui()
 
             if (!pGameObject || pGameObject->IsDestroyed()) continue; // Skip invalid or destroyed objects
 
-            // Indent GameObjects visually in ImGui based on depth
             ImGui::Indent(depth * 10.0f);
 
-            // Display as a selectable node
             std::string label = "GameObject " + std::to_string(reinterpret_cast<std::uintptr_t>(pGameObject));
             if (ImGui::Selectable(label.c_str(), pSelectedGameObject == pGameObject))
             {
@@ -225,32 +216,28 @@ void GameManager::RenderImGui()
             ImGui::Unindent(depth * 10.0f);
         }
 
-        // Move to the right column
         ImGui::NextColumn();
 
         // RIGHT SIDE: Components of the Selected GameObject
         ImGui::Text("Components");
         ImGui::Separator();
 
-        // Validate selectedGameObject before accessing it
         if (pSelectedGameObject && !pSelectedGameObject->IsDestroyed())
         {
             ImGui::Text("GameObject %p", pSelectedGameObject);
 
-            // Display components here
             for (auto * component : pSelectedGameObject->GetAllComponents())
             {
-                std::string componentLabel = "class " + component->GetClassName(); // Assuming a GetClassName() method
+                std::string componentLabel = "class " + component->GetClassName();
                 ImGui::BulletText("%s", componentLabel.c_str());
             }
         }
         else
         {
             ImGui::Text("No GameObject selected or it has been deleted.");
-            pSelectedGameObject = nullptr; // Reset the pointer to avoid dangling
+            pSelectedGameObject = nullptr;
         }
 
-        // End the columns
         ImGui::Columns(1);
 
         ImGui::End();
@@ -266,6 +253,7 @@ void GameManager::Render()
 {
     mpWindow->clear();
 
+    // Show mouse cursor if ImGui window is open
     if (!mShowImGuiWindow)
     {
         mpWindow->setMouseCursorVisible(false);
@@ -274,24 +262,30 @@ void GameManager::Render()
     // Draw background
     mpWindow->draw(mBackgroundSprite);
 
-    // Draw the root GameObject and its children
+    // Draw all GameObjects
     if (mpRootGameObject)
     {
         mpWindow->draw(*mpRootGameObject);
     }
 
-    auto * pScoreManager = GetManager<ScoreManager>();
-    mpWindow->draw(pScoreManager->GetScoreText());
-
-    auto & spriteLives = pScoreManager->GetSpriteLives();
-    for (auto & life : spriteLives)
+    // Draw UI
     {
-        mpWindow->draw(life);
-    }
+        auto * pScoreManager = GetManager<ScoreManager>();
+        mpWindow->draw(pScoreManager->GetScoreText());
 
-    sf::Vector2i mousePosition = sf::Mouse::getPosition(*mpWindow);
-    mCursorSprite.setPosition(float(mousePosition.x), float(mousePosition.y));
-    mpWindow->draw(mCursorSprite);
+        auto & spriteLives = pScoreManager->GetSpriteLives();
+        for (auto & life : spriteLives)
+        {
+            mpWindow->draw(life);
+        }
+    }
+    
+    // Draw Mouse Cursor
+    {
+        sf::Vector2i mousePosition = sf::Mouse::getPosition(*mpWindow);
+        mCursorSprite.setPosition(float(mousePosition.x), float(mousePosition.y));
+        mpWindow->draw(mCursorSprite);
+    }
 
     RenderImGui();
     mpWindow->display();
@@ -304,7 +298,7 @@ void GameManager::CheckCollision()
     auto * pPlayerManager = GetManager<PlayerManager>();
     if (!pPlayerManager || pPlayerManager->GetPlayers().empty())
     {
-        return; // No players to check collisions
+        return;
     }
     GameObject * pPlayer = pPlayerManager->GetPlayers()[0];
 
@@ -343,7 +337,7 @@ template <typename T>
 void GameManager::AddManager()
 {
     static_assert(std::is_base_of<BaseManager, T>::value, "T must inherit from BaseManager");
-    if (mManagers.find(typeid(T)) == mManagers.end()) // Prevent overwriting existing managers
+    if (mManagers.find(typeid(T)) == mManagers.end())
     {
         mManagers[typeid(T)] = new T(this);
     }
@@ -381,7 +375,7 @@ GameObject * GameManager::GetRootGameObject()
 
 void GameManager::InitWindow()
 {
-    mpWindow = new sf::RenderWindow(sf::VideoMode(1000, 1000), "Game", sf::Style::Default);
+    mpWindow = new sf::RenderWindow(sf::VideoMode(1800, 1200), "Game", sf::Style::Default);
     mpWindow->setFramerateLimit(240);
 
     std::string file = "Art/Background/background2.png";

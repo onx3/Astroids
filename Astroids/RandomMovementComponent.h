@@ -1,19 +1,23 @@
 #pragma once
 #include "GameComponent.h"
 #include <SFML/System.hpp>
-#include <random>
 
 class RandomMovementComponent : public GameComponent
 {
 public:
-	RandomMovementComponent(GameObject * pOwner);
-	virtual ~RandomMovementComponent();
+    RandomMovementComponent(GameObject * pOwner);
+    virtual ~RandomMovementComponent();
 
-	void Update() override;
+    void Update() override;
 
 private:
-	float mVelocity;
-	sf::Vector2f mDirection;
+    float mVelocity;
+    bool mIsEntering;
+    bool mSkipBoundaryCheck;
+    bool mHasEnteredScreen;
+    sf::Vector2f mDirection;
+    sf::Vector2f mStartPosition;
+    sf::Vector2f mTargetPosition;
 };
 
 //------------------------------------------------------------------------------------------------------------------------
