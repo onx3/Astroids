@@ -24,8 +24,9 @@ ExplosionComponent::ExplosionComponent(GameObject * pOwner, const std::string & 
 
     // Sound
     {
-        assert(mSoundBuffer.loadFromFile("Art/explosion.wav"));
+        assert(mSoundBuffer.loadFromFile("Audio/explosion.wav"));
         mSound.setBuffer(mSoundBuffer);
+        mSound.setVolume(20.f);
     }
 }
 

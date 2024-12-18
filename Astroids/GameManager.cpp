@@ -21,6 +21,7 @@ GameManager::GameManager()
     , mManagers()
     , mCursorTexture()
     , mCursorSprite()
+    , mSoundPlayed(false)
 {
     mClock.restart();
     InitWindow();
@@ -30,6 +31,14 @@ GameManager::GameManager()
     AddManager<PlayerManager>();
     AddManager<EnemyAIManager>();
     AddManager<ScoreManager>();
+
+    // Game Audio
+    {
+        assert(mSoundBuffer.loadFromFile("Audio/ThroughSpace.ogg"));
+        mSound.setBuffer(mSoundBuffer);
+        mSound.setVolume(25.f);
+        mSound.setLoop(true);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -90,6 +99,13 @@ void GameManager::PollEvents()
 
 void GameManager::Update()
 {
+    // Game Audio
+    if (!mSoundPlayed)
+    {
+        mSound.play();
+        mSoundPlayed = true;
+    }
+
     PollEvents();
 
     UpdateGameObjects();
@@ -375,7 +391,7 @@ void GameManager::InitWindow()
     // Scale to window size
     mBackgroundSprite.setScale(float(mpWindow->getSize().x) / mBackgroundTexture.getSize().x, float(mpWindow->getSize().y) / mBackgroundTexture.getSize().y);
 
-    assert(mCursorTexture.loadFromFile("Art/file.png"));
+    assert(mCursorTexture.loadFromFile("Art/Crosshair.png"));
     mCursorSprite.setTexture(mCursorTexture);
     mCursorSprite.setScale(.25f, .25f);
 
@@ -386,8 +402,6 @@ void GameManager::InitWindow()
     );
 
     ImGui::CreateContext();
-    ImGuiIO & io = ImGui::GetIO();
-    //io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
     ImGui::SFML::Init(*mpWindow);
 
     mpWindow->setMouseCursorVisible(false);

@@ -90,6 +90,18 @@ void PlayerManager::Update()
         // Call GameManager to end the game
         mpGameManager->EndGame();
     }
+    else
+    {
+        for (auto * pPlayer : mPlayerObjects)
+        {
+            auto pHealthComp = pPlayer->GetComponent<HealthComponent>().lock();
+            if (pHealthComp->GetLives() == 1)
+            {
+                auto pSpriteComponent = pPlayer->GetComponent<SpriteComponent>().lock();
+                pSpriteComponent->SetSprite("Art/playerDamaged.png", pSpriteComponent->GetSprite().getScale());
+            }
+        }
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------

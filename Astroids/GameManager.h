@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
+#include <SFML/Audio.hpp>
 #include "EnemyAIManager.h"
 #include "GameObject.h"
 #include "ScoreManager.h"
@@ -61,5 +62,10 @@ private:
 	GameObject * mpRootGameObject;
 
 	sf::Clock mClock;
+
+	// Audio
+	sf::SoundBuffer mSoundBuffer;
+	sf::Sound mSound;
+	bool mSoundPlayed;
 };
 
