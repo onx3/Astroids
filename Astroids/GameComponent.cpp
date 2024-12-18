@@ -29,11 +29,20 @@ void GameComponent::draw(sf::RenderTarget & target, sf::RenderStates states) con
 
 }
 
+//------------------------------------------------------------------------------------------------------------------------
+
 void GameComponent::DebugImGuiComponentInfo()
 {
 #if IMGUI_ENABLED()
     //ImGui::Text("This component doesn't hold any info.");
 #endif
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+std::string GameComponent::GetClassName()
+{
+    return "Please fill in component name\n";
 }
 
 //------------------------------------------------------------------------------------------------------------------------

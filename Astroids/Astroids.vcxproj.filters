@@ -38,9 +38,6 @@
     <ClCompile Include="ProjectileComponent.cpp">
       <Filter>Source Files\GameComponents</Filter>
     </ClCompile>
-    <ClCompile Include="EnemyAIManager.cpp">
-      <Filter>Source Files\GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files\GameObject</Filter>
     </ClCompile>
@@ -80,6 +77,12 @@
     <ClCompile Include="ScoreManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="EnemyAIManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -93,9 +96,6 @@
     </ClInclude>
     <ClInclude Include="ProjectileComponent.h">
       <Filter>Source Files\GameComponents</Filter>
-    </ClInclude>
-    <ClInclude Include="EnemyAIManager.h">
-      <Filter>Source Files\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Source Files\GameObject</Filter>
@@ -121,5 +121,9 @@
     <ClInclude Include="ScoreManager.h">
       <Filter>Source Files\Managers</Filter>
     </ClInclude>
+    <ClInclude Include="EnemyAIManager.h">
+      <Filter>Source Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerManager.h" />
   </ItemGroup>
 </Project>

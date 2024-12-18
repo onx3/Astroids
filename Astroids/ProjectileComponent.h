@@ -2,6 +2,7 @@
 #include "GameComponent.h"
 #include <SFML/System/Vector2.hpp>
 #include "GameObject.h"
+#include "CollisionComponent.h"
 
 enum class EProjectile
 {
@@ -26,8 +27,6 @@ public:
 	void DebugImGuiComponentInfo() override;
 
 private:
-	void UpdateProjectiles(float deltaTime);
-
 	struct Projectile
 	{
 		GameObject * pObject;
@@ -35,6 +34,10 @@ private:
 		int damage;
 		sf::Vector2f direction;
 	};
+
+	void UpdateProjectiles(float deltaTime);
+
+	void CheckCollisionsForProjectile(GameObject * root, Projectile & projectile, std::shared_ptr<CollisionComponent> pProjectileCollision);
 
 	std::vector<Projectile> mProjectiles;
 

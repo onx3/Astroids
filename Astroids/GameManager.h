@@ -16,10 +16,16 @@ public:
 	GameManager();
 	~GameManager();
 
+	void EndGame();
+
 	void Update();
 	void UpdateGameObjects();
 
 	void Render();
+
+	void CheckCollision();
+
+	void CheckCollisionRecursive(GameObject * root, GameObject * pPlayer);
 
 	template <typename T>
 	void AddManager();
@@ -27,17 +33,19 @@ public:
 	template <typename T>
 	T * GetManager();
 
-	std::vector<GameObject *> & GetGameObjects();
+	GameObject * CreateNewGameObject(ETeam team, GameObject * pParent);
 
+	GameObject * GetRootGameObject();
 	sf::RenderWindow * mpWindow;
 	sf::Event mEvent;
 
 private:
+	void CleanUpDestroyedGameObjects(GameObject * pRoot);
+
 	void PollEvents();
 
 	void RenderImGui();
 
-	void InitPlayer();
 	void InitWindow();
 
 	std::unordered_map<std::type_index, BaseManager *> mManagers;
@@ -45,7 +53,7 @@ private:
 	sf::Texture mBackgroundTexture;
 	sf::Sprite mBackgroundSprite;
 
-	std::vector<GameObject *> mGameObjects;
+	GameObject * mpRootGameObject;
 
 	sf::Clock mClock;
 };

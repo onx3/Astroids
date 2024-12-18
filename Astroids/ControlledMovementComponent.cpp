@@ -80,14 +80,21 @@ void ControlledMovementComponent::Update()
         pSpriteComponent->SetPosition(position);
 
         // Rotation towards the mouse
-        sf::RenderWindow * window = GetGameObject().GetGameManager().mpWindow;
-        sf::Vector2i mousePosition = sf::Mouse::getPosition(*window);
+        sf::RenderWindow * pWindow = GetGameObject().GetGameManager().mpWindow;
+        sf::Vector2i mousePosition = sf::Mouse::getPosition(*pWindow);
         sf::Vector2f spriteCenter = position + sf::Vector2f(size.x / 2.f, size.y / 2.f);
 
         sf::Vector2f direction = sf::Vector2f(mousePosition) - spriteCenter;
         float angle = std::atan2(direction.y, direction.x) * 180.f / 3.14159f; // Convert to degrees
         pSpriteComponent->SetRotation(angle + 90.f);
     }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+std::string ControlledMovementComponent::GetClassName()
+{
+    return "ControlledMovementComponent";
 }
 
 //------------------------------------------------------------------------------------------------------------------------

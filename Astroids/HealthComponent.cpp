@@ -1,5 +1,6 @@
 #include "HealthComponent.h"
 #include "iostream"
+#include "PlayerManager.h"
 
 HealthComponent::HealthComponent(GameObject * pOwner, int initialHealth, int maxHealth, int lifeCount, int maxLives, float hitCooldown)
 	: GameComponent(pOwner)

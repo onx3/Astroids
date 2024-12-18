@@ -1,6 +1,7 @@
 #include "ProjectileComponent.h"
 #include <iostream>
 #include <cmath>
+#include <stack>
 #include "SFML/Graphics.hpp"
 #include "imgui.h"
 #include "GameObject.h"
@@ -8,6 +9,7 @@
 #include "CollisionComponent.h"
 #include "HealthComponent.h"
 #include "BDConfig.h"
+#include "PlayerManager.h"
 
 ProjectileComponent::ProjectileComponent(GameObject * pOwner)
 	: GameComponent(pOwner)
@@ -46,8 +48,7 @@ std::string ProjectileComponent::GetCorrectProjectileFile()
 
 void ProjectileComponent::Shoot()
 {
-	auto * pProjectile = new GameObject(&GetGameObject().GetGameManager());
-	pProjectile->SetTeam(mpOwner->GetTeam()); // Optional, match team if implemented
+	auto * pProjectile = mpOwner->GetGameManager().CreateNewGameObject(mpOwner->GetTeam(), mpOwner);
 
 	auto pProjectileSpriteComponent = pProjectile->GetComponent<SpriteComponent>().lock();
 	if (pProjectileSpriteComponent)
@@ -100,9 +101,6 @@ void ProjectileComponent::Shoot()
 		// Add the projectile to the projectiles list
 		mProjectiles.push_back({ pProjectile, 3.f, 15, direction });
 	}
-
-	// Add the projectile to the GameManager's object list
-	GetGameObject().GetGameManager().GetGameObjects().push_back(pProjectile);
 }
 
 
@@ -156,62 +154,97 @@ void ProjectileComponent::DebugImGuiComponentInfo()
 
 void ProjectileComponent::UpdateProjectiles(float deltaTime)
 {
+	auto & gameManager = mpOwner->GetGameManager();
+
+	// Iterate through all projectiles
 	for (auto & projectile : mProjectiles)
 	{
+		// Update projectile position
 		auto pSpriteComponent = projectile.pObject->GetComponent<SpriteComponent>().lock();
 		auto pCollisionComponent = projectile.pObject->GetComponent<CollisionComponent>().lock();
 
 		if (pSpriteComponent && pCollisionComponent)
 		{
 			sf::Vector2f position = pSpriteComponent->GetPosition();
-			position += projectile.direction * mSpeed * deltaTime;
+			position += projectile.direction * mSpeed * deltaTime; // Move the projectile
 			pSpriteComponent->SetPosition(position);
 
-			auto & gameObjects = GetGameObject().GetGameManager().GetGameObjects();
-			for (auto * pGameObject : gameObjects)
-			{
-				if (pGameObject != projectile.pObject && pGameObject->GetTeam() != projectile.pObject->GetTeam())
-				{
-					auto targetCollision = pGameObject->GetComponent<CollisionComponent>().lock();
-					if (targetCollision && pCollisionComponent->CheckCollision(*targetCollision))
-					{
-						std::cout << "Projectile hit an object!\n";
-
-						auto pHealthComponent = pGameObject->GetComponent<HealthComponent>().lock();
-						if (pHealthComponent)
-						{
-							pHealthComponent->LooseHealth(projectile.damage);
-							if (mpOwner->GetTeam() == ETeam::Player)
-							{
-								mpOwner->GetGameManager().GetManager<ScoreManager>()->AddScore(1000);
-							}
-						}
-
-						if (!projectile.pObject->IsDestroyed())
-						{
-							projectile.pObject->Destroy();
-							projectile.lifespan = 0.0f;
-						}
-						break;
-					}
-				}
-			}
+			// Check for collisions in the GameObject hierarchy
+			CheckCollisionsForProjectile(gameManager.GetRootGameObject(), projectile, pCollisionComponent);
 		}
 
+		// Check lifespan
 		projectile.lifespan -= deltaTime;
 		if (projectile.lifespan <= 0.0f && !projectile.pObject->IsDestroyed())
 		{
-			projectile.pObject->Destroy();
+			projectile.pObject->Destroy(); // Destroy projectile if lifespan expired
 		}
 	}
 
-	// Remove expired projectiles
+	// Remove destroyed or expired projectiles
 	mProjectiles.erase(
 		std::remove_if(mProjectiles.begin(), mProjectiles.end(),
 			[](const Projectile & proj) {
 				return proj.pObject->IsDestroyed() || proj.lifespan <= 0.0f;
 			}),
 		mProjectiles.end());
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void ProjectileComponent::CheckCollisionsForProjectile(GameObject* root, Projectile & projectile, std::shared_ptr<CollisionComponent> pProjectileCollision)
+{
+    if (!root) return;
+
+    std::stack<GameObject *> stack;
+    stack.push(root);
+
+    while (!stack.empty())
+    {
+        GameObject* current = stack.top();
+        stack.pop();
+
+        // Skip self and same-team GameObjects
+        if (current != projectile.pObject && current->GetTeam() != projectile.pObject->GetTeam())
+        {
+            auto targetCollision = current->GetComponent<CollisionComponent>().lock();
+            if (targetCollision && pProjectileCollision->CheckCollision(*targetCollision))
+            {
+                auto pHealthComponent = current->GetComponent<HealthComponent>().lock();
+                if (pHealthComponent)
+                {
+                    // Deal damage
+                    pHealthComponent->LooseHealth(projectile.damage);
+
+                    // Award score if owner is the player
+                    auto* pPlayerManager = mpOwner->GetGameManager().GetManager<PlayerManager>();
+                    auto* pPlayer = pPlayerManager ? pPlayerManager->GetPlayers()[0] : nullptr;
+
+                    if (pPlayer && mpOwner == pPlayer)
+                    {
+                        mpOwner->GetGameManager().GetManager<ScoreManager>()->AddScore(1000);
+                    }
+                }
+
+                // Destroy the projectile after collision
+                if (!projectile.pObject->IsDestroyed())
+                {
+                    projectile.pObject->Destroy();
+                    projectile.lifespan = 0.0f;
+                }
+                return; // Stop further checks for this projectile
+            }
+        }
+
+        // Push all children onto the stack for further checks
+        for (auto* child : current->GetChildren())
+        {
+            if (child)
+            {
+                stack.push(child);
+            }
+        }
+    }
 }
 
 
