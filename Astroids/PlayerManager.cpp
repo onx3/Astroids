@@ -4,11 +4,24 @@
 #include "ProjectileComponent.h"
 #include "HealthComponent.h"
 #include "CollisionComponent.h"
+#include <cassert>
 
 PlayerManager::PlayerManager(GameManager * pGameManager)
-	: BaseManager(pGameManager)
+    : BaseManager(pGameManager)
+    , mSoundPlayed(false)
 {
     InitPlayer();
+
+    // Sound
+    {
+        assert(mLoseLifeSoundBuffer.loadFromFile("Audio/LoseLifeSound.wav"));
+        mLoseLifeSound.setBuffer(mLoseLifeSoundBuffer);
+        mLoseLifeSound.setVolume(100.f);
+        
+        assert(mDeathSoundBuffer.loadFromFile("Audio/Death.flac"));
+        mDeathSound.setBuffer(mDeathSoundBuffer);
+        mDeathSound.setVolume(50.f);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -22,7 +35,6 @@ PlayerManager::~PlayerManager()
 void PlayerManager::InitPlayer()
 {
     auto * pPlayer = mpGameManager->CreateNewGameObject(ETeam::Friendly, mpGameManager->GetRootGameObject());
-
     mPlayerObjects.push_back(pPlayer);
 
     // Sprite Component
@@ -31,7 +43,6 @@ void PlayerManager::InitPlayer()
         sf::Vector2f centerPosition(float(windowSize.x) / 2.0f, float(windowSize.y) / 2.0f);
 
         auto pSpriteComponent = pPlayer->GetComponent<SpriteComponent>().lock();
-
         if (pSpriteComponent)
         {
             std::string file = "Art/player.png";
@@ -87,7 +98,6 @@ void PlayerManager::Update()
 
     if (mPlayerObjects.empty())
     {
-        // Call GameManager to end the game
         mpGameManager->EndGame();
     }
     else
@@ -95,12 +105,53 @@ void PlayerManager::Update()
         for (auto * pPlayer : mPlayerObjects)
         {
             auto pHealthComp = pPlayer->GetComponent<HealthComponent>().lock();
-            if (pHealthComp->GetLives() == 1)
+
+            // Set the life lost callback
+            if (pHealthComp)
+            {
+                pHealthComp->SetLifeLostCallback([this, pPlayer]() {
+                    OnPlayerLostLife(pPlayer);
+                    }); 
+                pHealthComp->SetDeathCallBack([this, pPlayer]() {
+                    OnPlayerDeath(pPlayer);
+                    });
+            }
+
+            if (pHealthComp && pHealthComp->GetLives() == 1)
             {
                 auto pSpriteComponent = pPlayer->GetComponent<SpriteComponent>().lock();
-                pSpriteComponent->SetSprite("Art/playerDamaged.png", pSpriteComponent->GetSprite().getScale());
+                if (pSpriteComponent)
+                {
+                    pSpriteComponent->SetSprite("Art/playerDamaged.png", pSpriteComponent->GetSprite().getScale());
+                }
             }
         }
+
+        // Reset the sound flag if the sound has finished playing
+        if (mLoseLifeSound.getStatus() == sf::Sound::Stopped)
+        {
+            mSoundPlayed = false;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void PlayerManager::OnPlayerLostLife(GameObject * pPlayer)
+{
+    if (!mSoundPlayed)
+    {
+        mLoseLifeSound.play();
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void PlayerManager::OnPlayerDeath(GameObject * pPlayer)
+{
+    if (!mSoundPlayed)
+    {
+        mDeathSound.play();
     }
 }
 
@@ -117,12 +168,11 @@ void PlayerManager::CleanUpDeadPlayers()
     mPlayerObjects.erase(newEnd, mPlayerObjects.end());
 }
 
-
 //------------------------------------------------------------------------------------------------------------------------
 
 const std::vector<GameObject *> & PlayerManager::GetPlayers() const
 {
-	return mPlayerObjects;
+    return mPlayerObjects;
 }
 
 //------------------------------------------------------------------------------------------------------------------------

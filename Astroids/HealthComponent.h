@@ -1,11 +1,11 @@
 #pragma once
 #include "GameComponent.h"
+#include <functional>
+
 class HealthComponent : public GameComponent
 {
 public:
 	HealthComponent(GameObject * pOwner, int initialHealth, int maxHealth, int lifeCount, int maxLives, float hitCooldown = 0.f);
-
-	void TakeDamage(int amount);
 
 	int GetHealth() const;
 	void AddHealth(int amount);
@@ -13,9 +13,13 @@ public:
 
 	int GetLives() const;
 	void AddLife(int amount);
+	void LoseLife();
 
 	int GetMaxHealth() const;
 	void AddMaxHealth(int amount);
+
+	void SetDeathCallBack(std::function<void()> callback);
+	void SetLifeLostCallback(std::function<void()> callback);
 
 	virtual void Update() override;
 
@@ -31,6 +35,9 @@ private:
 	float mTimeSinceLastHit;
 	std::string mName;
 	sf::Clock mClock;
+	
+	std::function<void()> mLifeLostCallback;
+	std::function<void()> mDeathCallback;
 };
 
 //------------------------------------------------------------------------------------------------------------------------

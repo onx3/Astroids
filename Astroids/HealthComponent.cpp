@@ -4,6 +4,7 @@
 #include "ExplosionComponent.h"
 #include "SpriteComponent.h"
 #include "imgui.h"
+#include <functional>
 
 HealthComponent::HealthComponent(GameObject * pOwner, int initialHealth, int maxHealth, int lifeCount, int maxLives, float hitCooldown)
 	: GameComponent(pOwner)
@@ -16,13 +17,6 @@ HealthComponent::HealthComponent(GameObject * pOwner, int initialHealth, int max
 	, mName("HealthComponent")
 {
 	mClock.restart();
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void HealthComponent::TakeDamage(int amount)
-{
-	mHealth -= amount;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -97,6 +91,42 @@ void HealthComponent::AddMaxHealth(int amount)
 
 //------------------------------------------------------------------------------------------------------------------------
 
+void HealthComponent::SetDeathCallBack(std::function<void()> callback)
+{
+	mDeathCallback = callback;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void HealthComponent::SetLifeLostCallback(std::function<void()> callback)
+{
+	mLifeLostCallback = callback;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void HealthComponent::LoseLife()
+{
+	if (mLifeCount == 1)
+	{
+		--mLifeCount;
+		if (mDeathCallback)
+		{
+			mDeathCallback();
+		}
+	}
+	else if (mLifeCount > 0)
+	{
+		--mLifeCount;
+		if (mLifeLostCallback)
+		{
+			mLifeLostCallback();
+		}
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
 void HealthComponent::Update()
 {
 	mTimeSinceLastHit = mClock.getElapsedTime().asSeconds();
@@ -105,6 +135,8 @@ void HealthComponent::Update()
 		if (mLifeCount <= 1)
 		{
 			mpOwner->SetActiveState(false);
+			LoseLife();
+
 			if (!mpOwner->GetComponent<ExplosionComponent>().lock())
 			{
 				auto explosionComp = std::make_shared<ExplosionComponent>(
@@ -121,7 +153,7 @@ void HealthComponent::Update()
 		else
 		{
 			mHealth = mMaxHealth;
-			--mLifeCount;
+			LoseLife();
 		}
 	}
 
@@ -135,9 +167,9 @@ void HealthComponent::Update()
 		if (pSpriteComp)
 		{
 			// Create a flickering effect using sine wave
-			float flicker = std::sin(mTimeSinceLastHit * 10.0f) * 127.5f + 127.5f; // Range [0, 255]
+			float flicker = std::sin(mTimeSinceLastHit * 10.0f) * 127.5f + 127.5f;
 			sf::Color spriteColor = pSpriteComp->GetSprite().getColor();
-			spriteColor.a = static_cast<sf::Uint8>(flicker); // Set alpha transparency
+			spriteColor.a = static_cast<sf::Uint8>(flicker);
 			pSpriteComp->GetSprite().setColor(spriteColor);
 		}
 	}
