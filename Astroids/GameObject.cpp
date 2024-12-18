@@ -12,6 +12,7 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pPar
     : mDeltaTime(0.f)
     , mpGameManager(pGameManager)
     , mIsDestroyed(false)
+    , mIsActive(true)
     , mTeam(team)
     , mChildGameObjects()
 {
@@ -203,6 +204,20 @@ std::vector<GameComponent *> GameObject::GetAllComponents()
     }
 
     return components;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::SetActiveState(bool active)
+{
+    mIsActive = active;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+bool GameObject::IsActive()
+{
+    return mIsActive;
 }
 
 //------------------------------------------------------------------------------------------------------------------------

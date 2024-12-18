@@ -83,6 +83,9 @@
     <ClCompile Include="PlayerManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ExplosionComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -125,5 +128,6 @@
       <Filter>Source Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="PlayerManager.h" />
+    <ClInclude Include="ExplosionComponent.h" />
   </ItemGroup>
 </Project>

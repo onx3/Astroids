@@ -129,7 +129,7 @@ void ProjectileComponent::Update()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void ProjectileComponent::draw(sf::RenderTarget & target, sf::RenderStates states) const
+void ProjectileComponent::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
 	for (auto & projectile : mProjectiles)
 	{

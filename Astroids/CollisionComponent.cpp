@@ -24,7 +24,11 @@ sf::FloatRect CollisionComponent::GetBounds() const
 
 bool CollisionComponent::CheckCollision(const CollisionComponent & other) const
 {
-	return GetBounds().intersects(other.GetBounds());
+	if (mpOwner->IsActive() && other.mpOwner->IsActive())
+	{
+		return GetBounds().intersects(other.GetBounds());
+	}
+	return false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------

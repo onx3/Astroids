@@ -22,7 +22,7 @@ public:
 
 	void Update() override;
 
-	void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
+	void draw(sf::RenderTarget & target, sf::RenderStates states) override;
 
 	void DebugImGuiComponentInfo() override;
 

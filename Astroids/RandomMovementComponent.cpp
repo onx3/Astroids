@@ -42,31 +42,34 @@ RandomMovementComponent::~RandomMovementComponent()
 
 void RandomMovementComponent::Update()
 {
-    auto spriteComponent = GetGameObject().GetComponent<SpriteComponent>().lock();
-
-    if (spriteComponent)
+    if (mpOwner->IsActive())
     {
-        // Get current position and window bounds
-        sf::Vector2f position = spriteComponent->GetPosition();
-        sf::Vector2u windowSize = GetGameObject().GetGameManager().mpWindow->getSize();
-        sf::Vector2f size(spriteComponent->GetWidth(), spriteComponent->GetHeight());
+        auto spriteComponent = GetGameObject().GetComponent<SpriteComponent>().lock();
 
-        // Update position based on direction and velocity
-        position += mDirection * mVelocity * GetGameObject().GetDeltaTime();
-
-        if (position.x < 0 || position.x + size.x > windowSize.x)
+        if (spriteComponent)
         {
-            mDirection.x *= -1; // Reverse horizontal direction
-            position.x = std::max(0.f, std::min(position.x, windowSize.x - size.x)); // Clamp position to screen bounds
-        }
-        if (position.y < 0 || position.y + size.y > windowSize.y)
-        {
-            mDirection.y *= -1; // Reverse vertical direction
-            position.y = std::max(0.f, std::min(position.y, windowSize.y - size.y)); // Clamp position to screen bounds
-        }
+            // Get current position and window bounds
+            sf::Vector2f position = spriteComponent->GetPosition();
+            sf::Vector2u windowSize = GetGameObject().GetGameManager().mpWindow->getSize();
+            sf::Vector2f size(spriteComponent->GetWidth(), spriteComponent->GetHeight());
 
-        // Apply the updated position
-        spriteComponent->SetPosition(position);
+            // Update position based on direction and velocity
+            position += mDirection * mVelocity * GetGameObject().GetDeltaTime();
+
+            if (position.x < 0 || position.x + size.x > windowSize.x)
+            {
+                mDirection.x *= -1; // Reverse horizontal direction
+                position.x = std::max(0.f, std::min(position.x, windowSize.x - size.x)); // Clamp position to screen bounds
+            }
+            if (position.y < 0 || position.y + size.y > windowSize.y)
+            {
+                mDirection.y *= -1; // Reverse vertical direction
+                position.y = std::max(0.f, std::min(position.y, windowSize.y - size.y)); // Clamp position to screen bounds
+            }
+
+            // Apply the updated position
+            spriteComponent->SetPosition(position);
+        }
     }
 }
 

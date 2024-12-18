@@ -111,7 +111,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\ExtLibs\SFML\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-system-d.lib;sfml-window-d.lib;sfml-graphics-d.lib;%(AdditionalDependencies);opengl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-audio-d.lib;sfml-system-d.lib;sfml-window-d.lib;sfml-graphics-d.lib;%(AdditionalDependencies);opengl32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -131,13 +131,14 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\ExtLibs\SFML\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-system.lib;sfml-window.lib;sfml-graphics.lib;%(AdditionalDependencies);opengl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-audio.lib;sfml-system.lib;sfml-window.lib;sfml-graphics.lib;%(AdditionalDependencies);opengl32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BaseManager.cpp" />
     <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="ControlledMovementComponent.cpp" />
+    <ClCompile Include="ExplosionComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameComponent.cpp" />
     <ClCompile Include="EnemyAIManager.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="BDConfig.h" />
     <ClInclude Include="CollisionComponent.h" />
     <ClInclude Include="ControlledMovementComponent.h" />
+    <ClInclude Include="ExplosionComponent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="EnemyAIManager.h" />

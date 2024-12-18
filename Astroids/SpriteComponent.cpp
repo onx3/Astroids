@@ -122,14 +122,17 @@ void SpriteComponent::Update()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void SpriteComponent::draw(sf::RenderTarget & target, sf::RenderStates states) const
+void SpriteComponent::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-    target.draw(mSprite, states);
+    if (mpOwner->IsActive())
+    {
+        target.draw(mSprite, states);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-sf::Sprite SpriteComponent::GetSprite()
+sf::Sprite & SpriteComponent::GetSprite()
 {
     return mSprite;
 }
