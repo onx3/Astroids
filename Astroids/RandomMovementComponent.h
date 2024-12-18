@@ -18,6 +18,8 @@ private:
     sf::Vector2f mDirection;
     sf::Vector2f mStartPosition;
     sf::Vector2f mTargetPosition;
+
+    std::string mName;
 };
 
 //------------------------------------------------------------------------------------------------------------------------

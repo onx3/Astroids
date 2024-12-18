@@ -5,6 +5,7 @@
 
 GameComponent::GameComponent(GameObject * pOwner)
     : mpOwner(pOwner)
+    , mName("GameComponent")
 {
 }
 
@@ -40,9 +41,9 @@ void GameComponent::DebugImGuiComponentInfo()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-std::string GameComponent::GetClassName()
+std::string & GameComponent::GetClassName()
 {
-    return "Please fill in component name\n";
+    return mName;
 }
 
 //------------------------------------------------------------------------------------------------------------------------

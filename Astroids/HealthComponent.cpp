@@ -3,6 +3,7 @@
 #include "PlayerManager.h"
 #include "ExplosionComponent.h"
 #include "SpriteComponent.h"
+#include "imgui.h"
 
 HealthComponent::HealthComponent(GameObject * pOwner, int initialHealth, int maxHealth, int lifeCount, int maxLives, float hitCooldown)
 	: GameComponent(pOwner)
@@ -12,6 +13,7 @@ HealthComponent::HealthComponent(GameObject * pOwner, int initialHealth, int max
 	, mMaxLives(maxLives)
 	, mHitCooldown(hitCooldown)
 	, mTimeSinceLastHit(0.f)
+	, mName("HealthComponent")
 {
 	mClock.restart();
 }
@@ -106,11 +108,10 @@ void HealthComponent::Update()
 			if (!mpOwner->GetComponent<ExplosionComponent>().lock())
 			{
 				auto explosionComp = std::make_shared<ExplosionComponent>(
-					mpOwner, "Art/explosion.png", 32, 32, 7, 0.1f); // Example values
+					mpOwner, "Art/explosion.png", 32, 32, 7, 0.1f);
 				mpOwner->AddComponent(explosionComp);
 			}
 
-			// Delay removal until the explosion animation is complete
 			auto explosionComp = mpOwner->GetComponent<ExplosionComponent>().lock();
 			if (explosionComp && explosionComp->IsAnimationFinished())
 			{
@@ -150,6 +151,23 @@ void HealthComponent::Update()
 			pSpriteComp->GetSprite().setColor(spriteColor);
 		}
 	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void HealthComponent::DebugImGuiComponentInfo()
+{
+	ImGui::Text("Current amount of lives: %i", mLifeCount);
+	ImGui::Text("Max Lives: %i", mMaxLives);
+	ImGui::Text("Current Health: %i", mHealth);
+	ImGui::Text("Max Health: %i", mMaxHealth);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+std::string & HealthComponent::GetClassName()
+{
+	return mName;
 }
 
 //------------------------------------------------------------------------------------------------------------------------

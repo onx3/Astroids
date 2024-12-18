@@ -30,15 +30,17 @@ public:
 	void SetOriginToCenter();
 
 	virtual void Update() override;
-
 	virtual void draw(sf::RenderTarget & target, sf::RenderStates states) override;
+	virtual void DebugImGuiComponentInfo() override;
+	virtual std::string & GetClassName() override;
 
 private:
 	sf::Texture mTexture;
 	sf::Sprite mSprite;
-
 	float mRotationSpeed;
 	float mCurrentRotation;
+	std::string mFile;
+	std::string mName;
 };
 
 //------------------------------------------------------------------------------------------------------------------------

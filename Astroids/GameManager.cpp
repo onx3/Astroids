@@ -11,9 +11,10 @@
 #include "HealthComponent.h"
 #include "PlayerManager.h"
 
-GameManager::GameManager()
-    : mpWindow(nullptr)
-    , mEvent()
+GameManager::GameManager(WindowManager & windowManager)
+    : mWindowManager(windowManager)
+    , mpWindow(windowManager.GetWindow())
+    , mEvent(windowManager.GetEvent())
     , mBackgroundTexture()
     , mBackgroundSprite()
     , mShowImGuiWindow(false)
@@ -22,6 +23,7 @@ GameManager::GameManager()
     , mCursorTexture()
     , mCursorSprite()
     , mSoundPlayed(false)
+    , mIsGameOver(false)
 {
     mClock.restart();
     InitWindow();
@@ -39,6 +41,23 @@ GameManager::GameManager()
         mSound.setVolume(25.f);
         mSound.setLoop(true);
     }
+
+    // End Game
+    {
+        assert(mFont.loadFromFile("Art/font.ttf"));
+
+        mGameOverText.setFont(mFont);
+        mGameOverText.setString("GAME OVER");
+        mGameOverText.setCharacterSize(64);
+        mGameOverText.setFillColor(sf::Color::Green);
+        mGameOverText.setPosition(700, 400);
+
+        // Setup Score text
+        mScoreText.setFont(mFont);
+        mScoreText.setCharacterSize(32);
+        mScoreText.setFillColor(sf::Color::Green);
+        mScoreText.setPosition(700, 500);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -53,9 +72,6 @@ GameManager::~GameManager()
             manager.second = nullptr;
         }
     }
-
-    delete mpWindow;
-    ImGui::SFML::Shutdown();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -67,32 +83,7 @@ void GameManager::EndGame()
         delete mpRootGameObject;
         mpRootGameObject = nullptr;
     }
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameManager::PollEvents()
-{
-    ImGui::SFML::ProcessEvent(mEvent);
-    while (mpWindow->pollEvent(mEvent))
-    {
-        switch (mEvent.type)
-        {
-            case sf::Event::Closed:
-            {
-                mpWindow->close();
-                break;
-            }
-            case sf::Event::KeyPressed:
-            {
-                if (mEvent.key.code == sf::Keyboard::Escape)
-                {
-                    mpWindow->close();
-                }
-                break;
-            }
-        }
-    }
+    GameOver();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -105,8 +96,6 @@ void GameManager::Update()
         mSound.play();
         mSoundPlayed = true;
     }
-
-    PollEvents();
 
     UpdateGameObjects();
 
@@ -226,10 +215,15 @@ void GameManager::RenderImGui()
         {
             ImGui::Text("GameObject %p", pSelectedGameObject);
 
-            for (auto * component : pSelectedGameObject->GetAllComponents())
+            for (auto * pComponent : pSelectedGameObject->GetAllComponents())
             {
-                std::string componentLabel = "class " + component->GetClassName();
-                ImGui::BulletText("%s", componentLabel.c_str());
+                std::string componentLabel = "" + pComponent->GetClassName();
+
+                // Use CollapsingHeader for each component
+                if (ImGui::CollapsingHeader(componentLabel.c_str()))
+                {
+                    pComponent->DebugImGuiComponentInfo();
+                }
             }
         }
         else
@@ -252,39 +246,52 @@ void GameManager::RenderImGui()
 void GameManager::Render()
 {
     mpWindow->clear();
-
-    // Show mouse cursor if ImGui window is open
-    if (!mShowImGuiWindow)
-    {
-        mpWindow->setMouseCursorVisible(false);
-    }
-
-    // Draw background
-    mpWindow->draw(mBackgroundSprite);
-
-    // Draw all GameObjects
-    if (mpRootGameObject)
-    {
-        mpWindow->draw(*mpRootGameObject);
-    }
-
-    // Draw UI
-    {
-        auto * pScoreManager = GetManager<ScoreManager>();
-        mpWindow->draw(pScoreManager->GetScoreText());
-
-        auto & spriteLives = pScoreManager->GetSpriteLives();
-        for (auto & life : spriteLives)
-        {
-            mpWindow->draw(life);
-        }
-    }
     
-    // Draw Mouse Cursor
+    if (mIsGameOver)
     {
-        sf::Vector2i mousePosition = sf::Mouse::getPosition(*mpWindow);
-        mCursorSprite.setPosition(float(mousePosition.x), float(mousePosition.y));
-        mpWindow->draw(mCursorSprite);
+        mpWindow->draw(mBackgroundSprite);
+        mpWindow->draw(mGameOverText);
+        mpWindow->draw(mScoreText);
+    }
+    else
+    {
+        // Show mouse cursor if ImGui window is open
+        if (!mShowImGuiWindow)
+        {
+            mpWindow->setMouseCursorVisible(false);
+        }
+        else
+        {
+            mpWindow->setMouseCursorVisible(true);
+        }
+
+        // Draw background
+        mpWindow->draw(mBackgroundSprite);
+
+        // Draw all GameObjects
+        if (mpRootGameObject)
+        {
+            mpWindow->draw(*mpRootGameObject);
+        }
+
+        // Draw UI
+        {
+            auto * pScoreManager = GetManager<ScoreManager>();
+            mpWindow->draw(pScoreManager->GetScoreText());
+
+            auto & spriteLives = pScoreManager->GetSpriteLives();
+            for (auto & life : spriteLives)
+            {
+                mpWindow->draw(life);
+            }
+        }
+
+        // Draw Mouse Cursor
+        {
+            sf::Vector2i mousePosition = sf::Mouse::getPosition(*mpWindow);
+            mCursorSprite.setPosition(float(mousePosition.x), float(mousePosition.y));
+            mpWindow->draw(mCursorSprite);
+        }
     }
 
     RenderImGui();
@@ -373,11 +380,15 @@ GameObject * GameManager::GetRootGameObject()
 
 //------------------------------------------------------------------------------------------------------------------------
 
+bool GameManager::IsGameOver() const
+{
+    return mIsGameOver;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
 void GameManager::InitWindow()
 {
-    mpWindow = new sf::RenderWindow(sf::VideoMode(1800, 1200), "Game", sf::Style::Default);
-    mpWindow->setFramerateLimit(240);
-
     std::string file = "Art/Background/background2.png";
     assert(mBackgroundTexture.loadFromFile(file));
     mBackgroundSprite.setTexture(mBackgroundTexture);
@@ -395,10 +406,26 @@ void GameManager::InitWindow()
         localBounds.height / 2.0f
     );
 
-    ImGui::CreateContext();
-    ImGui::SFML::Init(*mpWindow);
-
     mpWindow->setMouseCursorVisible(false);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameManager::GameOver()
+{
+    mIsGameOver = true;
+
+    auto * pScoreManager = GetManager<ScoreManager>();
+    if (pScoreManager)
+    {
+        mScoreText.setString("Score: " + std::to_string(pScoreManager->GetScore()) + "\n" + "Press ENTER to Play Again!");
+    }
+
+    if (mpRootGameObject)
+    {
+        delete mpRootGameObject;
+        mpRootGameObject = nullptr;
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------

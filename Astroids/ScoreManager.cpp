@@ -15,7 +15,7 @@ ScoreManager::ScoreManager(GameManager * pGameManager)
 	}
 	mScoreText.setFont(mFont);
 	mScoreText.setCharacterSize(24);
-	mScoreText.setFillColor(sf::Color::White);
+	mScoreText.setFillColor(sf::Color::Green);
 	mScoreText.setOutlineColor(sf::Color::Black);
 	mScoreText.setPosition(10.f, 10.f); // Top-left corner
 	mScoreText.setString("Score: 0");
@@ -70,6 +70,13 @@ std::vector<sf::Sprite> & ScoreManager::GetSpriteLives()
     }
 
     return mSpriteLives;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+int ScoreManager::GetScore()
+{
+	return mScore;
 }
 
 

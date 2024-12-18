@@ -55,23 +55,23 @@ sf::Vector2f EnemyAIManager::GetRandomSpawnPosition()
 
     switch (edge)
     {
-        case 0: // Top (above screen)
+        case 0: // Top
             spawnPosition.x = static_cast<float>(rand() % screenWidth);
-            spawnPosition.y = -spawnOffset; // Further above the screen
+            spawnPosition.y = -spawnOffset;
             break;
 
-        case 1: // Bottom (below screen)
+        case 1: // Bottom
             spawnPosition.x = static_cast<float>(rand() % screenWidth);
-            spawnPosition.y = static_cast<float>(screenHeight) + spawnOffset; // Further below the screen
+            spawnPosition.y = static_cast<float>(screenHeight) + spawnOffset;
             break;
 
-        case 2: // Left (left of screen)
-            spawnPosition.x = -spawnOffset; // Further left of the screen
+        case 2: // Left
+            spawnPosition.x = -spawnOffset;
             spawnPosition.y = static_cast<float>(rand() % screenHeight);
             break;
 
-        case 3: // Right (right of screen)
-            spawnPosition.x = static_cast<float>(screenWidth) + spawnOffset; // Further right of the screen
+        case 3: // Right
+            spawnPosition.x = static_cast<float>(screenWidth) + spawnOffset;
             spawnPosition.y = static_cast<float>(rand() % screenHeight);
             break;
     }
@@ -83,7 +83,7 @@ sf::Vector2f EnemyAIManager::GetRandomSpawnPosition()
 
 void EnemyAIManager::RemoveEnemy(GameObject * pEnemy)
 {
-    pEnemy->Destroy(); // Use GameObject's Destroy function
+    pEnemy->Destroy();
 }
 
 //------------------------------------------------------------------------------------------------------------------------

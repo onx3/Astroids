@@ -13,6 +13,7 @@ RandomMovementComponent::RandomMovementComponent(GameObject * pOwner)
     , mIsEntering(true)
     , mSkipBoundaryCheck(true)
     , mHasEnteredScreen(false)
+    , mName("RandomMovementComponent")
 {
     static std::random_device rd;
     static std::mt19937 rng(rd());

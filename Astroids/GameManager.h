@@ -10,11 +10,12 @@
 #include "GameObject.h"
 #include "ScoreManager.h"
 #include "BaseManager.h"
+#include "WindowManager.h"
 
 class GameManager
 {
 public:
-	GameManager();
+	GameManager(WindowManager & windowManager);
 	~GameManager();
 
 	void EndGame();
@@ -37,35 +38,41 @@ public:
 	GameObject * CreateNewGameObject(ETeam team, GameObject * pParent);
 
 	GameObject * GetRootGameObject();
+
+	bool IsGameOver() const;
+
+	// Window
+	WindowManager & mWindowManager;
 	sf::RenderWindow * mpWindow;
 	sf::Event mEvent;
 
 private:
 	void CleanUpDestroyedGameObjects(GameObject * pRoot);
 
-	void PollEvents();
-
 	void RenderImGui();
 
 	void InitWindow();
+	
+	void GameOver();
 
 	bool mShowImGuiWindow;
-
 	std::unordered_map<std::type_index, BaseManager *> mManagers;
-
 	sf::Texture mBackgroundTexture;
 	sf::Sprite mBackgroundSprite;
-
 	sf::Texture mCursorTexture;
 	sf::Sprite mCursorSprite;
-
 	GameObject * mpRootGameObject;
-
 	sf::Clock mClock;
 
 	// Audio
 	sf::SoundBuffer mSoundBuffer;
 	sf::Sound mSound;
 	bool mSoundPlayed;
+
+	// GameOver
+	bool mIsGameOver;
+	sf::Text mGameOverText;
+	sf::Text mScoreText;
+	sf::Font mFont;
 };
 

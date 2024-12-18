@@ -1,10 +1,13 @@
 #include "SpriteComponent.h"
 #include "cassert"
+#include "imgui.h"
 
 SpriteComponent::SpriteComponent(GameObject * pOwner)
     : GameComponent(pOwner)
     , mRotationSpeed(3.f)
     , mCurrentRotation(0.f)
+    , mFile()
+    , mName("SpriteComponent")
 {
 }
 
@@ -22,6 +25,7 @@ void SpriteComponent::SetSprite(const std::string & file, const sf::Vector2f & s
     {
         assert(false && "Failed to load texture");
     }
+    mFile = file;
     mSprite.setTexture(mTexture);
     mSprite.setScale(scale);
     SetOriginToCenter();
@@ -128,6 +132,20 @@ void SpriteComponent::draw(sf::RenderTarget & target, sf::RenderStates states)
     {
         target.draw(mSprite, states);
     }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void SpriteComponent::DebugImGuiComponentInfo()
+{
+    ImGui::Text("File Path: %s", mFile.c_str());
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+std::string & SpriteComponent::GetClassName()
+{
+    return mName;
 }
 
 //------------------------------------------------------------------------------------------------------------------------

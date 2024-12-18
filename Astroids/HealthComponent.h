@@ -17,8 +17,11 @@ public:
 	int GetMaxHealth() const;
 	void AddMaxHealth(int amount);
 
-	void Update() override;
+	virtual void Update() override;
 
+	virtual void DebugImGuiComponentInfo() override;
+
+	virtual std::string & GetClassName() override;
 private:
 	int mHealth;
 	int mMaxHealth;
@@ -26,7 +29,7 @@ private:
 	int mMaxLives;
 	float mHitCooldown;
 	float mTimeSinceLastHit;
-
+	std::string mName;
 	sf::Clock mClock;
 };
 

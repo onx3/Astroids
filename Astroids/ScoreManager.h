@@ -13,6 +13,7 @@ public:
 	const sf::Text & GetScoreText();
 
 	std::vector<sf::Sprite> & GetSpriteLives();
+	int GetScore();
 
 private:
 	int mScore;
