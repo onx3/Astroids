@@ -1,6 +1,7 @@
 #include "GameManager.h"
 #include <cassert>
 #include <imgui.h>
+#include <stack>
 #include <imgui-SFML.h>
 #include "SpriteComponent.h"
 #include "ControlledMovementComponent.h"
@@ -15,11 +16,13 @@ GameManager::GameManager()
     , mEvent()
     , mBackgroundTexture()
     , mBackgroundSprite()
-    , mGameObjects()
+    , mpRootGameObject(nullptr)
     , mManagers()
 {
     mClock.restart();
     InitWindow();
+
+    mpRootGameObject = new GameObject(this, ETeam::Neutral);
 
     AddManager<PlayerManager>();
     AddManager<EnemyAIManager>();
@@ -30,14 +33,13 @@ GameManager::GameManager()
 
 GameManager::~GameManager()
 {
-    for (auto & obj : mGameObjects)
-    {
-        delete obj; // Delete each GameObject
-    }
-
     for (auto & manager : mManagers)
     {
-        delete manager.second; // Delete each Manager
+        if (manager.second)
+        {
+            delete manager.second;
+            manager.second = nullptr;
+        }
     }
 
     delete mpWindow;
@@ -48,12 +50,11 @@ GameManager::~GameManager()
 
 void GameManager::EndGame()
 {
-    for (auto * pGameObject : mGameObjects)
+    if (mpRootGameObject)
     {
-        delete pGameObject;
+        delete mpRootGameObject;
+        mpRootGameObject = nullptr;
     }
-
-    mGameObjects.clear();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -92,7 +93,14 @@ void GameManager::Update()
 
     for (auto & manager : mManagers)
     {
-        manager.second->Update();
+        if (manager.second) // Safety check
+        {
+            manager.second->Update();
+        }
+        else
+        {
+            std::cerr << "Error: Manager " << manager.first.name() << " is nullptr!\n";
+        }
     }
 
     CheckCollision();
@@ -102,20 +110,43 @@ void GameManager::Update()
 
 void GameManager::UpdateGameObjects()
 {
-    for (int ii = 0; ii < mGameObjects.size();)
+    if (mpRootGameObject)
     {
-        GameObject * pGameObject = mGameObjects[ii];
+        mpRootGameObject->Update();
 
-        if (pGameObject->IsDestroyed())
+        // Clean up destroyed objects
+        CleanUpDestroyedGameObjects(mpRootGameObject);
+
+        // If the root itself is destroyed
+        if (!mpRootGameObject)
         {
-            pGameObject->CleanUpChildren();
-            delete pGameObject;
-            mGameObjects.erase(mGameObjects.begin() + ii);
+            EndGame();
         }
-        else
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameManager::CleanUpDestroyedGameObjects(GameObject * pRoot)
+{
+    if (!pRoot)
+        return;
+
+    auto & children = pRoot->GetChildren();
+
+    // Loop backwards to safely delete children
+    for (int i = static_cast<int>(children.size()) - 1; i >= 0; --i)
+    {
+        GameObject * pChild = children[i];
+
+        // Recursively clean up the child
+        CleanUpDestroyedGameObjects(pChild);
+
+        // Check if the child should be destroyed
+        if (pChild && pChild->IsDestroyed())
         {
-            pGameObject->Update();
-            ++ii;
+            delete pChild;                         // Delete child
+            children.erase(children.begin() + i);  // Remove from vector
         }
     }
 }
@@ -126,38 +157,89 @@ void GameManager::RenderImGui()
 {
 #if IMGUI_ENABLED()
     static bool showWindow = false;
+    static GameObject * pSelectedGameObject = nullptr;
+
     ImGui::SFML::Update(*mpWindow, mClock.restart());
 
-   
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::G))
     {
         showWindow = true;
     }
 
-    if (showWindow)
+    if (showWindow && mpRootGameObject)
     {
-        ImGui::Begin("Game Objects", &showWindow);
+        ImGui::Begin("Game Objects", &showWindow, ImGuiWindowFlags_NoCollapse);
 
-        for (size_t i = 0; i < mGameObjects.size(); ++i)
+        // Split the window into two columns
+        ImGui::Columns(2, "GameObjectsColumns", true);
+
+        // LEFT SIDE: GameObject Tree
+        ImGui::Text("GameObject Tree");
+        ImGui::Separator();
+
+        // Use a stack to traverse the GameObject tree iteratively
+        std::stack<std::pair<GameObject *, int>> stack; // GameObject* + Depth
+        stack.push({ mpRootGameObject, 0 });
+
+        while (!stack.empty())
         {
-            auto * pGameObj = mGameObjects[i];
+            auto [pGameObject, depth] = stack.top();
+            stack.pop();
 
-            // Create a collapsible node for each GameObject
-            std::string headerLabel = "GameObject " + std::to_string(i);
-            if (ImGui::TreeNode(headerLabel.c_str()))
+            if (!pGameObject || pGameObject->IsDestroyed()) continue; // Skip invalid or destroyed objects
+
+            // Indent GameObjects visually in ImGui based on depth
+            ImGui::Indent(depth * 10.0f);
+
+            // Display as a selectable node
+            std::string label = "GameObject " + std::to_string(reinterpret_cast<std::uintptr_t>(pGameObject));
+            if (ImGui::Selectable(label.c_str(), pSelectedGameObject == pGameObject))
             {
-                // Inside the drop-down, display the GameObject's debug info
-                pGameObj->DebugImGuiInfo();
+                pSelectedGameObject = pGameObject; // Set this as the selected object
+            }
 
-                ImGui::TreePop(); // End the collapsible node
+            // Push children to the stack
+            for (auto * child : pGameObject->GetChildren())
+            {
+                stack.push({ child, depth + 1 });
+            }
+
+            ImGui::Unindent(depth * 10.0f);
+        }
+
+        // Move to the right column
+        ImGui::NextColumn();
+
+        // RIGHT SIDE: Components of the Selected GameObject
+        ImGui::Text("Components");
+        ImGui::Separator();
+
+        // Validate selectedGameObject before accessing it
+        if (pSelectedGameObject && !pSelectedGameObject->IsDestroyed())
+        {
+            ImGui::Text("GameObject %p", pSelectedGameObject);
+
+            // Display components here
+            for (auto * component : pSelectedGameObject->GetAllComponents())
+            {
+                std::string componentLabel = "class " + component->GetClassName(); // Assuming a GetClassName() method
+                ImGui::BulletText("%s", componentLabel.c_str());
             }
         }
+        else
+        {
+            ImGui::Text("No GameObject selected or it has been deleted.");
+            pSelectedGameObject = nullptr; // Reset the pointer to avoid dangling
+        }
+
+        // End the columns
+        ImGui::Columns(1);
+
         ImGui::End();
     }
 
     ImGui::SFML::Render(*mpWindow);
 #endif
-
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -166,13 +248,13 @@ void GameManager::Render()
 {
     mpWindow->clear();
 
-    // Draw Background
+    // Draw background
     mpWindow->draw(mBackgroundSprite);
 
-    // Draw All GameObjects
-    for (auto * pGameObj : mGameObjects)
+    // Draw the root GameObject and its children
+    if (mpRootGameObject)
     {
-        mpWindow->draw(*pGameObj);
+        mpWindow->draw(*mpRootGameObject);
     }
 
     auto * pScoreManager = GetManager<ScoreManager>();
@@ -185,15 +267,13 @@ void GameManager::Render()
     }
 
     RenderImGui();
-
-    mpWindow->display(); // Renderer is done keep at the end.
+    mpWindow->display();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 void GameManager::CheckCollision()
 {
-    // Retrieve player manager and player object
     auto * pPlayerManager = GetManager<PlayerManager>();
     if (!pPlayerManager || pPlayerManager->GetPlayers().empty())
     {
@@ -201,41 +281,32 @@ void GameManager::CheckCollision()
     }
     GameObject * pPlayer = pPlayerManager->GetPlayers()[0];
 
-    // Iterate through all game objects
-    for (int ii = 0; ii < mGameObjects.size(); ++ii)
+    CheckCollisionRecursive(mpRootGameObject, pPlayer);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameManager::CheckCollisionRecursive(GameObject * pRoot, GameObject * pPlayer)
+{
+    if (!pRoot) return;
+
+    auto pCollA = pRoot->GetComponent<CollisionComponent>().lock();
+    if (pCollA && pRoot != pPlayer && pRoot->GetTeam() != pPlayer->GetTeam())
     {
-        GameObject * pObjA = mGameObjects[ii];
-        auto pCollA = pObjA->GetComponent<CollisionComponent>().lock();
-        if (!pCollA) continue;
-
-        for (int jj = ii + 1; jj < mGameObjects.size(); ++jj)
+        auto pCollB = pPlayer->GetComponent<CollisionComponent>().lock();
+        if (pCollB && pCollA->CheckCollision(*pCollB))
         {
-            GameObject * pObjB = mGameObjects[jj];
-            auto pCollB = pObjB->GetComponent<CollisionComponent>().lock();
-            if (!pCollB) continue;
-
-            // Ensure one object is the player and teams are different
-            if ((pObjA == pPlayer) ^ (pObjB == pPlayer))
+            auto pHealthComp = pPlayer->GetComponent<HealthComponent>().lock();
+            if (pHealthComp)
             {
-                if (pObjA->GetTeam() == pObjB->GetTeam())
-                {
-                    continue;
-                }
-
-                // Check for collision
-                if (pCollA->CheckCollision(*pCollB))
-                {
-                    auto pHealthComp = (pObjA == pPlayer ?
-                        pObjA->GetComponent<HealthComponent>().lock() :
-                        pObjB->GetComponent<HealthComponent>().lock());
-
-                    if (pHealthComp)
-                    {
-                        pHealthComp->LooseHealth(100);
-                    }
-                }
+                pHealthComp->LooseHealth(100);
             }
         }
+    }
+
+    for (auto * child : pRoot->GetChildren())
+    {
+        CheckCollisionRecursive(child, pPlayer);
     }
 }
 
@@ -245,7 +316,10 @@ template <typename T>
 void GameManager::AddManager()
 {
     static_assert(std::is_base_of<BaseManager, T>::value, "T must inherit from BaseManager");
-    mManagers[typeid(T)] = new T(this);
+    if (mManagers.find(typeid(T)) == mManagers.end()) // Prevent overwriting existing managers
+    {
+        mManagers[typeid(T)] = new T(this);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -263,18 +337,17 @@ T * GameManager::GetManager()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-GameObject * GameManager::CreateNewGameObject(ETeam team)
+GameObject * GameManager::CreateNewGameObject(ETeam team, GameObject * pParent)
 {
-    GameObject * pGameObj = new GameObject(this, team);
-    mGameObjects.push_back(pGameObj);
+    GameObject * pGameObj = new GameObject(this, team, pParent);
     return pGameObj;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
-std::vector<GameObject *> & GameManager::GetGameObjects()
+GameObject * GameManager::GetRootGameObject()
 {
-    return mGameObjects;
+    return mpRootGameObject;
 }
 
 //------------------------------------------------------------------------------------------------------------------------

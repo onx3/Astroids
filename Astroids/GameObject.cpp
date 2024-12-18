@@ -5,9 +5,10 @@
 #include "BDConfig.h"
 #include "GameComponent.h"
 #include "GameManager.h"
+#include "PlayerManager.h"
 
 
-GameObject::GameObject(GameManager * pGameManager, ETeam team)
+GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pParent)
     : mDeltaTime(0.f)
     , mpGameManager(pGameManager)
     , mIsDestroyed(false)
@@ -15,6 +16,11 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team)
     , mChildGameObjects()
 {
     mClock.restart();
+    if (pParent)
+    {
+        pParent->AddChild(this);
+    }
+
     auto spriteComp = std::make_shared<SpriteComponent>(this);
     AddComponent(spriteComp); // Add a single instance of SpriteComponent
 }
@@ -23,18 +29,19 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team)
 
 GameObject::~GameObject()
 {
+    CleanUpChildren();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 void GameObject::CleanUpChildren()
 {
-    for (auto * child : mChildGameObjects)
+    for (auto * pChild : mChildGameObjects)
     {
-        if (child)
+        if (pChild)
         {
-            child->CleanUpChildren(); // Recursively clean up children
-            delete child;
+            pChild->CleanUpChildren();
+            delete pChild;
         }
     }
     mChildGameObjects.clear();
@@ -61,11 +68,19 @@ void GameObject::Update()
     if (!mIsDestroyed)
     {
         mDeltaTime = mClock.restart().asSeconds();
+
+        // Update components
         for (auto & component : mComponents)
         {
-            if (!mIsDestroyed)
+            component.second->Update();
+        }
+
+        // Update child objects
+        for (auto * pChild : mChildGameObjects)
+        {
+            if (pChild)
             {
-                component.second->Update(); // Update each component
+                pChild->Update();
             }
         }
     }
@@ -155,9 +170,39 @@ void GameObject::AddChild(GameObject * pChild)
 
 //------------------------------------------------------------------------------------------------------------------------
 
-std::vector<GameObject *> GameObject::GetChildren()
+std::vector<GameObject *> & GameObject::GetChildren()
 {
     return mChildGameObjects;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+std::vector<GameComponent *> GameObject::GetAllComponents()
+{
+    std::vector<GameComponent *> components;
+
+    // Validate 'this' pointer
+    if (!this)
+    {
+        return components;
+    }
+
+    // Validate mComponents
+    if (mComponents.empty() && mComponents.size() > 0) // Corruption check
+    {
+        return components;
+    }
+
+    // Safe iteration
+    for (const auto & [type, component] : mComponents)
+    {
+        if (component) // Ensure the shared_ptr is not null
+        {
+            components.push_back(component.get());
+        }
+    }
+
+    return components;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -168,6 +213,11 @@ void GameObject::DebugImGuiInfo()
     // Show Game Object stuff
     for (auto & component : mComponents)
     {
+        auto * pPlayer = GetGameManager().GetManager<PlayerManager>()->GetPlayers()[0];
+        if (this == pPlayer)
+        {
+            ImGui::Text("Children count: %zu", pPlayer->GetChildren().size());
+        }
         // Update each component
         if (ImGui::CollapsingHeader(component.first.name()))
         {
@@ -184,6 +234,14 @@ void GameObject::draw(sf::RenderTarget & target, sf::RenderStates states) const
     for (auto & pComponent : mComponents)
     {
         pComponent.second->draw(target, states);
+    }
+
+    for (auto * child : mChildGameObjects)
+    {
+        if (child)
+        {
+            target.draw(*child, states);
+        }
     }
 }
 

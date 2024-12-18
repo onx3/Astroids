@@ -47,11 +47,6 @@ void HealthComponent::AddHealth(int amount)
 
 void HealthComponent::LooseHealth(int amount)
 {
-	if (mpOwner == mpOwner->GetGameManager().GetManager<PlayerManager>()->GetPlayers()[0])
-	{
-		int ii = 0;
-		++ii;
-	}
 	mTimeSinceLastHit = mClock.getElapsedTime().asSeconds();
 	if (mTimeSinceLastHit >= mHitCooldown)
 	{

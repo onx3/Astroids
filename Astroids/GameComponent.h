@@ -21,6 +21,8 @@ public:
     virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const;
 
     virtual void DebugImGuiComponentInfo();
+
+    virtual std::string GetClassName();
 protected:
 
     GameObject * mpOwner = nullptr;

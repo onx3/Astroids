@@ -21,7 +21,7 @@ PlayerManager::~PlayerManager()
 
 void PlayerManager::InitPlayer()
 {
-    auto * pPlayer = mpGameManager->CreateNewGameObject(ETeam::Friendly);
+    auto * pPlayer = mpGameManager->CreateNewGameObject(ETeam::Friendly, mpGameManager->GetRootGameObject());
 
     mPlayerObjects.push_back(pPlayer);
 

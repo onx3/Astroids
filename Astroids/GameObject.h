@@ -59,12 +59,14 @@ public:
     GameManager & GetGameManager() const;
 
     void AddChild(GameObject * pChild);
-    std::vector<GameObject *> GetChildren();
+    std::vector<GameObject *> & GetChildren();
+
+    std::vector<GameComponent *> GetAllComponents();
 
     void DebugImGuiInfo();
 
 protected:
-    GameObject(GameManager * pGameManager, ETeam team);
+    GameObject(GameManager * pGameManager, ETeam team, GameObject * pParent = nullptr);
     ~GameObject();
 
     void CleanUpChildren();

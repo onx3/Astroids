@@ -12,6 +12,8 @@ public:
 
 	void Update() override;
 
+	std::string GetClassName() override;
+
 	void SetVelocityX(float velo);
 	void SetVelocityY(float velo);
 private:

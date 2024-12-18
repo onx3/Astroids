@@ -22,7 +22,7 @@ public:
 
 	void Update() override;
 
-	void RemoveEnemy(GameObject * enemy);
+	void RemoveEnemy(GameObject * pEnemy);
 	void RespawnEnemy(EEnemy type, sf::Vector2f pos);
 
 	void AddEnemies(int count, EEnemy type, sf::Vector2f pos);

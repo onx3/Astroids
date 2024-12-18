@@ -25,20 +25,23 @@ public:
 
 	void CheckCollision();
 
+	void CheckCollisionRecursive(GameObject * root, GameObject * pPlayer);
+
 	template <typename T>
 	void AddManager();
 
 	template <typename T>
 	T * GetManager();
 
-	GameObject * CreateNewGameObject(ETeam team = ETeam::Neutral);
+	GameObject * CreateNewGameObject(ETeam team, GameObject * pParent);
 
-	std::vector<GameObject *> & GetGameObjects();
-
+	GameObject * GetRootGameObject();
 	sf::RenderWindow * mpWindow;
 	sf::Event mEvent;
 
 private:
+	void CleanUpDestroyedGameObjects(GameObject * pRoot);
+
 	void PollEvents();
 
 	void RenderImGui();
@@ -50,7 +53,7 @@ private:
 	sf::Texture mBackgroundTexture;
 	sf::Sprite mBackgroundSprite;
 
-	std::vector<GameObject *> mGameObjects;
+	GameObject * mpRootGameObject;
 
 	sf::Clock mClock;
 };

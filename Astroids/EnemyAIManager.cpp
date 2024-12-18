@@ -80,9 +80,9 @@ sf::Vector2f EnemyAIManager::GetRandomSpawnPosition()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void EnemyAIManager::RemoveEnemy(GameObject * enemy)
+void EnemyAIManager::RemoveEnemy(GameObject * pEnemy)
 {
-	enemy->Destroy(); // Use GameObject's Destroy function
+    pEnemy->Destroy(); // Use GameObject's Destroy function
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
 {
     for (int i = 0; i < count; ++i)
     {
-        auto * pEnemy = mpGameManager->CreateNewGameObject(ETeam::Enemy);
+        auto * pEnemy = mpGameManager->CreateNewGameObject(ETeam::Enemy, mpGameManager->GetRootGameObject());
         mEnemyObjects.push_back(pEnemy);
 
         auto pSpriteComp = pEnemy->GetComponent<SpriteComponent>().lock();
@@ -129,9 +129,9 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
 void EnemyAIManager::CleanUpDeadEnemies()
 {
 	auto removeStart = std::remove_if(mEnemyObjects.begin(), mEnemyObjects.end(),
-		[](GameObject * obj)
+		[](GameObject * pObj)
 		{
-			return obj->IsDestroyed();
+			return pObj->IsDestroyed();
 		});
 
 	mEnemyObjects.erase(removeStart, mEnemyObjects.end());
