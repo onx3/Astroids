@@ -63,6 +63,9 @@ public:
 
     std::vector<GameComponent *> GetAllComponents();
 
+    void SetActiveState(bool active);
+    bool IsActive();
+
     void DebugImGuiInfo();
 
 protected:
@@ -79,6 +82,7 @@ private:
     sf::Clock mClock;
     float mDeltaTime;
     bool mIsDestroyed;
+    bool mIsActive;
     GameManager * mpGameManager;
     ETeam mTeam;
     std::vector<GameObject *> mChildGameObjects;

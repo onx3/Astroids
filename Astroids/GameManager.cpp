@@ -16,8 +16,11 @@ GameManager::GameManager()
     , mEvent()
     , mBackgroundTexture()
     , mBackgroundSprite()
+    , mShowImGuiWindow(false)
     , mpRootGameObject(nullptr)
     , mManagers()
+    , mCursorTexture()
+    , mCursorSprite()
 {
     mClock.restart();
     InitWindow();
@@ -156,19 +159,18 @@ void GameManager::CleanUpDestroyedGameObjects(GameObject * pRoot)
 void GameManager::RenderImGui()
 {
 #if IMGUI_ENABLED()
-    static bool showWindow = false;
     static GameObject * pSelectedGameObject = nullptr;
 
     ImGui::SFML::Update(*mpWindow, mClock.restart());
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::G))
     {
-        showWindow = true;
+        mShowImGuiWindow = true;
     }
 
-    if (showWindow && mpRootGameObject)
+    if (mShowImGuiWindow && mpRootGameObject)
     {
-        ImGui::Begin("Game Objects", &showWindow, ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin("Game Objects", &mShowImGuiWindow, ImGuiWindowFlags_NoCollapse);
 
         // Split the window into two columns
         ImGui::Columns(2, "GameObjectsColumns", true);
@@ -248,6 +250,11 @@ void GameManager::Render()
 {
     mpWindow->clear();
 
+    if (!mShowImGuiWindow)
+    {
+        mpWindow->setMouseCursorVisible(false);
+    }
+
     // Draw background
     mpWindow->draw(mBackgroundSprite);
 
@@ -265,6 +272,10 @@ void GameManager::Render()
     {
         mpWindow->draw(life);
     }
+
+    sf::Vector2i mousePosition = sf::Mouse::getPosition(*mpWindow);
+    mCursorSprite.setPosition(float(mousePosition.x), float(mousePosition.y));
+    mpWindow->draw(mCursorSprite);
 
     RenderImGui();
     mpWindow->display();
@@ -364,7 +375,22 @@ void GameManager::InitWindow()
     // Scale to window size
     mBackgroundSprite.setScale(float(mpWindow->getSize().x) / mBackgroundTexture.getSize().x, float(mpWindow->getSize().y) / mBackgroundTexture.getSize().y);
 
+    assert(mCursorTexture.loadFromFile("Art/file.png"));
+    mCursorSprite.setTexture(mCursorTexture);
+    mCursorSprite.setScale(.25f, .25f);
+
+    sf::FloatRect localBounds = mCursorSprite.getLocalBounds();
+    mCursorSprite.setOrigin(
+        localBounds.width / 2.0f,
+        localBounds.height / 2.0f
+    );
+
+    ImGui::CreateContext();
+    ImGuiIO & io = ImGui::GetIO();
+    //io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
     ImGui::SFML::Init(*mpWindow);
+
+    mpWindow->setMouseCursorVisible(false);
 }
 
 //------------------------------------------------------------------------------------------------------------------------

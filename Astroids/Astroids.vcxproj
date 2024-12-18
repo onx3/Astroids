@@ -138,6 +138,7 @@
     <ClCompile Include="BaseManager.cpp" />
     <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="ControlledMovementComponent.cpp" />
+    <ClCompile Include="ExplosionComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameComponent.cpp" />
     <ClCompile Include="EnemyAIManager.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="BDConfig.h" />
     <ClInclude Include="CollisionComponent.h" />
     <ClInclude Include="ControlledMovementComponent.h" />
+    <ClInclude Include="ExplosionComponent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="EnemyAIManager.h" />

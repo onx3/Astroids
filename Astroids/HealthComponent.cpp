@@ -1,6 +1,8 @@
 #include "HealthComponent.h"
 #include "iostream"
 #include "PlayerManager.h"
+#include "ExplosionComponent.h"
+#include "SpriteComponent.h"
 
 HealthComponent::HealthComponent(GameObject * pOwner, int initialHealth, int maxHealth, int lifeCount, int maxLives, float hitCooldown)
 	: GameComponent(pOwner)
@@ -100,12 +102,52 @@ void HealthComponent::Update()
 	{
 		if (mLifeCount <= 1)
 		{
-			mpOwner->Destroy();
+			mpOwner->SetActiveState(false);
+			if (!mpOwner->GetComponent<ExplosionComponent>().lock())
+			{
+				auto explosionComp = std::make_shared<ExplosionComponent>(
+					mpOwner, "Art/explosion.png", 32, 32, 7, 0.1f); // Example values
+				mpOwner->AddComponent(explosionComp);
+			}
+
+			// Delay removal until the explosion animation is complete
+			auto explosionComp = mpOwner->GetComponent<ExplosionComponent>().lock();
+			if (explosionComp && explosionComp->IsAnimationFinished())
+			{
+				mpOwner->Destroy();
+			}
 		}
 		else
 		{
 			mHealth = mMaxHealth;
 			--mLifeCount;
+		}
+	}
+
+	if (mpOwner->IsDestroyed())
+	{
+		return;
+	}
+	if (mTimeSinceLastHit < mHitCooldown)
+	{
+		auto pSpriteComp = mpOwner->GetComponent<SpriteComponent>().lock();
+		if (pSpriteComp)
+		{
+			// Create a flickering effect using sine wave
+			float flicker = std::sin(mTimeSinceLastHit * 10.0f) * 127.5f + 127.5f; // Range [0, 255]
+			sf::Color spriteColor = pSpriteComp->GetSprite().getColor();
+			spriteColor.a = static_cast<sf::Uint8>(flicker); // Set alpha transparency
+			pSpriteComp->GetSprite().setColor(spriteColor);
+		}
+	}
+	else
+	{
+		auto pSpriteComp = mpOwner->GetComponent<SpriteComponent>().lock();
+		if (pSpriteComp)
+		{
+			sf::Color spriteColor = pSpriteComp->GetSprite().getColor();
+			spriteColor.a = 255;
+			pSpriteComp->GetSprite().setColor(spriteColor);
 		}
 	}
 }

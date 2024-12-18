@@ -10,7 +10,7 @@ public:
 	~SpriteComponent();
 
 	void SetSprite(const std::string & file, const sf::Vector2f & scale = {1.f, 1.f});
-	sf::Sprite GetSprite();
+	sf::Sprite & GetSprite();
 
 	sf::Vector2f GetPosition() const;
 	void SetPosition(const sf::Vector2f & position);
@@ -29,9 +29,9 @@ public:
 
 	void SetOriginToCenter();
 
-	void Update() override;
+	virtual void Update() override;
 
-	void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
+	virtual void draw(sf::RenderTarget & target, sf::RenderStates states) override;
 
 private:
 	sf::Texture mTexture;

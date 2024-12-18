@@ -7,7 +7,7 @@ int main()
     GameManager * pGameManager = new GameManager();
     auto * pWindow = pGameManager->mpWindow;
     auto & event = pGameManager->mEvent;
-
+    
     while (pWindow->isOpen())
     {
         pGameManager->Update();
