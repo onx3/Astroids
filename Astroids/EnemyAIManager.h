@@ -29,13 +29,14 @@ public:
 
 	const std::vector<GameObject *> & GetEnemies() const;
 
+	void OnDeath(GameObject * pEnemy);
 private:
 	std::string GetEnemyFile(EEnemy type);
 	void CleanUpDeadEnemies();
 
 	sf::Vector2f GetRandomSpawnPosition();
 
-	const int mMaxEnemies = 15;
+	const int mMaxEnemies = 25;
 	std::vector<GameObject *> mEnemyObjects;
 };
 

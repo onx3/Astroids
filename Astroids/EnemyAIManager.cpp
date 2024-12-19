@@ -6,6 +6,7 @@
 #include "CollisionComponent.h"
 #include "HealthComponent.h"
 #include "RandomMovementComponent.h"
+#include "ExplosionComponent.h"
 
 EnemyAIManager::EnemyAIManager(GameManager * pGameManager)
 	: BaseManager(pGameManager)
@@ -32,6 +33,16 @@ EnemyAIManager::~EnemyAIManager()
 
 void EnemyAIManager::Update()
 {
+    for (auto * pEnemy : mEnemyObjects)
+    {
+        auto pHealthComp = pEnemy->GetComponent<HealthComponent>().lock();
+        if (pHealthComp)
+        {
+            pHealthComp->SetDeathCallBack([this, pEnemy]() {
+                OnDeath(pEnemy);
+                });
+        }
+    }
 	CleanUpDeadEnemies();
 	while (mEnemyObjects.size() < mMaxEnemies)
 	{
@@ -55,23 +66,23 @@ sf::Vector2f EnemyAIManager::GetRandomSpawnPosition()
 
     switch (edge)
     {
-        case 0: // Top (above screen)
+        case 0: // Top
             spawnPosition.x = static_cast<float>(rand() % screenWidth);
-            spawnPosition.y = -spawnOffset; // Further above the screen
+            spawnPosition.y = -spawnOffset;
             break;
 
-        case 1: // Bottom (below screen)
+        case 1: // Bottom
             spawnPosition.x = static_cast<float>(rand() % screenWidth);
-            spawnPosition.y = static_cast<float>(screenHeight) + spawnOffset; // Further below the screen
+            spawnPosition.y = static_cast<float>(screenHeight) + spawnOffset;
             break;
 
-        case 2: // Left (left of screen)
-            spawnPosition.x = -spawnOffset; // Further left of the screen
+        case 2: // Left
+            spawnPosition.x = -spawnOffset;
             spawnPosition.y = static_cast<float>(rand() % screenHeight);
             break;
 
-        case 3: // Right (right of screen)
-            spawnPosition.x = static_cast<float>(screenWidth) + spawnOffset; // Further right of the screen
+        case 3: // Right
+            spawnPosition.x = static_cast<float>(screenWidth) + spawnOffset;
             spawnPosition.y = static_cast<float>(rand() % screenHeight);
             break;
     }
@@ -83,7 +94,7 @@ sf::Vector2f EnemyAIManager::GetRandomSpawnPosition()
 
 void EnemyAIManager::RemoveEnemy(GameObject * pEnemy)
 {
-    pEnemy->Destroy(); // Use GameObject's Destroy function
+    pEnemy->Destroy();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -129,6 +140,15 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
 
 void EnemyAIManager::CleanUpDeadEnemies()
 {
+    for (auto * pEnemy : mEnemyObjects)
+    {
+        auto explosionComp = pEnemy->GetComponent<ExplosionComponent>().lock();
+        if (explosionComp && explosionComp->IsAnimationFinished())
+        {
+            pEnemy->Destroy();
+        }
+    }
+
 	auto removeStart = std::remove_if(mEnemyObjects.begin(), mEnemyObjects.end(),
 		[](GameObject * pObj)
 		{
@@ -168,6 +188,19 @@ std::string EnemyAIManager::GetEnemyFile(EEnemy type)
 const std::vector<GameObject *> & EnemyAIManager::GetEnemies() const
 {
 	return mEnemyObjects;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void EnemyAIManager::OnDeath(GameObject * pEnemy)
+{
+    // Add the explosion animation here
+    if (!pEnemy->GetComponent<ExplosionComponent>().lock())
+    {
+        auto explosionComp = std::make_shared<ExplosionComponent>(
+            pEnemy, "Art/explosion.png", 32, 32, 7, 0.1f);
+        pEnemy->AddComponent(explosionComp);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------

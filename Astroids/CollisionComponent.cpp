@@ -3,6 +3,7 @@
 CollisionComponent::CollisionComponent(GameObject * pOwner, sf::Vector2f size)
 	: GameComponent(pOwner)
 	, mSize(size)
+	, mName("CollisionComponent")
 {
 
 }

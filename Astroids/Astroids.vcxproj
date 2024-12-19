@@ -156,6 +156,7 @@
     <ClCompile Include="RandomMovementComponent.cpp" />
     <ClCompile Include="ScoreManager.cpp" />
     <ClCompile Include="SpriteComponent.cpp" />
+    <ClCompile Include="WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseManager.h" />
@@ -173,6 +174,7 @@
     <ClInclude Include="RandomMovementComponent.h" />
     <ClInclude Include="ScoreManager.h" />
     <ClInclude Include="SpriteComponent.h" />
+    <ClInclude Include="WindowManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

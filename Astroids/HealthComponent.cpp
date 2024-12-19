@@ -3,6 +3,8 @@
 #include "PlayerManager.h"
 #include "ExplosionComponent.h"
 #include "SpriteComponent.h"
+#include "imgui.h"
+#include <functional>
 
 HealthComponent::HealthComponent(GameObject * pOwner, int initialHealth, int maxHealth, int lifeCount, int maxLives, float hitCooldown)
 	: GameComponent(pOwner)
@@ -12,15 +14,9 @@ HealthComponent::HealthComponent(GameObject * pOwner, int initialHealth, int max
 	, mMaxLives(maxLives)
 	, mHitCooldown(hitCooldown)
 	, mTimeSinceLastHit(0.f)
+	, mName("HealthComponent")
 {
 	mClock.restart();
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void HealthComponent::TakeDamage(int amount)
-{
-	mHealth -= amount;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -95,48 +91,72 @@ void HealthComponent::AddMaxHealth(int amount)
 
 //------------------------------------------------------------------------------------------------------------------------
 
+void HealthComponent::SetDeathCallBack(std::function<void()> callback)
+{
+	mDeathCallback = callback;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void HealthComponent::SetLifeLostCallback(std::function<void()> callback)
+{
+	mLifeLostCallback = callback;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void HealthComponent::LoseLife()
+{
+	if (mLifeCount == 1)
+	{
+		--mLifeCount;
+		if (mDeathCallback)
+		{
+			mDeathCallback();
+		}
+	}
+	else if (mLifeCount > 0)
+	{
+		--mLifeCount;
+		if (mLifeLostCallback)
+		{
+			mLifeLostCallback();
+		}
+	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
 void HealthComponent::Update()
 {
 	mTimeSinceLastHit = mClock.getElapsedTime().asSeconds();
+
 	if (mHealth <= 0)
 	{
 		if (mLifeCount <= 1)
 		{
 			mpOwner->SetActiveState(false);
-			if (!mpOwner->GetComponent<ExplosionComponent>().lock())
-			{
-				auto explosionComp = std::make_shared<ExplosionComponent>(
-					mpOwner, "Art/explosion.png", 32, 32, 7, 0.1f); // Example values
-				mpOwner->AddComponent(explosionComp);
-			}
-
-			// Delay removal until the explosion animation is complete
-			auto explosionComp = mpOwner->GetComponent<ExplosionComponent>().lock();
-			if (explosionComp && explosionComp->IsAnimationFinished())
-			{
-				mpOwner->Destroy();
-			}
 		}
 		else
 		{
 			mHealth = mMaxHealth;
-			--mLifeCount;
 		}
+		LoseLife();
 	}
 
 	if (mpOwner->IsDestroyed())
 	{
 		return;
 	}
+
 	if (mTimeSinceLastHit < mHitCooldown)
 	{
 		auto pSpriteComp = mpOwner->GetComponent<SpriteComponent>().lock();
 		if (pSpriteComp)
 		{
-			// Create a flickering effect using sine wave
-			float flicker = std::sin(mTimeSinceLastHit * 10.0f) * 127.5f + 127.5f; // Range [0, 255]
+			float flicker = std::sin(mTimeSinceLastHit * 10.0f) * 127.5f + 127.5f;
 			sf::Color spriteColor = pSpriteComp->GetSprite().getColor();
-			spriteColor.a = static_cast<sf::Uint8>(flicker); // Set alpha transparency
+			spriteColor.a = static_cast<sf::Uint8>(flicker);
 			pSpriteComp->GetSprite().setColor(spriteColor);
 		}
 	}
@@ -150,6 +170,24 @@ void HealthComponent::Update()
 			pSpriteComp->GetSprite().setColor(spriteColor);
 		}
 	}
+}
+
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void HealthComponent::DebugImGuiComponentInfo()
+{
+	ImGui::Text("Current amount of lives: %i", mLifeCount);
+	ImGui::Text("Max Lives: %i", mMaxLives);
+	ImGui::Text("Current Health: %i", mHealth);
+	ImGui::Text("Max Health: %i", mMaxHealth);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+std::string & HealthComponent::GetClassName()
+{
+	return mName;
 }
 
 //------------------------------------------------------------------------------------------------------------------------

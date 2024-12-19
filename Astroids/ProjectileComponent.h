@@ -40,10 +40,9 @@ private:
 	void CheckCollisionsForProjectile(GameObject * root, Projectile & projectile, std::shared_ptr<CollisionComponent> pProjectileCollision);
 
 	std::vector<Projectile> mProjectiles;
-
 	float mSpeed;
 	float mCooldown;
 	float mTimeSinceLastShot;
-
 	EProjectile mLastUsedProjectile;
+	std::string mName;
 };

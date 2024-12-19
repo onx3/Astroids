@@ -12,7 +12,7 @@ public:
 
 	void Update() override;
 
-	std::string GetClassName() override;
+	std::string & GetClassName() override;
 
 	void SetVelocityX(float velo);
 	void SetVelocityY(float velo);
@@ -24,6 +24,7 @@ private:
 	float mAcceleration;
 	float mDeceleration;
 	float mMaxSpeed;
+	std::string mName;
 };
 
 //------------------------------------------------------------------------------------------------------------------------

@@ -13,6 +13,7 @@ ControlledMovementComponent::ControlledMovementComponent(GameObject * pOwner)
     , mMaxSpeed(300.f)
     , mVelocityX(0.f)
     , mVelocityY(0.f)
+    , mName("ControlledMovementComponent")
 {
 }
 
@@ -39,6 +40,11 @@ ControlledMovementComponent::~ControlledMovementComponent()
 
 void ControlledMovementComponent::Update()
 {
+    if (!mpOwner->IsActive())
+    {
+        return;
+    }
+
     auto pSpriteComponent = GetGameObject().GetComponent<SpriteComponent>().lock();
 
     if (pSpriteComponent)
@@ -119,7 +125,7 @@ void ControlledMovementComponent::Update()
         // Update position
         position += mVelocity * GetGameObject().GetDeltaTime();
 
-        // Boundary checking (adjust for center origin)
+        // Boundary checking
         float halfWidth = size.x / 2.0f;
         float halfHeight = size.y / 2.0f;
 
@@ -132,8 +138,8 @@ void ControlledMovementComponent::Update()
         sf::RenderWindow * pWindow = GetGameObject().GetGameManager().mpWindow;
         sf::Vector2i mousePosition = sf::Mouse::getPosition(*pWindow);
 
-        sf::Vector2f direction = sf::Vector2f(mousePosition) - position; // Centered position
-        float angle = std::atan2(direction.y, direction.x) * 180.f / 3.14159f; // Convert to degrees
+        sf::Vector2f direction = sf::Vector2f(mousePosition) - position;
+        float angle = std::atan2(direction.y, direction.x) * 180.f / 3.14159f;
         pSpriteComponent->SetRotation(angle + 90.f);
     }
 }
@@ -141,9 +147,9 @@ void ControlledMovementComponent::Update()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-std::string ControlledMovementComponent::GetClassName()
+std::string & ControlledMovementComponent::GetClassName()
 {
-    return "ControlledMovementComponent";
+    return mName;
 }
 
 //------------------------------------------------------------------------------------------------------------------------

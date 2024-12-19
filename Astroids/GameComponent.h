@@ -22,10 +22,11 @@ public:
 
     virtual void DebugImGuiComponentInfo();
 
-    virtual std::string GetClassName();
+    virtual std::string & GetClassName();
 protected:
-
     GameObject * mpOwner = nullptr;
+private:
+    std::string mName;
 };
 
 //------------------------------------------------------------------------------------------------------------------------
