@@ -83,11 +83,11 @@
     <ClCompile Include="PlayerManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="WindowManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ExplosionComponent.cpp">
       <Filter>Source Files\GameComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowManager.cpp">
+      <Filter>Source Files\Managers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -137,7 +137,7 @@
       <Filter>Source Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="WindowManager.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Managers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

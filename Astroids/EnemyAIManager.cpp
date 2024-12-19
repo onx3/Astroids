@@ -6,6 +6,7 @@
 #include "CollisionComponent.h"
 #include "HealthComponent.h"
 #include "RandomMovementComponent.h"
+#include "ExplosionComponent.h"
 
 EnemyAIManager::EnemyAIManager(GameManager * pGameManager)
 	: BaseManager(pGameManager)
@@ -32,6 +33,16 @@ EnemyAIManager::~EnemyAIManager()
 
 void EnemyAIManager::Update()
 {
+    for (auto * pEnemy : mEnemyObjects)
+    {
+        auto pHealthComp = pEnemy->GetComponent<HealthComponent>().lock();
+        if (pHealthComp)
+        {
+            pHealthComp->SetDeathCallBack([this, pEnemy]() {
+                OnDeath(pEnemy);
+                });
+        }
+    }
 	CleanUpDeadEnemies();
 	while (mEnemyObjects.size() < mMaxEnemies)
 	{
@@ -129,6 +140,15 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
 
 void EnemyAIManager::CleanUpDeadEnemies()
 {
+    for (auto * pEnemy : mEnemyObjects)
+    {
+        auto explosionComp = pEnemy->GetComponent<ExplosionComponent>().lock();
+        if (explosionComp && explosionComp->IsAnimationFinished())
+        {
+            pEnemy->Destroy();
+        }
+    }
+
 	auto removeStart = std::remove_if(mEnemyObjects.begin(), mEnemyObjects.end(),
 		[](GameObject * pObj)
 		{
@@ -168,6 +188,19 @@ std::string EnemyAIManager::GetEnemyFile(EEnemy type)
 const std::vector<GameObject *> & EnemyAIManager::GetEnemies() const
 {
 	return mEnemyObjects;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void EnemyAIManager::OnDeath(GameObject * pEnemy)
+{
+    // Add the explosion animation here
+    if (!pEnemy->GetComponent<ExplosionComponent>().lock())
+    {
+        auto explosionComp = std::make_shared<ExplosionComponent>(
+            pEnemy, "Art/explosion.png", 32, 32, 7, 0.1f);
+        pEnemy->AddComponent(explosionComp);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------

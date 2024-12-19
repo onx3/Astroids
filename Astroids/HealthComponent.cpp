@@ -130,43 +130,30 @@ void HealthComponent::LoseLife()
 void HealthComponent::Update()
 {
 	mTimeSinceLastHit = mClock.getElapsedTime().asSeconds();
+
 	if (mHealth <= 0)
 	{
 		if (mLifeCount <= 1)
 		{
 			mpOwner->SetActiveState(false);
-			LoseLife();
-
-			if (!mpOwner->GetComponent<ExplosionComponent>().lock())
-			{
-				auto explosionComp = std::make_shared<ExplosionComponent>(
-					mpOwner, "Art/explosion.png", 32, 32, 7, 0.1f);
-				mpOwner->AddComponent(explosionComp);
-			}
-
-			auto explosionComp = mpOwner->GetComponent<ExplosionComponent>().lock();
-			if (explosionComp && explosionComp->IsAnimationFinished())
-			{
-				mpOwner->Destroy();
-			}
 		}
 		else
 		{
 			mHealth = mMaxHealth;
-			LoseLife();
 		}
+		LoseLife();
 	}
 
 	if (mpOwner->IsDestroyed())
 	{
 		return;
 	}
+
 	if (mTimeSinceLastHit < mHitCooldown)
 	{
 		auto pSpriteComp = mpOwner->GetComponent<SpriteComponent>().lock();
 		if (pSpriteComp)
 		{
-			// Create a flickering effect using sine wave
 			float flicker = std::sin(mTimeSinceLastHit * 10.0f) * 127.5f + 127.5f;
 			sf::Color spriteColor = pSpriteComp->GetSprite().getColor();
 			spriteColor.a = static_cast<sf::Uint8>(flicker);
@@ -184,6 +171,7 @@ void HealthComponent::Update()
 		}
 	}
 }
+
 
 //------------------------------------------------------------------------------------------------------------------------
 

@@ -4,6 +4,7 @@
 #include "ProjectileComponent.h"
 #include "HealthComponent.h"
 #include "CollisionComponent.h"
+#include "ExplosionComponent.h"
 #include <cassert>
 
 PlayerManager::PlayerManager(GameManager * pGameManager)
@@ -76,7 +77,7 @@ void PlayerManager::InitPlayer()
         auto pHealthComponent = pPlayer->GetComponent<HealthComponent>().lock();
         if (!pHealthComponent)
         {
-            pPlayer->AddComponent(std::make_shared<HealthComponent>(pPlayer, 100, 100, 3, 3, 2.f));
+            pPlayer->AddComponent(std::make_shared<HealthComponent>(pPlayer, 102220, 102220, 3, 3, 2.f));
         }
     }
 
@@ -104,14 +105,22 @@ void PlayerManager::Update()
     {
         for (auto * pPlayer : mPlayerObjects)
         {
+            // Destroy the player after the explosion animation finishes
+            auto explosionComp = pPlayer->GetComponent<ExplosionComponent>().lock();
+            if (explosionComp && explosionComp->IsAnimationFinished())
+            {
+                pPlayer->Destroy();
+                return;
+            }
+
             auto pHealthComp = pPlayer->GetComponent<HealthComponent>().lock();
 
-            // Set the life lost callback
             if (pHealthComp)
             {
+                // Set the callbacks
                 pHealthComp->SetLifeLostCallback([this, pPlayer]() {
                     OnPlayerLostLife(pPlayer);
-                    }); 
+                    });
                 pHealthComp->SetDeathCallBack([this, pPlayer]() {
                     OnPlayerDeath(pPlayer);
                     });
@@ -127,7 +136,6 @@ void PlayerManager::Update()
             }
         }
 
-        // Reset the sound flag if the sound has finished playing
         if (mLoseLifeSound.getStatus() == sf::Sound::Stopped)
         {
             mSoundPlayed = false;
@@ -152,6 +160,15 @@ void PlayerManager::OnPlayerDeath(GameObject * pPlayer)
     if (!mSoundPlayed)
     {
         mDeathSound.play();
+        mSoundPlayed = true;
+    }
+
+    // Add the explosion animation here
+    if (!pPlayer->GetComponent<ExplosionComponent>().lock())
+    {
+        auto explosionComp = std::make_shared<ExplosionComponent>(
+            pPlayer, "Art/explosion.png", 32, 32, 7, 0.1f);
+        pPlayer->AddComponent(explosionComp);
     }
 }
 
