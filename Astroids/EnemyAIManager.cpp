@@ -130,7 +130,12 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
             auto pHealthComponent = std::make_shared<HealthComponent>(pEnemy, 10, 100, 1, 1);
             pEnemy->AddComponent(pHealthComponent);
 
-            auto pCollisionComp = std::make_shared<CollisionComponent>(pEnemy, pEnemy->GetSize());
+            auto pCollisionComp = std::make_shared<CollisionComponent>(
+                pEnemy,
+                &mpGameManager->GetPhysicsWorld(),
+                pEnemy->GetSize(),
+                true
+            );
             pEnemy->AddComponent(pCollisionComp);
         }
     }

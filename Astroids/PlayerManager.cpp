@@ -7,6 +7,8 @@
 #include "ExplosionComponent.h"
 #include <cassert>
 
+static int sPlayerHealth = 100;
+
 PlayerManager::PlayerManager(GameManager * pGameManager)
     : BaseManager(pGameManager)
     , mSoundPlayed(false)
@@ -51,6 +53,8 @@ void PlayerManager::InitPlayer()
             pSpriteComponent->SetSprite(file, scale);
             pSpriteComponent->SetPosition(centerPosition);
         }
+        pPlayer->CreatePhysicsBody(&mpGameManager->GetPhysicsWorld(), pPlayer->GetSize(), true);
+
     }
 
     // Controlled Movement Component
@@ -77,7 +81,7 @@ void PlayerManager::InitPlayer()
         auto pHealthComponent = pPlayer->GetComponent<HealthComponent>().lock();
         if (!pHealthComponent)
         {
-            pPlayer->AddComponent(std::make_shared<HealthComponent>(pPlayer, 102220, 102220, 3, 3, 2.f));
+            pPlayer->AddComponent(std::make_shared<HealthComponent>(pPlayer, sPlayerHealth, sPlayerHealth, 3, 3, 2.f));
         }
     }
 
@@ -86,8 +90,14 @@ void PlayerManager::InitPlayer()
         auto pCollisionComponent = pPlayer->GetComponent<CollisionComponent>().lock();
         if (!pCollisionComponent)
         {
-            pPlayer->AddComponent(std::make_shared<CollisionComponent>(pPlayer, pPlayer->GetSize()));
+            pPlayer->AddComponent(std::make_shared<CollisionComponent>(
+                pPlayer,
+                &mpGameManager->GetPhysicsWorld(),
+                pPlayer->GetSize(),
+                true
+            ));
         }
+
     }
 }
 

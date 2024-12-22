@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include "box2d/box2d.h"
 
 class GameComponent;
 class GameManager;
@@ -22,6 +23,12 @@ class GameObject : public sf::Drawable
 public:
     void Destroy();
     bool IsDestroyed() const;
+
+    void CreatePhysicsBody(b2World * world, const sf::Vector2f & size, bool isDynamic);
+
+    void DestroyPhysicsBody(b2World * world);
+
+    b2Body * GetPhysicsBody() const;
 
     // Add a single component of type T
     template <typename T>
@@ -43,6 +50,12 @@ public:
         return std::weak_ptr<T>(); // Return an empty weak_ptr if the component doesn't exist
     }
 
+    template <typename T>
+    bool HasComponent() const
+    {
+        return mComponents.find(std::type_index(typeid(T))) != mComponents.end();
+    }
+
     void Update();
 
     float GetDeltaTime() const;
@@ -54,6 +67,7 @@ public:
     void SetPosition(const sf::Vector2f & position);
 
     float GetRotation() const;
+    void SetRotation(float angle);
     sf::Vector2f GetSize() const;
 
     GameManager & GetGameManager() const;
@@ -86,6 +100,7 @@ private:
     GameManager * mpGameManager;
     ETeam mTeam;
     std::vector<GameObject *> mChildGameObjects;
+    b2Body * mpPhysicsBody;
 
     friend class GameManager;
 };

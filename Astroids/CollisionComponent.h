@@ -2,21 +2,20 @@
 #include "GameComponent.h"
 #include <SFML/Graphics.hpp>
 
+#include <box2d/box2d.h>
+
 class CollisionComponent : public GameComponent
 {
 public:
-	CollisionComponent(GameObject * pOwner, sf::Vector2f size);
-	~CollisionComponent();
+    CollisionComponent(GameObject * pOwner, b2World * world, sf::Vector2f size, bool isDynamic);
+    ~CollisionComponent();
 
-	sf::FloatRect GetBounds() const;
-
-	bool CheckCollision(const CollisionComponent & other) const;
-
-	void Update() override;
+    void Update() override;
+    bool IsColliding() const;
 
 private:
-	sf::Vector2f mSize;
-	std::string mName;
+    b2Body * mBody;
+    b2World * mWorld;
 };
 
 //------------------------------------------------------------------------------------------------------------------------

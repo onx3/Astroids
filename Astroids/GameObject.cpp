@@ -15,6 +15,7 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pPar
     , mIsActive(true)
     , mTeam(team)
     , mChildGameObjects()
+    , mpPhysicsBody(nullptr)
 {
     mClock.restart();
     if (pParent)
@@ -60,6 +61,46 @@ void GameObject::Destroy()
 bool GameObject::IsDestroyed() const
 {
     return mIsDestroyed;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::CreatePhysicsBody(b2World * world, const sf::Vector2f & size, bool isDynamic)
+{
+    b2BodyDef bodyDef;
+    bodyDef.type = isDynamic ? b2_dynamicBody : b2_staticBody;
+    bodyDef.position.Set(GetPosition().x, GetPosition().y);
+
+    mpPhysicsBody = world->CreateBody(&bodyDef);
+
+    b2PolygonShape boxShape;
+    boxShape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
+
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &boxShape;
+    fixtureDef.density = 1.0f;
+    fixtureDef.friction = 0.3f;
+
+    mpPhysicsBody->CreateFixture(&fixtureDef);
+    mpPhysicsBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::DestroyPhysicsBody(b2World * world)
+{
+    if (mpPhysicsBody)
+    {
+        world->DestroyBody(mpPhysicsBody);
+        mpPhysicsBody = nullptr;
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+b2Body * GameObject::GetPhysicsBody() const
+{
+    return mpPhysicsBody;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -141,6 +182,17 @@ float GameObject::GetRotation() const
         return pGameObjectSprite->GetRotation();
     }
     return 0.0f;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::SetRotation(float angle)
+{
+    auto pGameObjectSprite = GetComponent<SpriteComponent>().lock();
+    if (pGameObjectSprite)
+    {
+        return pGameObjectSprite->SetRotation(angle);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------

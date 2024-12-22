@@ -41,16 +41,16 @@ RandomMovementComponent::RandomMovementComponent(GameObject * pOwner)
         switch (edge)
         {
             case 0: // Top
-                mTargetPosition = { static_cast<float>(rand() % windowSize.x), 100.f };
+                mTargetPosition = { static_cast<float>(rand() % windowSize.x), 50.f };
                 break;
             case 1: // Bottom
-                mTargetPosition = { static_cast<float>(rand() % windowSize.x), static_cast<float>(windowSize.y - 100.f) };
+                mTargetPosition = { static_cast<float>(rand() % windowSize.x), static_cast<float>(windowSize.y - 50.f) };
                 break;
             case 2: // Left
-                mTargetPosition = { 100.f, static_cast<float>(rand() % windowSize.y) };
+                mTargetPosition = { 50.f, static_cast<float>(rand() % windowSize.y) };
                 break;
             case 3: // Right
-                mTargetPosition = { static_cast<float>(windowSize.x - 100.f), static_cast<float>(rand() % windowSize.y) };
+                mTargetPosition = { static_cast<float>(windowSize.x - 50.f), static_cast<float>(rand() % windowSize.y) };
                 break;
         }
     }

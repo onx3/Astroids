@@ -40,110 +40,56 @@ ControlledMovementComponent::~ControlledMovementComponent()
 
 void ControlledMovementComponent::Update()
 {
-    if (!mpOwner->IsActive())
+    auto * body = GetGameObject().GetPhysicsBody();
+    if (!mpOwner->IsActive() || !body)
     {
         return;
     }
 
-    auto pSpriteComponent = GetGameObject().GetComponent<SpriteComponent>().lock();
+    sf::Vector2f inputDirection = { 0.f, 0.f };
 
-    if (pSpriteComponent)
+    // Handle input
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
     {
-        // Get current position, size, and window bounds
-        auto position = pSpriteComponent->GetPosition();
-        sf::Vector2f size(pSpriteComponent->GetWidth(), pSpriteComponent->GetHeight());
-        sf::Vector2u windowSize = GetGameObject().GetGameManager().mpWindow->getSize();
-
-        sf::Vector2f inputDirection = { 0.f, 0.f };
-
-        // Input direction based on key presses
-        static std::string currentSprite = "Art/Player.png";
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        {
-            inputDirection.y -= 1.f;
-            if (currentSprite != "Art/Player.png")
-            {
-                pSpriteComponent->SetSprite("Art/Player.png", pSpriteComponent->GetSprite().getScale());
-                currentSprite = "Art/Player.png";
-            }
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        {
-            inputDirection.y += 1.f;
-            if (currentSprite != "Art/Player.png")
-            {
-                pSpriteComponent->SetSprite("Art/Player.png", pSpriteComponent->GetSprite().getScale());
-                currentSprite = "Art/Player.png";
-            }
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        {
-            inputDirection.x -= 1.f;
-            if (currentSprite != "Art/PlayerLeft.png")
-            {
-                pSpriteComponent->SetSprite("Art/PlayerLeft.png", pSpriteComponent->GetSprite().getScale());
-                currentSprite = "Art/PlayerLeft.png";
-            }
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        {
-            inputDirection.x += 1.f;
-            if (currentSprite != "Art/PlayerRight.png")
-            {
-                pSpriteComponent->SetSprite("Art/PlayerRight.png", pSpriteComponent->GetSprite().getScale());
-                currentSprite = "Art/PlayerRight.png";
-            }
-        }
-
-        // Normalize input direction to prevent faster diagonal movement
-        if (inputDirection.x != 0.f || inputDirection.y != 0.f)
-        {
-            inputDirection /= std::sqrt(inputDirection.x * inputDirection.x + inputDirection.y * inputDirection.y);
-        }
-
-        // Apply acceleration
-        mVelocity += inputDirection * mAcceleration * GetGameObject().GetDeltaTime();
-
-        // Clamp velocity to max speed
-        float velocityLength = std::hypot(mVelocity.x, mVelocity.y);
-        if (velocityLength > mMaxSpeed)
-        {
-            mVelocity = (mVelocity / velocityLength) * mMaxSpeed;
-        }
-
-        // Apply deceleration if no input
-        if (inputDirection.x == 0)
-        {
-            mVelocity.x -= std::min(std::abs(mVelocity.x), mDeceleration * GetGameObject().GetDeltaTime()) * (mVelocity.x > 0 ? 1 : -1);
-        }
-        if (inputDirection.y == 0)
-        {
-            mVelocity.y -= std::min(std::abs(mVelocity.y), mDeceleration * GetGameObject().GetDeltaTime()) * (mVelocity.y > 0 ? 1 : -1);
-        }
-
-        // Update position
-        position += mVelocity * GetGameObject().GetDeltaTime();
-
-        // Boundary checking
-        float halfWidth = size.x / 2.0f;
-        float halfHeight = size.y / 2.0f;
-
-        position.x = std::clamp(position.x, halfWidth, windowSize.x - halfWidth);
-        position.y = std::clamp(position.y, halfHeight, windowSize.y - halfHeight);
-
-        pSpriteComponent->SetPosition(position);
-
-        // Rotate sprite towards mouse
-        sf::RenderWindow * pWindow = GetGameObject().GetGameManager().mpWindow;
-        sf::Vector2i mousePosition = sf::Mouse::getPosition(*pWindow);
-
-        sf::Vector2f direction = sf::Vector2f(mousePosition) - position;
-        float angle = std::atan2(direction.y, direction.x) * 180.f / 3.14159f;
-        pSpriteComponent->SetRotation(angle + 90.f);
+        inputDirection.y -= 1.f;
     }
-}
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+    {
+        inputDirection.y += 1.f;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+    {
+        inputDirection.x -= 1.f;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+    {
+        inputDirection.x += 1.f;
+    }
 
+    // Normalize the direction
+    if (inputDirection.x != 0.f || inputDirection.y != 0.f)
+    {
+        inputDirection /= std::sqrt(inputDirection.x * inputDirection.x + inputDirection.y * inputDirection.y);
+    }
+
+    // Apply force to the physics body
+    b2Vec2 force(inputDirection.x * mAcceleration, inputDirection.y * mAcceleration);
+    body->ApplyForceToCenter(force, true);
+
+    // Clamp velocity
+    b2Vec2 velocity = body->GetLinearVelocity();
+    float speed = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+    if (speed > mMaxSpeed)
+    {
+        velocity *= mMaxSpeed / speed;
+        body->SetLinearVelocity(velocity);
+    }
+
+    // Sync GameObject position and rotation with the physics body
+    b2Vec2 position = body->GetPosition();
+    mpOwner->SetPosition(sf::Vector2f(position.x, position.y));
+    mpOwner->SetRotation(body->GetAngle() * 180.f / b2_pi);
+}
 
 //------------------------------------------------------------------------------------------------------------------------
 
