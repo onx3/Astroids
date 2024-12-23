@@ -1,44 +1,37 @@
 #include "CollisionComponent.h"
 #include "box2d/box2d.h"
 
-CollisionComponent::CollisionComponent(GameObject * pOwner, b2World * world, sf::Vector2f size, bool isDynamic)
-    : GameComponent(pOwner), mWorld(world)
+CollisionComponent::CollisionComponent(GameObject * pOwner, b2World * pWorld, b2Body * pBody, sf::Vector2f size, bool isDynamic)
+    : GameComponent(pOwner)
+    , mpWorld(pWorld)
+    , mpBody(pBody)
 {
-    b2BodyDef bodyDef;
-    bodyDef.position.Set(pOwner->GetPosition().x, pOwner->GetPosition().y);
-    bodyDef.type = isDynamic ? b2_dynamicBody : b2_staticBody;
-    mBody = mWorld->CreateBody(&bodyDef);
-
-    b2PolygonShape box;
-    box.SetAsBox(size.x / 2.0f, size.y / 2.0f);
-
-    b2FixtureDef fixtureDef;
-    fixtureDef.shape = &box;
-    fixtureDef.density = isDynamic ? 1.0f : 0.0f;
-    mBody->CreateFixture(&fixtureDef);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 CollisionComponent::~CollisionComponent()
 {
-    mWorld->DestroyBody(mBody);
+    mpWorld->DestroyBody(mpBody);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 void CollisionComponent::Update()
 {
-    b2Vec2 position = mBody->GetPosition();
-    mpOwner->SetPosition(sf::Vector2f(position.x, position.y));
-    mpOwner->SetRotation(mBody->GetAngle() * 180.0f / b2_pi);
+    // Every frame set the physics body to be equal to the sprite
+    float scale = 30.f;
+    auto spritePos = mpOwner->GetPosition();
+    b2Vec2 box2dPosition(spritePos.x / scale, spritePos.y / scale);
+    auto rotation = mpOwner->GetRotation() * (b2_pi / 180.0f);;
+    mpBody->SetTransform(box2dPosition, rotation);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 bool CollisionComponent::IsColliding() const
 {
-    for (b2ContactEdge * contactEdge = mBody->GetContactList(); contactEdge; contactEdge = contactEdge->next)
+    for (b2ContactEdge * contactEdge = mpBody->GetContactList(); contactEdge; contactEdge = contactEdge->next)
     {
         if (contactEdge->contact->IsTouching())
         {

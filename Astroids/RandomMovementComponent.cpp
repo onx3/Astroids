@@ -4,6 +4,7 @@
 #include "GameManager.h"
 #include <SFML/Graphics.hpp>
 #include <random>
+#include "imgui.h"
 
 //------------------------------------------------------------------------------------------------------------------------
 
@@ -115,4 +116,14 @@ void RandomMovementComponent::Update()
             spriteComponent->SetPosition(position);
         }
     }
+}
+
+void RandomMovementComponent::DebugImGuiComponentInfo()
+{
+    ImGui::Text("%i %i", mpOwner->GetPosition().x, mpOwner->GetPosition().y);
+}
+
+std::string & RandomMovementComponent::GetClassName()
+{
+    return mName;
 }

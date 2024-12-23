@@ -24,7 +24,7 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pPar
     }
 
     auto spriteComp = std::make_shared<SpriteComponent>(this);
-    AddComponent(spriteComp); // Add a single instance of SpriteComponent
+    AddComponent(spriteComp);
 }
 
 //------------------------------------------------------------------------------------------------------------------------

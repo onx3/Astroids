@@ -90,9 +90,11 @@ void PlayerManager::InitPlayer()
         auto pCollisionComponent = pPlayer->GetComponent<CollisionComponent>().lock();
         if (!pCollisionComponent)
         {
+            pPlayer->CreatePhysicsBody(&mpGameManager->GetPhysicsWorld(), pPlayer->GetSize(), true);
             pPlayer->AddComponent(std::make_shared<CollisionComponent>(
                 pPlayer,
                 &mpGameManager->GetPhysicsWorld(),
+                pPlayer->GetPhysicsBody(),
                 pPlayer->GetSize(),
                 true
             ));

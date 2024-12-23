@@ -7,6 +7,7 @@
 #include "HealthComponent.h"
 #include "RandomMovementComponent.h"
 #include "ExplosionComponent.h"
+#include <iostream>
 
 EnemyAIManager::EnemyAIManager(GameManager * pGameManager)
 	: BaseManager(pGameManager)
@@ -87,6 +88,7 @@ sf::Vector2f EnemyAIManager::GetRandomSpawnPosition()
             break;
     }
 
+    std::cout << "Spawn Position: (" << spawnPosition.x << ", " << spawnPosition.y << ")" << std::endl;
     return spawnPosition;
 }
 
@@ -130,9 +132,11 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
             auto pHealthComponent = std::make_shared<HealthComponent>(pEnemy, 10, 100, 1, 1);
             pEnemy->AddComponent(pHealthComponent);
 
+            pEnemy->CreatePhysicsBody(&mpGameManager->GetPhysicsWorld(), pEnemy->GetSize(), true);
             auto pCollisionComp = std::make_shared<CollisionComponent>(
                 pEnemy,
                 &mpGameManager->GetPhysicsWorld(),
+                pEnemy->GetPhysicsBody(),
                 pEnemy->GetSize(),
                 true
             );

@@ -4,15 +4,19 @@
 
 void CollisionListener::BeginContact(b2Contact * contact)
 {
-    GameObject * objectA = reinterpret_cast<GameObject *>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
-    GameObject * objectB = reinterpret_cast<GameObject *>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
+    GameObject * pObjectA = reinterpret_cast<GameObject *>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
+    GameObject * pObjectB = reinterpret_cast<GameObject *>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
 
-    if (objectA && objectB)
+    if (pObjectA && pObjectB)
     {
-        // Example: Check for projectile collision
-        if (objectA->HasComponent<ProjectileComponent>() || objectB->HasComponent<ProjectileComponent>())
+        if (pObjectA->GetTeam() == ETeam::Friendly && pObjectB->GetTeam() == ETeam::Enemy)
         {
-            // Handle projectile hit logic
+            std::cout << "BodyA Position: " << contact->GetFixtureA()->GetBody()->GetPosition().x << ", "
+                << contact->GetFixtureA()->GetBody()->GetPosition().y << std::endl;
+            std::cout << "BodyB Position: " << contact->GetFixtureB()->GetBody()->GetPosition().x << ", "
+                << contact->GetFixtureB()->GetBody()->GetPosition().y << std::endl;
+
+            //pObjectB->SetActiveState(false);
         }
     }
 }

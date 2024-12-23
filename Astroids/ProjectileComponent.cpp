@@ -96,9 +96,11 @@ void ProjectileComponent::Shoot()
 		pProjectileSpriteComponent->SetRotation(angleDegrees + 90.f); // Adjust rotation for sprite alignment
 
 		// Add collision
+		pProjectile->CreatePhysicsBody(&mpOwner->GetGameManager().GetPhysicsWorld(), pProjectile->GetSize(), true);
 		auto pCollisionComponent = std::make_shared<CollisionComponent>(
-            pProjectile, 
-            &mpOwner->GetGameManager().GetPhysicsWorld(), 
+			pProjectile,
+			&mpOwner->GetGameManager().GetPhysicsWorld(),
+			pProjectile->GetPhysicsBody(),
             pProjectile->GetSize(), 
             true
         );
@@ -160,6 +162,16 @@ void ProjectileComponent::DebugImGuiComponentInfo()
 
 void ProjectileComponent::UpdateProjectiles(float deltaTime)
 {
+	for (auto & projectile : mProjectiles)
+	{
+		if (projectile.pObject && !projectile.pObject->IsDestroyed())
+		{
+			sf::Vector2f currentPosition = projectile.pObject->GetPosition();
+			sf::Vector2f newPosition = currentPosition + (projectile.direction * mSpeed * deltaTime);
+			projectile.pObject->SetPosition(newPosition);
+		}
+	}
+	
 	mProjectiles.erase(
 		std::remove_if(mProjectiles.begin(), mProjectiles.end(),
 			[deltaTime](Projectile & projectile) {
@@ -174,6 +186,7 @@ void ProjectileComponent::UpdateProjectiles(float deltaTime)
 		mProjectiles.end()
 	);
 }
+
 
 
 

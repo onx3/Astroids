@@ -7,15 +7,15 @@
 class CollisionComponent : public GameComponent
 {
 public:
-    CollisionComponent(GameObject * pOwner, b2World * world, sf::Vector2f size, bool isDynamic);
+    CollisionComponent(GameObject * pOwner, b2World * pWorld, b2Body * pBody, sf::Vector2f size, bool isDynamic);
     ~CollisionComponent();
 
     void Update() override;
     bool IsColliding() const;
 
 private:
-    b2Body * mBody;
-    b2World * mWorld;
+    b2Body * mpBody;
+    b2World * mpWorld;
 };
 
 //------------------------------------------------------------------------------------------------------------------------
