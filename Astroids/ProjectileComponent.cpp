@@ -54,7 +54,7 @@ void ProjectileComponent::Shoot()
 	auto pProjectileSpriteComponent = pProjectile->GetComponent<SpriteComponent>().lock();
 	if (pProjectileSpriteComponent)
 	{
-		pProjectileSpriteComponent->SetSprite(GetCorrectProjectileFile());
+		pProjectileSpriteComponent->SetSprite(GetCorrectProjectileFile(), sf::Vector2f(1.05f, 1.05f));
 
 		// Get ship's position, size
 		sf::Vector2f playerPosition = mpOwner->GetPosition();
@@ -110,8 +110,6 @@ void ProjectileComponent::Shoot()
 		mProjectiles.push_back({ pProjectile, 3.f, 15, direction });
 	}
 }
-
-
 
 //------------------------------------------------------------------------------------------------------------------------
 

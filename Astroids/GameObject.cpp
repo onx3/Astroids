@@ -72,6 +72,8 @@ void GameObject::CreatePhysicsBody(b2World * world, const sf::Vector2f & size, b
     b2BodyDef bodyDef;
     bodyDef.type = isDynamic ? b2_dynamicBody : b2_staticBody;
     bodyDef.position.Set(GetPosition().x / PIXELS_PER_METER, GetPosition().y / PIXELS_PER_METER);
+    bodyDef.bullet = true; // More acurate collision checks
+    bodyDef.awake = true;
 
     // Create the body in the Box2D world
     mpPhysicsBody = world->CreateBody(&bodyDef);
@@ -99,7 +101,6 @@ void GameObject::CreatePhysicsBody(b2World * world, const sf::Vector2f & size, b
     mBoundingBox.setOutlineColor(sf::Color::Green);   // Green outline for debugging
     mBoundingBox.setOutlineThickness(1.0f);
 }
-
 
 //------------------------------------------------------------------------------------------------------------------------
 

@@ -7,6 +7,7 @@ CollisionComponent::CollisionComponent(GameObject * pOwner, b2World * pWorld, b2
     , mpBody(pBody)
     , mSize(size)
 {
+    mpBody->SetSleepingAllowed(false);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -31,6 +32,8 @@ void CollisionComponent::Update()
         mpBody->SetTransform(box2dPosition, rotation);
     }
 }
+
+//------------------------------------------------------------------------------------------------------------------------
 
 void CollisionComponent::Draw(sf::RenderWindow & window)
 {

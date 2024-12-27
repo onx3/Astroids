@@ -83,7 +83,7 @@ public:
 
     void DebugImGuiInfo();
 
-    const float PIXELS_PER_METER = 20.f;
+    const float PIXELS_PER_METER = 100.f;
 protected:
     GameObject(GameManager * pGameManager, ETeam team, GameObject * pParent = nullptr);
     ~GameObject();
