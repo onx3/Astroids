@@ -49,7 +49,7 @@ std::string ProjectileComponent::GetCorrectProjectileFile()
 
 void ProjectileComponent::Shoot()
 {
-	auto * pProjectile = mpOwner->GetGameManager().CreateNewGameObject(mpOwner->GetTeam(), mpOwner);
+	auto * pProjectile = mpOwner->GetGameManager().CreateNewGameObject(ETeam::Friendly, mpOwner);
 
 	auto pProjectileSpriteComponent = pProjectile->GetComponent<SpriteComponent>().lock();
 	if (pProjectileSpriteComponent)

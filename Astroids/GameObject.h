@@ -13,6 +13,7 @@ class GameManager;
 
 enum class ETeam
 {
+    Player,
     Friendly,
     Enemy,
     Neutral
@@ -82,6 +83,7 @@ public:
 
     void DebugImGuiInfo();
 
+    const float PIXELS_PER_METER = 20.f;
 protected:
     GameObject(GameManager * pGameManager, ETeam team, GameObject * pParent = nullptr);
     ~GameObject();
@@ -101,6 +103,8 @@ private:
     ETeam mTeam;
     std::vector<GameObject *> mChildGameObjects;
     b2Body * mpPhysicsBody;
+
+    sf::RectangleShape mBoundingBox;
 
     friend class GameManager;
 };

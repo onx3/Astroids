@@ -16,6 +16,7 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pPar
     , mTeam(team)
     , mChildGameObjects()
     , mpPhysicsBody(nullptr)
+    , mBoundingBox()
 {
     mClock.restart();
     if (pParent)
@@ -67,23 +68,38 @@ bool GameObject::IsDestroyed() const
 
 void GameObject::CreatePhysicsBody(b2World * world, const sf::Vector2f & size, bool isDynamic)
 {
+    // Define the body
     b2BodyDef bodyDef;
     bodyDef.type = isDynamic ? b2_dynamicBody : b2_staticBody;
-    bodyDef.position.Set(GetPosition().x, GetPosition().y);
+    bodyDef.position.Set(GetPosition().x / PIXELS_PER_METER, GetPosition().y / PIXELS_PER_METER);
 
+    // Create the body in the Box2D world
     mpPhysicsBody = world->CreateBody(&bodyDef);
 
+    // Define the shape
     b2PolygonShape boxShape;
-    boxShape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
+    boxShape.SetAsBox((size.x / 2.0f) / PIXELS_PER_METER, (size.y / 2.0f) / PIXELS_PER_METER);
 
+    // Define the fixture
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &boxShape;
-    fixtureDef.density = 1.0f;
+    fixtureDef.density = isDynamic ? 1.0f : 0.0f;
     fixtureDef.friction = 0.3f;
 
+    // Attach the fixture to the body
     mpPhysicsBody->CreateFixture(&fixtureDef);
+
+    // Set user data for later use
     mpPhysicsBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+
+    // Initialize the bounding box
+    mBoundingBox.setSize(size);
+    mBoundingBox.setOrigin(size.x / 2.0f, size.y / 2.0f); // Center the origin for proper rotation
+    mBoundingBox.setFillColor(sf::Color(0, 0, 0, 0)); // Transparent fill
+    mBoundingBox.setOutlineColor(sf::Color::Green);   // Green outline for debugging
+    mBoundingBox.setOutlineThickness(1.0f);
 }
+
 
 //------------------------------------------------------------------------------------------------------------------------
 
@@ -124,6 +140,17 @@ void GameObject::Update()
             {
                 pChild->Update();
             }
+        }
+
+        // Update bounding box to match physics body
+        if (mpPhysicsBody)
+        {
+            float scale = PIXELS_PER_METER;
+            b2Vec2 bodyPos = mpPhysicsBody->GetPosition();
+            float bodyAngle = mpPhysicsBody->GetAngle();
+
+            mBoundingBox.setPosition(bodyPos.x * scale, bodyPos.y * scale);
+            mBoundingBox.setRotation(bodyAngle * 180.0f / b2_pi); // Convert radians to degrees
         }
     }
 }
@@ -310,7 +337,11 @@ void GameObject::draw(sf::RenderTarget & target, sf::RenderStates states) const
             target.draw(*child, states);
         }
     }
+
+    // Draw the bounding box for debugging
+    target.draw(mBoundingBox, states);
 }
+
 
 //------------------------------------------------------------------------------------------------------------------------
 //EOF

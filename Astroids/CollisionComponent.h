@@ -11,11 +11,13 @@ public:
     ~CollisionComponent();
 
     void Update() override;
-    bool IsColliding() const;
+
+    void Draw(sf::RenderWindow & window);
 
 private:
     b2Body * mpBody;
     b2World * mpWorld;
+    sf::Vector2f mSize;
 };
 
 //------------------------------------------------------------------------------------------------------------------------

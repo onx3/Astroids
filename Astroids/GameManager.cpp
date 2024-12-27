@@ -64,6 +64,7 @@ GameManager::GameManager(WindowManager & windowManager)
     // Box2d
     {
         mPhysicsWorld.SetContactListener(&mCollisionListener);
+        mPhysicsWorld.Step(0.f, 0, 0);
     }
 }
 
@@ -106,9 +107,9 @@ void GameManager::Update()
 
     // Physics
     {
-        const float timeStep = 1.0f / 60.0f;
-        const int velocityIterations = 6;
-        const int positionIterations = 2;
+        float timeStep = 1.0f / 60.0f; // 60 Hz
+        int velocityIterations = 8;
+        int positionIterations = 3;
         mPhysicsWorld.Step(timeStep, velocityIterations, positionIterations);
     }
 

@@ -87,8 +87,6 @@ sf::Vector2f EnemyAIManager::GetRandomSpawnPosition()
             spawnPosition.y = static_cast<float>(rand() % screenHeight);
             break;
     }
-
-    std::cout << "Spawn Position: (" << spawnPosition.x << ", " << spawnPosition.y << ")" << std::endl;
     return spawnPosition;
 }
 

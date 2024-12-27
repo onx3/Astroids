@@ -9,18 +9,50 @@ void CollisionListener::BeginContact(b2Contact * contact)
 
     if (pObjectA && pObjectB)
     {
-        if (pObjectA->GetTeam() == ETeam::Friendly && pObjectB->GetTeam() == ETeam::Enemy)
+        //if (pObjectA->GetTeam() != ETeam::Player && pObjectB->GetTeam() != ETeam::Player)
         {
-            std::cout << "BodyA Position: " << contact->GetFixtureA()->GetBody()->GetPosition().x << ", "
-                << contact->GetFixtureA()->GetBody()->GetPosition().y << std::endl;
-            std::cout << "BodyB Position: " << contact->GetFixtureB()->GetBody()->GetPosition().x << ", "
-                << contact->GetFixtureB()->GetBody()->GetPosition().y << std::endl;
-
-            //pObjectB->SetActiveState(false);
+            HandleCollision(pObjectA, pObjectB);
         }
     }
+    else
+    {
+        int ii = 0;
+        ++ii;
+    }
 }
+
+//------------------------------------------------------------------------------------------------------------------------
 
 void CollisionListener::EndContact(b2Contact * contact)
 {
 }
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
+{
+    if (pObjA->GetTeam() == ETeam::Player && pObjB->GetTeam() == ETeam::Enemy)
+    {
+        std::cout << "Player collided with Enemy\n";
+        //pObjB->SetActiveState(false);
+    }
+    else if (pObjA->GetTeam() == ETeam::Enemy && pObjB->GetTeam() == ETeam::Player)
+    {
+        std::cout << "Enemy collided with Player\n";
+        //pObjA->SetActiveState(false);
+    }
+    else if (pObjA->GetTeam() == ETeam::Friendly && pObjB->GetTeam() == ETeam::Enemy)
+    {
+        std::cout << "Projectile collided with Enemy\n";
+        //pObjA->SetActiveState(false);
+    }
+    else if (pObjA->GetTeam() == ETeam::Enemy && pObjB->GetTeam() == ETeam::Friendly)
+    {
+        std::cout << "Projectile collided with Enemy\n";
+        //pObjA->SetActiveState(false);
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+// EOF
+//------------------------------------------------------------------------------------------------------------------------

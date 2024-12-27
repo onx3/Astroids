@@ -37,7 +37,7 @@ PlayerManager::~PlayerManager()
 
 void PlayerManager::InitPlayer()
 {
-    auto * pPlayer = mpGameManager->CreateNewGameObject(ETeam::Friendly, mpGameManager->GetRootGameObject());
+    auto * pPlayer = mpGameManager->CreateNewGameObject(ETeam::Player, mpGameManager->GetRootGameObject());
     mPlayerObjects.push_back(pPlayer);
 
     // Sprite Component
@@ -53,8 +53,6 @@ void PlayerManager::InitPlayer()
             pSpriteComponent->SetSprite(file, scale);
             pSpriteComponent->SetPosition(centerPosition);
         }
-        pPlayer->CreatePhysicsBody(&mpGameManager->GetPhysicsWorld(), pPlayer->GetSize(), true);
-
     }
 
     // Controlled Movement Component
@@ -99,7 +97,6 @@ void PlayerManager::InitPlayer()
                 true
             ));
         }
-
     }
 }
 
