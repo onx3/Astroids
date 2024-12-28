@@ -16,7 +16,6 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pPar
     , mTeam(team)
     , mChildGameObjects()
     , mpPhysicsBody(nullptr)
-    , mBoundingBox()
 {
     mClock.restart();
     if (pParent)
@@ -93,13 +92,6 @@ void GameObject::CreatePhysicsBody(b2World * world, const sf::Vector2f & size, b
 
     // Set user data for later use
     mpPhysicsBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
-
-    // Initialize the bounding box
-    mBoundingBox.setSize(size);
-    mBoundingBox.setOrigin(size.x / 2.0f, size.y / 2.0f); // Center the origin for proper rotation
-    mBoundingBox.setFillColor(sf::Color(0, 0, 0, 0)); // Transparent fill
-    mBoundingBox.setOutlineColor(sf::Color::Green);   // Green outline for debugging
-    mBoundingBox.setOutlineThickness(1.0f);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -141,17 +133,6 @@ void GameObject::Update()
             {
                 pChild->Update();
             }
-        }
-
-        // Update bounding box to match physics body
-        if (mpPhysicsBody)
-        {
-            float scale = PIXELS_PER_METER;
-            b2Vec2 bodyPos = mpPhysicsBody->GetPosition();
-            float bodyAngle = mpPhysicsBody->GetAngle();
-
-            mBoundingBox.setPosition(bodyPos.x * scale, bodyPos.y * scale);
-            mBoundingBox.setRotation(bodyAngle * 180.0f / b2_pi); // Convert radians to degrees
         }
     }
 }
@@ -338,9 +319,6 @@ void GameObject::draw(sf::RenderTarget & target, sf::RenderStates states) const
             target.draw(*child, states);
         }
     }
-
-    // Draw the bounding box for debugging
-    target.draw(mBoundingBox, states);
 }
 
 

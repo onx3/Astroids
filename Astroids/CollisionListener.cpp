@@ -1,6 +1,7 @@
 #include "CollisionListener.h"
 #include "GameObject.h"
 #include "ProjectileComponent.h"
+#include "HealthComponent.h"
 
 void CollisionListener::BeginContact(b2Contact * contact)
 {
@@ -9,15 +10,7 @@ void CollisionListener::BeginContact(b2Contact * contact)
 
     if (pObjectA && pObjectB)
     {
-        //if (pObjectA->GetTeam() != ETeam::Player && pObjectB->GetTeam() != ETeam::Player)
-        {
-            HandleCollision(pObjectA, pObjectB);
-        }
-    }
-    else
-    {
-        int ii = 0;
-        ++ii;
+        HandleCollision(pObjectA, pObjectB);
     }
 }
 
@@ -33,23 +26,51 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
 {
     if (pObjA->GetTeam() == ETeam::Player && pObjB->GetTeam() == ETeam::Enemy)
     {
-        std::cout << "Player collided with Enemy\n";
-        //pObjB->SetActiveState(false);
+        auto pHealthComp = pObjA->GetComponent<HealthComponent>().lock();
+        if (pHealthComp)
+        {
+            if (pObjB->IsActive())
+            {
+                pHealthComp->LooseHealth(100);
+            }
+        }
     }
     else if (pObjA->GetTeam() == ETeam::Enemy && pObjB->GetTeam() == ETeam::Player)
     {
-        std::cout << "Enemy collided with Player\n";
-        //pObjA->SetActiveState(false);
+        auto pHealthComp = pObjB->GetComponent<HealthComponent>().lock();
+        if (pHealthComp)
+        {
+            if (pObjB->IsActive())
+            {
+                pHealthComp->LooseHealth(100);
+            }
+        }
     }
     else if (pObjA->GetTeam() == ETeam::Friendly && pObjB->GetTeam() == ETeam::Enemy)
     {
-        std::cout << "Projectile collided with Enemy\n";
-        //pObjA->SetActiveState(false);
+        if (pObjB->IsActive())
+        {
+            auto pObjBHealthComp = pObjB->GetComponent<HealthComponent>().lock();
+            if (pObjBHealthComp)
+            {
+                pObjBHealthComp->LooseHealth(100);
+                pObjA->SetActiveState(false);
+                pObjA->Destroy();
+            }
+        }        
     }
     else if (pObjA->GetTeam() == ETeam::Enemy && pObjB->GetTeam() == ETeam::Friendly)
     {
-        std::cout << "Projectile collided with Enemy\n";
-        //pObjA->SetActiveState(false);
+        if (pObjA->IsActive())
+        {
+            auto pObjAHealthComp = pObjA->GetComponent<HealthComponent>().lock();
+            if (pObjAHealthComp)
+            {
+                pObjAHealthComp->LooseHealth(100);
+                pObjB->SetActiveState(false);
+                pObjB->Destroy();
+            }
+        }
     }
 }
 

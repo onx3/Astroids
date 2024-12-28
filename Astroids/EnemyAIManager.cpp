@@ -36,12 +36,15 @@ void EnemyAIManager::Update()
 {
     for (auto * pEnemy : mEnemyObjects)
     {
-        auto pHealthComp = pEnemy->GetComponent<HealthComponent>().lock();
-        if (pHealthComp)
+        if (pEnemy)
         {
-            pHealthComp->SetDeathCallBack([this, pEnemy]() {
-                OnDeath(pEnemy);
-                });
+            auto pHealthComp = pEnemy->GetComponent<HealthComponent>().lock();
+            if (pHealthComp)
+            {
+                pHealthComp->SetDeathCallBack([this, pEnemy]() {
+                    OnDeath(pEnemy);
+                    });
+            }
         }
     }
 	CleanUpDeadEnemies();

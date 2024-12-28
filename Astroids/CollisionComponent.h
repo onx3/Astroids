@@ -12,8 +12,6 @@ public:
 
     void Update() override;
 
-    void Draw(sf::RenderWindow & window);
-
 private:
     b2Body * mpBody;
     b2World * mpWorld;

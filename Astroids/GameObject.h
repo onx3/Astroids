@@ -104,8 +104,6 @@ private:
     std::vector<GameObject *> mChildGameObjects;
     b2Body * mpPhysicsBody;
 
-    sf::RectangleShape mBoundingBox;
-
     friend class GameManager;
 };
 

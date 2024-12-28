@@ -137,11 +137,14 @@ void ProjectileComponent::Update()
 
 void ProjectileComponent::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	for (auto & projectile : mProjectiles)
+	/*for (auto & projectile : mProjectiles)
 	{
-		auto spriteComponentToDraw = projectile.pObject->GetComponent<SpriteComponent>().lock();
-		target.draw(spriteComponentToDraw->GetSprite());
-	}
+		if (projectile.pObject->IsActive() && !projectile.pObject->IsDestroyed())
+		{
+			auto spriteComponentToDraw = projectile.pObject->GetComponent<SpriteComponent>().lock();
+			target.draw(spriteComponentToDraw->GetSprite());
+		}		
+	}*/
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -160,17 +163,7 @@ void ProjectileComponent::DebugImGuiComponentInfo()
 
 void ProjectileComponent::UpdateProjectiles(float deltaTime)
 {
-	for (auto & projectile : mProjectiles)
-	{
-		if (projectile.pObject && !projectile.pObject->IsDestroyed())
-		{
-			sf::Vector2f currentPosition = projectile.pObject->GetPosition();
-			sf::Vector2f newPosition = currentPosition + (projectile.direction * mSpeed * deltaTime);
-			projectile.pObject->SetPosition(newPosition);
-		}
-	}
-	
-	mProjectiles.erase(
+	/*mProjectiles.erase(
 		std::remove_if(mProjectiles.begin(), mProjectiles.end(),
 			[deltaTime](Projectile & projectile) {
 				projectile.lifespan -= deltaTime;
@@ -182,7 +175,25 @@ void ProjectileComponent::UpdateProjectiles(float deltaTime)
 				return false;
 			}),
 		mProjectiles.end()
-	);
+	);*/
+
+	for (auto & projectile : mProjectiles)
+	{
+		if (projectile.pObject && !projectile.pObject->IsDestroyed())
+		{
+			sf::Vector2f currentPosition = projectile.pObject->GetPosition();
+			sf::Vector2f newPosition = currentPosition + (projectile.direction * mSpeed * deltaTime);
+			projectile.pObject->SetPosition(newPosition);
+		}
+	}
+
+
+	mProjectiles.erase(
+		std::remove_if(mProjectiles.begin(), mProjectiles.end(),
+			[](const Projectile & proj) {
+				return proj.pObject->IsDestroyed() || proj.lifespan <= 0.0f;
+			}),
+		mProjectiles.end());
 }
 
 

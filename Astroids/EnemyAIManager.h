@@ -36,7 +36,7 @@ private:
 
 	sf::Vector2f GetRandomSpawnPosition();
 
-	const int mMaxEnemies = 1;
+	const int mMaxEnemies = 25;
 	std::vector<GameObject *> mEnemyObjects;
 };
 
