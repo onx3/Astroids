@@ -137,14 +137,7 @@ void ProjectileComponent::Update()
 
 void ProjectileComponent::draw(sf::RenderTarget & target, sf::RenderStates states)
 {
-	/*for (auto & projectile : mProjectiles)
-	{
-		if (projectile.pObject->IsActive() && !projectile.pObject->IsDestroyed())
-		{
-			auto spriteComponentToDraw = projectile.pObject->GetComponent<SpriteComponent>().lock();
-			target.draw(spriteComponentToDraw->GetSprite());
-		}		
-	}*/
+	
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -163,20 +156,6 @@ void ProjectileComponent::DebugImGuiComponentInfo()
 
 void ProjectileComponent::UpdateProjectiles(float deltaTime)
 {
-	/*mProjectiles.erase(
-		std::remove_if(mProjectiles.begin(), mProjectiles.end(),
-			[deltaTime](Projectile & projectile) {
-				projectile.lifespan -= deltaTime;
-				if (projectile.lifespan <= 0.0f && !projectile.pObject->IsDestroyed())
-				{
-					projectile.pObject->Destroy();
-					return true;
-				}
-				return false;
-			}),
-		mProjectiles.end()
-	);*/
-
 	for (auto & projectile : mProjectiles)
 	{
 		if (projectile.pObject && !projectile.pObject->IsDestroyed())
@@ -186,7 +165,6 @@ void ProjectileComponent::UpdateProjectiles(float deltaTime)
 			projectile.pObject->SetPosition(newPosition);
 		}
 	}
-
 
 	mProjectiles.erase(
 		std::remove_if(mProjectiles.begin(), mProjectiles.end(),
