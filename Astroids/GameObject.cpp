@@ -15,6 +15,7 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pPar
     , mIsActive(true)
     , mTeam(team)
     , mChildGameObjects()
+    , mpPhysicsBody(nullptr)
 {
     mClock.restart();
     if (pParent)
@@ -23,7 +24,7 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pPar
     }
 
     auto spriteComp = std::make_shared<SpriteComponent>(this);
-    AddComponent(spriteComp); // Add a single instance of SpriteComponent
+    AddComponent(spriteComp);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -60,6 +61,55 @@ void GameObject::Destroy()
 bool GameObject::IsDestroyed() const
 {
     return mIsDestroyed;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::CreatePhysicsBody(b2World * world, const sf::Vector2f & size, bool isDynamic)
+{
+    // Define the body
+    b2BodyDef bodyDef;
+    bodyDef.type = isDynamic ? b2_dynamicBody : b2_staticBody;
+    bodyDef.position.Set(GetPosition().x / PIXELS_PER_METER, GetPosition().y / PIXELS_PER_METER);
+    bodyDef.bullet = true; // More acurate collision checks
+    bodyDef.awake = true;
+
+    // Create the body in the Box2D world
+    mpPhysicsBody = world->CreateBody(&bodyDef);
+
+    // Define the shape
+    b2PolygonShape boxShape;
+    boxShape.SetAsBox((size.x / 2.0f) / PIXELS_PER_METER, (size.y / 2.0f) / PIXELS_PER_METER);
+
+    // Define the fixture
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &boxShape;
+    fixtureDef.density = isDynamic ? 1.0f : 0.0f;
+    fixtureDef.friction = 0.3f;
+
+    // Attach the fixture to the body
+    mpPhysicsBody->CreateFixture(&fixtureDef);
+
+    // Set user data for later use
+    mpPhysicsBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::DestroyPhysicsBody(b2World * world)
+{
+    if (mpPhysicsBody)
+    {
+        world->DestroyBody(mpPhysicsBody);
+        mpPhysicsBody = nullptr;
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+b2Body * GameObject::GetPhysicsBody() const
+{
+    return mpPhysicsBody;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -141,6 +191,17 @@ float GameObject::GetRotation() const
         return pGameObjectSprite->GetRotation();
     }
     return 0.0f;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::SetRotation(float angle)
+{
+    auto pGameObjectSprite = GetComponent<SpriteComponent>().lock();
+    if (pGameObjectSprite)
+    {
+        return pGameObjectSprite->SetRotation(angle);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -259,6 +320,7 @@ void GameObject::draw(sf::RenderTarget & target, sf::RenderStates states) const
         }
     }
 }
+
 
 //------------------------------------------------------------------------------------------------------------------------
 //EOF

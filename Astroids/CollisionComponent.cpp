@@ -1,41 +1,39 @@
 #include "CollisionComponent.h"
+#include "box2d/box2d.h"
 
-CollisionComponent::CollisionComponent(GameObject * pOwner, sf::Vector2f size)
-	: GameComponent(pOwner)
-	, mSize(size)
-	, mName("CollisionComponent")
+CollisionComponent::CollisionComponent(GameObject * pOwner, b2World * pWorld, b2Body * pBody, sf::Vector2f size, bool isDynamic)
+    : GameComponent(pOwner)
+    , mpWorld(pWorld)
+    , mpBody(pBody)
+    , mSize(size)
 {
-
+    mpBody->SetSleepingAllowed(false);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 CollisionComponent::~CollisionComponent()
 {
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-sf::FloatRect CollisionComponent::GetBounds() const
-{
-	return sf::FloatRect(mpOwner->GetPosition(), mSize);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-bool CollisionComponent::CheckCollision(const CollisionComponent & other) const
-{
-	if (mpOwner->IsActive() && other.mpOwner->IsActive())
-	{
-		return GetBounds().intersects(other.GetBounds());
-	}
-	return false;
+    mpWorld->DestroyBody(mpBody);
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 void CollisionComponent::Update()
 {
+    if (mpOwner->IsActive())
+    {
+        float scale = mpOwner->PIXELS_PER_METER;
+        auto spritePos = mpOwner->GetPosition();
+        b2Vec2 box2dPosition(spritePos.x / scale, spritePos.y / scale);
+        auto rotation = mpOwner->GetRotation() * (b2_pi / 180.0f);
+
+        // Only update if there's a difference
+        if (box2dPosition != mpBody->GetPosition() || rotation != mpBody->GetAngle())
+        {
+            mpBody->SetTransform(box2dPosition, rotation);
+        }
+    }    
 }
 
 //------------------------------------------------------------------------------------------------------------------------

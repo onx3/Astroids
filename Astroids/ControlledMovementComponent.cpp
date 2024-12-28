@@ -144,7 +144,6 @@ void ControlledMovementComponent::Update()
     }
 }
 
-
 //------------------------------------------------------------------------------------------------------------------------
 
 std::string & ControlledMovementComponent::GetClassName()

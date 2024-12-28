@@ -23,7 +23,7 @@ int main()
         {
             windowManager.PollEvents();
 
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
             {
                 waitingForRestart = false;
             }

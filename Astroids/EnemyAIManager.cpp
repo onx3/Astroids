@@ -7,6 +7,7 @@
 #include "HealthComponent.h"
 #include "RandomMovementComponent.h"
 #include "ExplosionComponent.h"
+#include <iostream>
 
 EnemyAIManager::EnemyAIManager(GameManager * pGameManager)
 	: BaseManager(pGameManager)
@@ -35,12 +36,15 @@ void EnemyAIManager::Update()
 {
     for (auto * pEnemy : mEnemyObjects)
     {
-        auto pHealthComp = pEnemy->GetComponent<HealthComponent>().lock();
-        if (pHealthComp)
+        if (pEnemy)
         {
-            pHealthComp->SetDeathCallBack([this, pEnemy]() {
-                OnDeath(pEnemy);
-                });
+            auto pHealthComp = pEnemy->GetComponent<HealthComponent>().lock();
+            if (pHealthComp)
+            {
+                pHealthComp->SetDeathCallBack([this, pEnemy]() {
+                    OnDeath(pEnemy);
+                    });
+            }
         }
     }
 	CleanUpDeadEnemies();
@@ -86,7 +90,6 @@ sf::Vector2f EnemyAIManager::GetRandomSpawnPosition()
             spawnPosition.y = static_cast<float>(rand() % screenHeight);
             break;
     }
-
     return spawnPosition;
 }
 
@@ -130,7 +133,14 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
             auto pHealthComponent = std::make_shared<HealthComponent>(pEnemy, 10, 100, 1, 1);
             pEnemy->AddComponent(pHealthComponent);
 
-            auto pCollisionComp = std::make_shared<CollisionComponent>(pEnemy, pEnemy->GetSize());
+            pEnemy->CreatePhysicsBody(&mpGameManager->GetPhysicsWorld(), pEnemy->GetSize(), true);
+            auto pCollisionComp = std::make_shared<CollisionComponent>(
+                pEnemy,
+                &mpGameManager->GetPhysicsWorld(),
+                pEnemy->GetPhysicsBody(),
+                pEnemy->GetSize(),
+                true
+            );
             pEnemy->AddComponent(pCollisionComp);
         }
     }

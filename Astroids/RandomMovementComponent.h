@@ -10,6 +10,10 @@ public:
 
     void Update() override;
 
+    virtual void DebugImGuiComponentInfo() override;
+
+    virtual std::string & GetClassName() override;
+
 private:
     float mVelocity;
     bool mIsEntering;

@@ -24,6 +24,8 @@ GameManager::GameManager(WindowManager & windowManager)
     , mCursorSprite()
     , mSoundPlayed(false)
     , mIsGameOver(false)
+    , mPhysicsWorld(b2Vec2(0.0f, 0.f))
+    , mCollisionListener()
 {
     mClock.restart();
     InitWindow();
@@ -57,6 +59,12 @@ GameManager::GameManager(WindowManager & windowManager)
         mScoreText.setCharacterSize(32);
         mScoreText.setFillColor(sf::Color::Green);
         mScoreText.setPosition(700, 500);
+    }
+
+    // Box2d
+    {
+        mPhysicsWorld.SetContactListener(&mCollisionListener);
+        mPhysicsWorld.Step(0.f, 0, 0);
     }
 }
 
@@ -97,6 +105,14 @@ void GameManager::Update()
         mSoundPlayed = true;
     }
 
+    // Physics
+    {
+        float timeStep = 1.0f / 60.0f; // 60 Hz
+        int velocityIterations = 8;
+        int positionIterations = 3;
+        mPhysicsWorld.Step(timeStep, velocityIterations, positionIterations);
+    }
+
     UpdateGameObjects();
 
     for (auto & manager : mManagers)
@@ -110,8 +126,6 @@ void GameManager::Update()
             std::cerr << "Error: Manager " << manager.first.name() << " is nullptr!\n";
         }
     }
-
-    CheckCollision();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -300,46 +314,6 @@ void GameManager::Render()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void GameManager::CheckCollision()
-{
-    auto * pPlayerManager = GetManager<PlayerManager>();
-    if (!pPlayerManager || pPlayerManager->GetPlayers().empty())
-    {
-        return;
-    }
-    GameObject * pPlayer = pPlayerManager->GetPlayers()[0];
-
-    CheckCollisionRecursive(mpRootGameObject, pPlayer);
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-void GameManager::CheckCollisionRecursive(GameObject * pRoot, GameObject * pPlayer)
-{
-    if (!pRoot) return;
-
-    auto pCollA = pRoot->GetComponent<CollisionComponent>().lock();
-    if (pCollA && pRoot != pPlayer && pRoot->GetTeam() != pPlayer->GetTeam())
-    {
-        auto pCollB = pPlayer->GetComponent<CollisionComponent>().lock();
-        if (pCollB && pCollA->CheckCollision(*pCollB))
-        {
-            auto pHealthComp = pPlayer->GetComponent<HealthComponent>().lock();
-            if (pHealthComp)
-            {
-                pHealthComp->LooseHealth(100);
-            }
-        }
-    }
-
-    for (auto * child : pRoot->GetChildren())
-    {
-        CheckCollisionRecursive(child, pPlayer);
-    }
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
 template <typename T>
 void GameManager::AddManager()
 {
@@ -348,19 +322,6 @@ void GameManager::AddManager()
     {
         mManagers[typeid(T)] = new T(this);
     }
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-template <typename T>
-T * GameManager::GetManager()
-{
-    auto it = mManagers.find(typeid(T));
-    if (it != mManagers.end())
-    {
-        return dynamic_cast<T *>(it->second);
-    }
-    return nullptr;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -383,6 +344,13 @@ GameObject * GameManager::GetRootGameObject()
 bool GameManager::IsGameOver() const
 {
     return mIsGameOver;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+b2World & GameManager::GetPhysicsWorld()
+{
+    return mPhysicsWorld;
 }
 
 //------------------------------------------------------------------------------------------------------------------------

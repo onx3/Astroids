@@ -6,11 +6,13 @@
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
+#include "box2d/box2d.h"
 #include "EnemyAIManager.h"
 #include "GameObject.h"
 #include "ScoreManager.h"
 #include "BaseManager.h"
 #include "WindowManager.h"
+#include "CollisionListener.h"
 
 class GameManager
 {
@@ -25,21 +27,27 @@ public:
 
 	void Render();
 
-	void CheckCollision();
-
-	void CheckCollisionRecursive(GameObject * root, GameObject * pPlayer);
-
 	template <typename T>
 	void AddManager();
 
 	template <typename T>
-	T * GetManager();
+	T * GetManager()
+	{
+		auto it = mManagers.find(typeid(T));
+		if (it != mManagers.end())
+		{
+			return dynamic_cast<T *>(it->second);
+		}
+		return nullptr;
+	}
 
 	GameObject * CreateNewGameObject(ETeam team, GameObject * pParent);
 
 	GameObject * GetRootGameObject();
 
 	bool IsGameOver() const;
+
+	b2World & GetPhysicsWorld();
 
 	// Window
 	WindowManager & mWindowManager;
@@ -74,5 +82,9 @@ private:
 	sf::Text mGameOverText;
 	sf::Text mScoreText;
 	sf::Font mFont;
+
+	// Box2d
+	b2World mPhysicsWorld;
+	CollisionListener mCollisionListener;
 };
 
