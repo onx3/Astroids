@@ -105,8 +105,8 @@ protected:
 private:
     sf::Clock mClock;
     float mDeltaTime;
-    bool mIsDestroyed;
-    bool mIsActive;
+    bool mIsDestroyed; // Used to know when GameManager can Delete
+    bool mIsActive; // Used to know when the GameObject is dying
     GameManager * mpGameManager;
     ETeam mTeam;
     std::vector<GameObject *> mChildGameObjects;

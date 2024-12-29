@@ -80,7 +80,7 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
         if (pObjA->IsActive() && pObjB->IsActive())
         {
             mpGameManager->GetManager<EnemyAIManager>()->DestroyAllEnemies();
-            pObjB->Destroy();
+            pObjB->SetActiveState(false);
         }
     }
     else if (pObjA->GetTeam() == ETeam::NukeDrop && pObjB->GetTeam() == ETeam::Player)
@@ -88,7 +88,7 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
         if (pObjA->IsActive() && pObjB->IsActive())
         {
             mpGameManager->GetManager<EnemyAIManager>()->DestroyAllEnemies();
-            pObjA->Destroy();
+            pObjB->SetActiveState(false);
         }
     }
     // Life Drop

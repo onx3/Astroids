@@ -197,7 +197,7 @@ void PlayerManager::OnPlayerDeath(GameObject * pPlayer)
     if (!pPlayer->GetComponent<ExplosionComponent>().lock())
     {
         auto explosionComp = std::make_shared<ExplosionComponent>(
-            pPlayer, "Art/explosion.png", 32, 32, 7, 0.1f);
+            pPlayer, "Art/explosion.png", 32, 32, 7, 0.1f, sf::Vector2f(2.f, 2.f), pPlayer->GetPosition());
         pPlayer->AddComponent(explosionComp);
     }
 }

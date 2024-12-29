@@ -249,7 +249,7 @@ void EnemyAIManager::OnDeath(GameObject * pEnemy)
     if (!pEnemy->GetComponent<ExplosionComponent>().lock())
     {
         auto explosionComp = std::make_shared<ExplosionComponent>(
-            pEnemy, "Art/explosion.png", 32, 32, 7, 0.1f);
+            pEnemy, "Art/explosion.png", 32, 32, 7, 0.1f, sf::Vector2f(2.f, 2.f), pEnemy->GetPosition());
         pEnemy->AddComponent(explosionComp);
     }
     // Add Score

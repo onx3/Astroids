@@ -5,6 +5,7 @@
 int main()
 {
     WindowManager windowManager;
+    bool paused = false;
 
     while (windowManager.GetWindow()->isOpen())
     {
@@ -13,7 +14,15 @@ int main()
         while (windowManager.GetWindow()->isOpen() && !pGameManager->IsGameOver())
         {
             windowManager.PollEvents();
-            pGameManager->Update();
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+            {
+                paused = !paused;
+            }
+            if (!paused)
+            {
+                pGameManager->Update();
+            }
             pGameManager->Render();
         }
         delete pGameManager;
@@ -26,10 +35,6 @@ int main()
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
             {
                 waitingForRestart = false;
-            }
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-            {
-                windowManager.GetWindow()->close();
             }
         }
     }

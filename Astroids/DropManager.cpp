@@ -4,6 +4,7 @@
 #include "CollisionComponent.h"
 #include "ResourceManager.h"
 #include "DropMovementComponent.h"
+#include "ExplosionComponent.h"
 
 DropManager::DropManager(GameManager * pGameManager)
 	: BaseManager(pGameManager)
@@ -16,6 +17,28 @@ DropManager::DropManager(GameManager * pGameManager)
 void DropManager::Update()
 {
     CleanUpDrops();
+    for (auto * pDrop : mDropObjects)
+    {
+        if (!pDrop->IsActive())
+        {
+            if (!pDrop->GetComponent<ExplosionComponent>().lock())
+            {
+                auto * pWindow = mpGameManager->mpWindow;
+                if (pWindow)
+                {
+                    sf::Vector2u windowSize = mpGameManager->mpWindow->getSize();
+                    sf::Vector2f centerPosition(float(windowSize.x) / 2.0f, float(windowSize.y) / 2.0f);
+                    auto explosionComp = std::make_shared<ExplosionComponent>(
+                        pDrop, "Art/explosion.png", 32, 32, 7, 0.1f, sf::Vector2f(50.f, 50.f), centerPosition);
+                    pDrop->AddComponent(explosionComp);
+                }
+                else
+                {
+                    pDrop->Destroy();
+                }
+            }
+        }
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -29,6 +52,18 @@ void DropManager::OnGameEnd()
 
 void DropManager::CleanUpDrops()
 {
+    for (auto * pDrop : mDropObjects)
+    {
+        if (pDrop && !pDrop->IsDestroyed())
+        {
+            auto explosionComp = pDrop->GetComponent<ExplosionComponent>().lock();
+            if (explosionComp && explosionComp->IsAnimationFinished())
+            {
+                pDrop->Destroy();
+            }
+        }
+    }
+
     auto removeStart = std::remove_if(mDropObjects.begin(), mDropObjects.end(),
         [](GameObject * pObj)
         {

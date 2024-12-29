@@ -41,10 +41,10 @@ void WindowManager::PollEvents()
             }
             case sf::Event::KeyPressed:
             {
-                if (mEvent.key.code == sf::Keyboard::Escape)
+                /*if (mEvent.key.code == sf::Keyboard::Escape)
                 {
                     mpWindow->close();
-                }
+                }*/
                 break;
             }
         }

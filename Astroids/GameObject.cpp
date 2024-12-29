@@ -27,6 +27,7 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pPar
 
     auto spriteComp = std::make_shared<SpriteComponent>(this);
     AddComponent(spriteComp);
+    spriteComp->SetOriginToCenter();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
