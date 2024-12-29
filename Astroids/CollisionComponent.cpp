@@ -1,3 +1,4 @@
+#include "AstroidsPrivate.h"
 #include "CollisionComponent.h"
 #include "box2d/box2d.h"
 

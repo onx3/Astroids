@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
+#include "AstroidsPrivate.h"
 #include "GameComponent.h"
 
 class SpriteComponent : public GameComponent

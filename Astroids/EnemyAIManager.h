@@ -1,9 +1,7 @@
 #pragma once
-
+#include "AstroidsPrivate.h"
 #include "BaseManager.h"
-#include "GameManager.h"
 #include <vector>
-#include <SFML/Graphics.hpp>
 #include "GameObject.h"
 #include "DropManager.h"
 
@@ -43,7 +41,7 @@ private:
 
 	EDropType DetermineDropType() const;
 
-	const int mMaxEnemies = 1;
+	const int mMaxEnemies = 25;
 	std::vector<GameObject *> mEnemyObjects;
 };
 

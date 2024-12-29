@@ -1,5 +1,5 @@
+#include "AstroidsPrivate.h"
 #include "ScoreManager.h"
-#include "GameManager.h"
 #include "HealthComponent.h"
 #include <cassert>
 #include "PlayerManager.h"

@@ -1,7 +1,6 @@
 #pragma once
+#include "AstroidsPrivate.h"
 #include "GameComponent.h"
-#include <SFML/Graphics.hpp>
-
 #include <box2d/box2d.h>
 
 class CollisionComponent : public GameComponent

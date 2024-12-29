@@ -1,5 +1,6 @@
 #pragma once
 
+#include "AstroidsPrivate.h"
 #include "GameComponent.h"
 enum class ESpriteTilt
 {

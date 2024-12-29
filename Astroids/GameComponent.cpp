@@ -1,5 +1,5 @@
+#include "AstroidsPrivate.h"
 #include "GameComponent.h"
-#include "GameManager.h"
 #include "imgui.h"
 #include "BDConfig.h"
 

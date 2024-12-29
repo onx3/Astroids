@@ -1,7 +1,6 @@
 #pragma once
 
-#include "SFML/Graphics.hpp"
-#include "GameManager.h"
+#include "AstroidsPrivate.h"
 
 class GameObject;
 class GameManager;

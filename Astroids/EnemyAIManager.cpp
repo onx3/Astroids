@@ -1,3 +1,4 @@
+#include "AstroidsPrivate.h"
 #include "EnemyAIManager.h"
 #include "GameObject.h"
 #include <memory>
@@ -9,7 +10,6 @@
 #include "RandomMovementComponent.h"
 #include "ExplosionComponent.h"
 #include "DropManager.h"
-#include "Timer.h"
 #include "ResourceManager.h"
 
 
@@ -217,7 +217,6 @@ std::string EnemyAIManager::GetEnemyFile(EEnemy type)
 	{
 		case (EEnemy::Ship):
 		{
-            //return ResourceManager.GetTexture("Art/EnemyShip.png");
 			return "Art/EnemyShip.png";
 		}
 		case (EEnemy::Ufo):
@@ -270,15 +269,17 @@ void EnemyAIManager::OnDeath(GameObject * pEnemy)
     }
 }
 
+//------------------------------------------------------------------------------------------------------------------------
+
 EDropType EnemyAIManager::DetermineDropType() const
 {
     int randomValue = rand() % 100;
 
-    if (randomValue < 10)
+    if (randomValue < 3)
     {
         return EDropType::NukePickup;
     }
-    else if (randomValue < 30)
+    else if (randomValue < 7)
     {
         return EDropType::LifePickup;
     }

@@ -1,3 +1,4 @@
+#include "AstroidsPrivate.h"
 // dear imgui, v1.91.6
 // (main code and documentation)
 

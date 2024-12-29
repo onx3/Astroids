@@ -1,6 +1,6 @@
 #pragma once
+#include "AstroidsPrivate.h"
 #include "GameComponent.h"
-#include <SFML/System.hpp>
 
 class RandomMovementComponent : public GameComponent
 {

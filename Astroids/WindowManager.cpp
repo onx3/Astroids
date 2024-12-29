@@ -1,3 +1,4 @@
+#include "AstroidsPrivate.h"
 #include "WindowManager.h"
 #include <cassert>
 #include <imgui-SFML.h>

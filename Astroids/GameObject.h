@@ -1,6 +1,5 @@
 #pragma once
-
-#include <SFML/Graphics.hpp>
+#include "AstroidsPrivate.h"
 #include <unordered_map>
 #include <typeindex>
 #include <memory>

@@ -1,3 +1,4 @@
+#include "AstroidsPrivate.h"
 #include "HealthComponent.h"
 #include "iostream"
 #include "PlayerManager.h"

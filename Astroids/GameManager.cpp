@@ -1,4 +1,4 @@
-#include "GameManager.h"
+#include "AstroidsPrivate.h"
 #include <cassert>
 #include <imgui.h>
 #include <stack>
@@ -11,7 +11,6 @@
 #include "HealthComponent.h"
 #include "PlayerManager.h"
 #include "DropManager.h"
-#include "Timer.h"
 #include "ResourceManager.h"
 
 GameManager::GameManager(WindowManager & windowManager)

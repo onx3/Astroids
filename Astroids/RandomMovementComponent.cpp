@@ -1,8 +1,7 @@
+#include "AstroidsPrivate.h"
 #include "RandomMovementComponent.h"
 #include "GameObject.h"
 #include "SpriteComponent.h"
-#include "GameManager.h"
-#include <SFML/Graphics.hpp>
 #include <random>
 #include "imgui.h"
 

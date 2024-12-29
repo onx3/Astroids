@@ -1,3 +1,4 @@
+#include "AstroidsPrivate.h"
 #include <windows.h>
 #include <iostream>
 #include "Timer.h"

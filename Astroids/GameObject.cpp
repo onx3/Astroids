@@ -1,12 +1,11 @@
+#include "AstroidsPrivate.h"
 #include "GameObject.h"
 #include <cassert>
 #include <imgui.h>
 #include "SpriteComponent.h"
 #include "BDConfig.h"
 #include "GameComponent.h"
-#include "GameManager.h"
 #include "PlayerManager.h"
-#include "Timer.h"
 
 
 GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pParent)

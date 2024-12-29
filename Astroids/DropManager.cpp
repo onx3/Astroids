@@ -1,8 +1,9 @@
+#include "AstroidsPrivate.h"
 #include "DropManager.h"
-#include "GameManager.h"
 #include "SpriteComponent.h"
 #include "CollisionComponent.h"
 #include "ResourceManager.h"
+#include "DropMovementComponent.h"
 
 DropManager::DropManager(GameManager * pGameManager)
 	: BaseManager(pGameManager)
@@ -71,7 +72,7 @@ void DropManager::SpawnDrop(EDropType dropType, const sf::Vector2f & position)
                     pSpriteTexture = mpGameManager->GetManager<ResourceManager>()->GetTexture(resourceId);
                     if (pSpriteTexture)
                     {
-                        pSpriteComp->SetSprite(pSpriteTexture, sf::Vector2f(.75, .75));
+                        pSpriteComp->SetSprite(pSpriteTexture, sf::Vector2f(1, 1));
                     }
                     break;
                 case EDropType::LifePickup:
@@ -80,15 +81,20 @@ void DropManager::SpawnDrop(EDropType dropType, const sf::Vector2f & position)
                     pSpriteTexture = mpGameManager->GetManager<ResourceManager>()->GetTexture(resourceId);
                     if (pSpriteTexture)
                     {
-                        pSpriteComp->SetSprite(pSpriteTexture, sf::Vector2f(.75, .75));
+                        pSpriteComp->SetSprite(pSpriteTexture, sf::Vector2f(1, 1));
                     }
                     break;
                 default:
                     return;
             }
+            sf::Color greenTint(0, 255, 0, 255);
+            pSpriteComp->GetSprite().setColor(greenTint);
 
             pSpriteComp->SetPosition(position);
             pDrop->AddComponent(pSpriteComp);
+
+            auto pDropMovementComponent = std::make_shared<DropMovementComponent>(pDrop);
+            pDrop->AddComponent(pDropMovementComponent);
 
             // Add collision or interaction logic for pickup
             pDrop->CreatePhysicsBody(&mpGameManager->GetPhysicsWorld(), pDrop->GetSize(), true);

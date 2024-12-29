@@ -1,8 +1,8 @@
+#include "AstroidsPrivate.h"
 #include "ProjectileComponent.h"
 #include <iostream>
 #include <cmath>
 #include <stack>
-#include "SFML/Graphics.hpp"
 #include "imgui.h"
 #include "GameObject.h"
 #include "SpriteComponent.h"

@@ -1,8 +1,8 @@
+#include "AstroidsPrivate.h"
 #include "CollisionListener.h"
 #include "GameObject.h"
 #include "ProjectileComponent.h"
 #include "HealthComponent.h"
-#include "GameManager.h"
 
 CollisionListener::CollisionListener(GameManager * pGameManager)
     : mpGameManager(pGameManager)
@@ -24,14 +24,9 @@ void CollisionListener::BeginContact(b2Contact * contact)
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void CollisionListener::EndContact(b2Contact * contact)
-{
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
 void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
 {
+    // Player hit enemy
     if (pObjA->GetTeam() == ETeam::Player && pObjB->GetTeam() == ETeam::Enemy)
     {
         auto pHealthComp = pObjA->GetComponent<HealthComponent>().lock();
@@ -54,6 +49,7 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
             }
         }
     }
+    // Projectile hit enemy
     else if (pObjA->GetTeam() == ETeam::Friendly && pObjB->GetTeam() == ETeam::Enemy)
     {
         if (pObjB->IsActive())
@@ -65,7 +61,7 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
                 pObjA->SetActiveState(false);
                 pObjA->Destroy();
             }
-        }        
+        }
     }
     else if (pObjA->GetTeam() == ETeam::Enemy && pObjB->GetTeam() == ETeam::Friendly)
     {
@@ -80,7 +76,7 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
             }
         }
     }
-    // Drops
+    // Nuke Drop
     else if (pObjA->GetTeam() == ETeam::Player && pObjB->GetTeam() == ETeam::NukeDrop)
     {
         if (pObjA->IsActive() && pObjB->IsActive())
@@ -97,6 +93,7 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
             pObjA->Destroy();
         }
     }
+    // Life Drop
     else if (pObjA->GetTeam() == ETeam::Player && pObjB->GetTeam() == ETeam::LifeDrop)
     {
         if (pObjA->IsActive() && pObjB->IsActive())
@@ -122,6 +119,14 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
         }
     }
 }
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void CollisionListener::EndContact(b2Contact * contact)
+{
+}
+
+
 
 //------------------------------------------------------------------------------------------------------------------------
 // EOF

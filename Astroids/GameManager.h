@@ -1,11 +1,7 @@
 #pragma once
-
+#include "AstroidsPrivate.h"
 #include <iostream>
 #include <vector>
-#include <SFML/Graphics.hpp>
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Audio.hpp>
 #include "box2d/box2d.h"
 #include "EnemyAIManager.h"
 #include "GameObject.h"

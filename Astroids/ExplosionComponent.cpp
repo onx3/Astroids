@@ -1,9 +1,9 @@
+#include "AstroidsPrivate.h"
 #include "ExplosionComponent.h"
 #include <cassert>
 #include <random>
 #include "GameObject.h"
 #include "SpriteComponent.h"
-#include "ResourceManager.h"
 
 ExplosionComponent::ExplosionComponent(GameObject * pOwner, const std::string & spriteSheetPath, int frameWidth, int frameHeight, int numFrames, float frameTime)
     : GameComponent(pOwner)

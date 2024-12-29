@@ -1,3 +1,4 @@
+#include "AstroidsPrivate.h"
 #include "ResourceManager.h"
 
 ResourceId::ResourceId(std::string const & name)

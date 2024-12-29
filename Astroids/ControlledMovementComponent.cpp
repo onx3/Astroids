@@ -1,5 +1,5 @@
+#include "AstroidsPrivate.h"
 #include "ControlledMovementComponent.h"
-#include <SFML/Graphics.hpp>
 #include <cassert>
 #include "GameObject.h"
 #include "SpriteComponent.h"

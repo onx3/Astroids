@@ -106,7 +106,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\ExtLibs\SFML\include;$(SolutionDir)\ExtLibs\ImGui\;$(SolutionDir)\ExtLibs\ImGui-sfml\;$(SolutionDir)\ExtLibs\Box2d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>AstroidsPrivate.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -126,7 +126,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\ExtLibs\SFML\include;$(SolutionDir)\ExtLibs\ImGui\;$(SolutionDir)\ExtLibs\ImGui-sfml\;$(SolutionDir)\ExtLibs\Box2d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>AstroidsPrivate.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -148,6 +148,7 @@
     <ClCompile Include="CollisionListener.cpp" />
     <ClCompile Include="ControlledMovementComponent.cpp" />
     <ClCompile Include="DropManager.cpp" />
+    <ClCompile Include="DropMovementComponent.cpp" />
     <ClCompile Include="ExplosionComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameComponent.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="CollisionListener.h" />
     <ClInclude Include="ControlledMovementComponent.h" />
     <ClInclude Include="DropManager.h" />
+    <ClInclude Include="DropMovementComponent.h" />
     <ClInclude Include="ExplosionComponent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameComponent.h" />

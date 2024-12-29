@@ -1,3 +1,4 @@
+#include "AstroidsPrivate.h"
 #include "PlayerManager.h"
 #include "SpriteComponent.h"
 #include "ControlledMovementComponent.h"

@@ -1,6 +1,6 @@
 #pragma once
+#include "AstroidsPrivate.h"
 #include "GameComponent.h"
-#include "SFML/Audio.hpp"
 #include "string"
 #include "GameObject.h"
 

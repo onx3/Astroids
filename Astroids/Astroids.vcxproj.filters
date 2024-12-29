@@ -21,6 +21,9 @@
     <Filter Include="Source Files\Managers">
       <UniqueIdentifier>{3ad0fd14-835e-46e3-bdaf-c6cc75962630}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Profiling">
+      <UniqueIdentifier>{b3997d3f-3928-4e06-a60f-8450f83face7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameManager.cpp">
@@ -95,14 +98,14 @@
     <ClCompile Include="DropManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="Timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AstroidsPrivate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Source Files\Profiling</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -160,12 +163,14 @@
     <ClInclude Include="DropManager.h">
       <Filter>Source Files\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="AstroidsPrivate.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Source Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Source Files\Profiling</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

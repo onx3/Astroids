@@ -1,3 +1,4 @@
+#include "AstroidsPrivate.h"
 #include "SpriteComponent.h"
 #include "cassert"
 #include "imgui.h"
