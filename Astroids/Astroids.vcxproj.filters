@@ -107,6 +107,9 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Source Files\Profiling</Filter>
     </ClCompile>
+    <ClCompile Include="DropMovementComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameManager.h">
@@ -171,6 +174,9 @@
     </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>Source Files\Profiling</Filter>
+    </ClInclude>
+    <ClInclude Include="DropMovementComponent.h">
+      <Filter>Source Files\GameComponents</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

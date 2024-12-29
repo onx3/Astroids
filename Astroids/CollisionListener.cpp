@@ -58,7 +58,6 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
             if (pObjBHealthComp)
             {
                 pObjBHealthComp->LooseHealth(100);
-                pObjA->SetActiveState(false);
                 pObjA->Destroy();
             }
         }
@@ -71,7 +70,6 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
             if (pObjAHealthComp)
             {
                 pObjAHealthComp->LooseHealth(100);
-                pObjB->SetActiveState(false);
                 pObjB->Destroy();
             }
         }
@@ -125,8 +123,6 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
 void CollisionListener::EndContact(b2Contact * contact)
 {
 }
-
-
 
 //------------------------------------------------------------------------------------------------------------------------
 // EOF

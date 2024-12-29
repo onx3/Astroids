@@ -74,6 +74,10 @@ void HealthComponent::AddLife(int amount)
 	{
 		mLifeCount = mMaxLives;
 	}
+	else
+	{
+		++mLifeCount;
+	}
 }
 
 //------------------------------------------------------------------------------------------------------------------------
