@@ -35,7 +35,7 @@ void GameComponent::draw(sf::RenderTarget & target, sf::RenderStates states)
 void GameComponent::DebugImGuiComponentInfo()
 {
 #if IMGUI_ENABLED()
-    //ImGui::Text("This component doesn't hold any info.");
+
 #endif
 }
 

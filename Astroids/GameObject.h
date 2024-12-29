@@ -16,7 +16,9 @@ enum class ETeam
     Player,
     Friendly,
     Enemy,
-    Neutral
+    Neutral,
+    NukeDrop,
+    LifeDrop
 };
 
 class GameObject : public sf::Drawable
@@ -30,6 +32,8 @@ public:
     void DestroyPhysicsBody(b2World * world);
 
     b2Body * GetPhysicsBody() const;
+
+    void NotifyParentOfDeletion();
 
     // Add a single component of type T
     template <typename T>
@@ -74,7 +78,11 @@ public:
     GameManager & GetGameManager() const;
 
     void AddChild(GameObject * pChild);
+    void RemoveChild(GameObject * pChild);
     std::vector<GameObject *> & GetChildren();
+
+    GameObject * GetParent() const;
+    void SetParent(GameObject * pParent);
 
     std::vector<GameComponent *> GetAllComponents();
 
@@ -84,6 +92,7 @@ public:
     void DebugImGuiInfo();
 
     const float PIXELS_PER_METER = 100.f;
+
 protected:
     GameObject(GameManager * pGameManager, ETeam team, GameObject * pParent = nullptr);
     ~GameObject();
@@ -102,6 +111,7 @@ private:
     GameManager * mpGameManager;
     ETeam mTeam;
     std::vector<GameObject *> mChildGameObjects;
+    GameObject * mpParent;
     b2Body * mpPhysicsBody;
 
     friend class GameManager;

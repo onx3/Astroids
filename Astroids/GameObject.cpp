@@ -6,6 +6,7 @@
 #include "GameComponent.h"
 #include "GameManager.h"
 #include "PlayerManager.h"
+#include "Timer.h"
 
 
 GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pParent)
@@ -15,13 +16,10 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pPar
     , mIsActive(true)
     , mTeam(team)
     , mChildGameObjects()
+    , mpParent(pParent)
     , mpPhysicsBody(nullptr)
 {
     mClock.restart();
-    if (pParent)
-    {
-        pParent->AddChild(this);
-    }
 
     auto spriteComp = std::make_shared<SpriteComponent>(this);
     AddComponent(spriteComp);
@@ -54,6 +52,13 @@ void GameObject::CleanUpChildren()
 void GameObject::Destroy()
 {
     mIsDestroyed = true;
+    for (auto * pChild : mChildGameObjects)
+    {
+        if (pChild)
+        {
+            pChild->Destroy();
+        }
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -114,6 +119,22 @@ b2Body * GameObject::GetPhysicsBody() const
 
 //------------------------------------------------------------------------------------------------------------------------
 
+void GameObject::NotifyParentOfDeletion()
+{
+    if (mpParent)
+    {
+        auto & siblings = mpParent->GetChildren();
+        auto it = std::find(siblings.begin(), siblings.end(), this);
+        if (it != siblings.end())
+        {
+            siblings.erase(it);
+        }
+    }
+}
+
+
+//------------------------------------------------------------------------------------------------------------------------
+
 void GameObject::Update()
 {
     if (!mIsDestroyed)
@@ -129,7 +150,7 @@ void GameObject::Update()
         // Update child objects
         for (auto * pChild : mChildGameObjects)
         {
-            if (pChild)
+            if (pChild && !pChild->IsDestroyed())
             {
                 pChild->Update();
             }
@@ -227,7 +248,23 @@ GameManager & GameObject::GetGameManager() const
 
 void GameObject::AddChild(GameObject * pChild)
 {
-    mChildGameObjects.push_back(pChild);
+    if (pChild)
+    {
+        mChildGameObjects.push_back(pChild);
+        pChild->SetParent(this);
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::RemoveChild(GameObject * child)
+{
+    auto it = std::find(mChildGameObjects.begin(), mChildGameObjects.end(), child);
+    if (it != mChildGameObjects.end())
+    {
+        (*it)->SetParent(nullptr);
+        mChildGameObjects.erase(it);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -235,6 +272,20 @@ void GameObject::AddChild(GameObject * pChild)
 std::vector<GameObject *> & GameObject::GetChildren()
 {
     return mChildGameObjects;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+GameObject * GameObject::GetParent() const
+{
+    return mpParent;
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameObject::SetParent(GameObject * pParent)
+{
+    mpParent = pParent;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -320,7 +371,6 @@ void GameObject::draw(sf::RenderTarget & target, sf::RenderStates states) const
         }
     }
 }
-
 
 //------------------------------------------------------------------------------------------------------------------------
 //EOF

@@ -6,6 +6,7 @@
 #include "CollisionComponent.h"
 #include "ExplosionComponent.h"
 #include <cassert>
+#include "ResourceManager.h"
 
 static int sPlayerHealth = 100;
 
@@ -48,10 +49,15 @@ void PlayerManager::InitPlayer()
         auto pSpriteComponent = pPlayer->GetComponent<SpriteComponent>().lock();
         if (pSpriteComponent)
         {
-            std::string file = "Art/player.png";
-            auto scale = sf::Vector2f(.5f, .5f);
-            pSpriteComponent->SetSprite(file, scale);
-            pSpriteComponent->SetPosition(centerPosition);
+            std::string file = "Art/Player.png";
+            ResourceId resourceId(file);
+
+            auto pTexture = mpGameManager->GetManager<ResourceManager>()->GetTexture(resourceId);
+            if (pTexture)
+            {
+                pSpriteComponent->SetSprite(pTexture, sf::Vector2f(0.5f, 0.5f));
+                pSpriteComponent->SetPosition(centerPosition);
+            }
         }
     }
 
@@ -140,7 +146,14 @@ void PlayerManager::Update()
                 auto pSpriteComponent = pPlayer->GetComponent<SpriteComponent>().lock();
                 if (pSpriteComponent)
                 {
-                    pSpriteComponent->SetSprite("Art/playerDamaged.png", pSpriteComponent->GetSprite().getScale());
+                    std::string file = "Art/playerDamaged.png";
+                    ResourceId resourceId(file);
+
+                    auto texture = mpGameManager->GetManager<ResourceManager>()->GetTexture(resourceId);
+                    if (texture)
+                    {
+                        pSpriteComponent->SetSprite(texture, pSpriteComponent->GetSprite().getScale());
+                    }
                 }
             }
         }
@@ -150,6 +163,13 @@ void PlayerManager::Update()
             mSoundPlayed = false;
         }
     }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void PlayerManager::OnGameEnd()
+{
+    mPlayerObjects.clear();
 }
 
 //------------------------------------------------------------------------------------------------------------------------

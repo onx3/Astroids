@@ -10,6 +10,7 @@
 #include "HealthComponent.h"
 #include "BDConfig.h"
 #include "PlayerManager.h"
+#include "ResourceManager.h"
 
 ProjectileComponent::ProjectileComponent(GameObject * pOwner)
 	: GameComponent(pOwner)
@@ -54,7 +55,11 @@ void ProjectileComponent::Shoot()
 	auto pProjectileSpriteComponent = pProjectile->GetComponent<SpriteComponent>().lock();
 	if (pProjectileSpriteComponent)
 	{
-		pProjectileSpriteComponent->SetSprite(GetCorrectProjectileFile(), sf::Vector2f(1.05f, 1.05f));
+		auto file = GetCorrectProjectileFile();
+		ResourceId resourceId(file);
+		auto pTexture = mpOwner->GetGameManager().GetManager<ResourceManager>()->GetTexture(resourceId);
+
+		pProjectileSpriteComponent->SetSprite(pTexture, sf::Vector2f(1.05f, 1.05f));
 
 		// Get ship's position, size
 		sf::Vector2f playerPosition = mpOwner->GetPosition();
@@ -163,19 +168,23 @@ void ProjectileComponent::UpdateProjectiles(float deltaTime)
 			sf::Vector2f currentPosition = projectile.pObject->GetPosition();
 			sf::Vector2f newPosition = currentPosition + (projectile.direction * mSpeed * deltaTime);
 			projectile.pObject->SetPosition(newPosition);
+
+			projectile.lifespan -= deltaTime;
 		}
 	}
 
 	mProjectiles.erase(
 		std::remove_if(mProjectiles.begin(), mProjectiles.end(),
-			[](const Projectile & proj) {
-				return proj.pObject->IsDestroyed() || proj.lifespan <= 0.0f;
+			[](Projectile & proj) {
+				if (proj.pObject && !proj.pObject->IsDestroyed() && proj.lifespan <= 0.0f)
+				{
+					proj.pObject->Destroy(); // Destroy the object if its lifespan is over
+				}
+				// Remove if the object is destroyed or lifespan is exhausted
+				return !proj.pObject || proj.pObject->IsDestroyed();
 			}),
 		mProjectiles.end());
 }
-
-
-
 
 //------------------------------------------------------------------------------------------------------------------------
 // EOF

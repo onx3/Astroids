@@ -3,6 +3,7 @@
 #include <random>
 #include "GameObject.h"
 #include "SpriteComponent.h"
+#include "ResourceManager.h"
 
 ExplosionComponent::ExplosionComponent(GameObject * pOwner, const std::string & spriteSheetPath, int frameWidth, int frameHeight, int numFrames, float frameTime)
     : GameComponent(pOwner)
@@ -15,13 +16,16 @@ ExplosionComponent::ExplosionComponent(GameObject * pOwner, const std::string & 
     , mAnimationFinished(false)
     , mSoundPlayed(false)
 {
-    if (!mTexture.loadFromFile(spriteSheetPath))
-    {
-        throw std::runtime_error("Failed to load sprite sheet: " + spriteSheetPath);
-    }
+    std::string file = spriteSheetPath;
+    ResourceId resourceId(file);
 
-    mSprite.setTexture(mTexture);
-    mSprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
+    auto pTexture = mpOwner->GetGameManager().GetManager<ResourceManager>()->GetTexture(resourceId);
+    if (pTexture)
+    {
+        mTexture = *pTexture;
+        mSprite.setTexture(mTexture);
+        mSprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
+    }
 
     // Sound
     {

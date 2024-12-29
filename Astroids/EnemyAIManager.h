@@ -5,6 +5,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "GameObject.h"
+#include "DropManager.h"
 
 enum class EEnemy
 {
@@ -22,21 +23,27 @@ public:
 
 	void Update() override;
 
+	void OnGameEnd() override;
+
 	void RemoveEnemy(GameObject * pEnemy);
 	void RespawnEnemy(EEnemy type, sf::Vector2f pos);
 
 	void AddEnemies(int count, EEnemy type, sf::Vector2f pos);
+	void DestroyAllEnemies();
 
 	const std::vector<GameObject *> & GetEnemies() const;
 
 	void OnDeath(GameObject * pEnemy);
+
 private:
 	std::string GetEnemyFile(EEnemy type);
 	void CleanUpDeadEnemies();
 
 	sf::Vector2f GetRandomSpawnPosition();
 
-	const int mMaxEnemies = 25;
+	EDropType DetermineDropType() const;
+
+	const int mMaxEnemies = 1;
 	std::vector<GameObject *> mEnemyObjects;
 };
 

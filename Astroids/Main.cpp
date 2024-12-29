@@ -1,6 +1,7 @@
 #include <iostream>
 #include "GameManager.h"
 #include <cstdlib>
+#include "Timer.h"
 
 int main()
 {

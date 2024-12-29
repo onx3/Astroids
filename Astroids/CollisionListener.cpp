@@ -2,6 +2,14 @@
 #include "GameObject.h"
 #include "ProjectileComponent.h"
 #include "HealthComponent.h"
+#include "GameManager.h"
+
+CollisionListener::CollisionListener(GameManager * pGameManager)
+    : mpGameManager(pGameManager)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------
 
 void CollisionListener::BeginContact(b2Contact * contact)
 {
@@ -70,6 +78,47 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
                 pObjB->SetActiveState(false);
                 pObjB->Destroy();
             }
+        }
+    }
+    // Drops
+    else if (pObjA->GetTeam() == ETeam::Player && pObjB->GetTeam() == ETeam::NukeDrop)
+    {
+        if (pObjA->IsActive() && pObjB->IsActive())
+        {
+            mpGameManager->GetManager<EnemyAIManager>()->DestroyAllEnemies();
+            pObjB->Destroy();
+        }
+    }
+    else if (pObjA->GetTeam() == ETeam::NukeDrop && pObjB->GetTeam() == ETeam::Player)
+    {
+        if (pObjA->IsActive() && pObjB->IsActive())
+        {
+            mpGameManager->GetManager<EnemyAIManager>()->DestroyAllEnemies();
+            pObjA->Destroy();
+        }
+    }
+    else if (pObjA->GetTeam() == ETeam::Player && pObjB->GetTeam() == ETeam::LifeDrop)
+    {
+        if (pObjA->IsActive() && pObjB->IsActive())
+        {
+            auto pObjAHealthComp = pObjA->GetComponent<HealthComponent>().lock();
+            if (pObjAHealthComp)
+            {
+                pObjAHealthComp->AddLife(1);
+            }
+            pObjB->Destroy();
+        }
+    }
+    else if (pObjA->GetTeam() == ETeam::LifeDrop && pObjB->GetTeam() == ETeam::Player)
+    {
+        if (pObjA->IsActive() && pObjB->IsActive())
+        {
+            auto pObjBHealthComp = pObjB->GetComponent<HealthComponent>().lock();
+            if (pObjBHealthComp)
+            {
+                pObjBHealthComp->AddLife(1);
+            }
+            pObjA->Destroy();
         }
     }
 }

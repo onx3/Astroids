@@ -55,12 +55,14 @@ std::vector<sf::Sprite> & ScoreManager::GetSpriteLives()
 		return mSpriteLives;
 	}
     auto * pPlayerObject = pPlayerManager->GetPlayers()[0];
-	
-	auto healthComponent = pPlayerObject->GetComponent<HealthComponent>().lock();
-	if (healthComponent)
+	if (pPlayerObject && !pPlayerObject->IsDestroyed())
 	{
-		lives = healthComponent->GetLives(); // Fetch the player's current health
-	}
+		auto pHealthComponent = pPlayerObject->GetComponent<HealthComponent>().lock();
+		if (pHealthComponent)
+		{
+			lives = pHealthComponent->GetLives(); // Fetch the player's current health
+		}
+	}	
 
     // Generate life sprites based on the player's current lives
     for (int ii = 0; ii < lives; ++ii)

@@ -1,3 +1,4 @@
+#include "AstroidsPrivate.h"
 #include "BaseManager.h"
 
 BaseManager::BaseManager(GameManager * pGameManager)
@@ -16,6 +17,13 @@ BaseManager::~BaseManager()
 //------------------------------------------------------------------------------------------------------------------------
 
 void BaseManager::Update()
+{
+
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void BaseManager::OnGameEnd()
 {
 
 }

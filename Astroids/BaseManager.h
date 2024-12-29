@@ -10,6 +10,8 @@ public:
 
 	virtual void Update();
 
+	virtual void OnGameEnd();
+
 protected:
 	GameManager * mpGameManager;
 };

@@ -8,8 +8,8 @@ class SpriteComponent : public GameComponent
 public:
 	SpriteComponent(GameObject * pOwner);
 	~SpriteComponent();
-
-	void SetSprite(const std::string & file, const sf::Vector2f & scale = {1.f, 1.f});
+	
+	void SetSprite(std::shared_ptr<sf::Texture> pTexture, const sf::Vector2f & scale);
 	sf::Sprite & GetSprite();
 
 	sf::Vector2f GetPosition() const;

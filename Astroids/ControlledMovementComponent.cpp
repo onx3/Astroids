@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "SpriteComponent.h"
 #include "BDConfig.h"
+#include "ResourceManager.h"
 
 ControlledMovementComponent::ControlledMovementComponent(GameObject * pOwner)
     : GameComponent(pOwner)
@@ -14,6 +15,7 @@ ControlledMovementComponent::ControlledMovementComponent(GameObject * pOwner)
     , mVelocityX(0.f)
     , mVelocityY(0.f)
     , mName("ControlledMovementComponent")
+    , mTilt(ESpriteTilt::Normal)
 {
 }
 
@@ -56,43 +58,65 @@ void ControlledMovementComponent::Update()
 
         sf::Vector2f inputDirection = { 0.f, 0.f };
 
-        // Input direction based on key presses
-        static std::string currentSprite = "Art/Player.png";
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
         {
             inputDirection.y -= 1.f;
-            if (currentSprite != "Art/Player.png")
+            if (mTilt != ESpriteTilt::Normal)
             {
-                pSpriteComponent->SetSprite("Art/Player.png", pSpriteComponent->GetSprite().getScale());
-                currentSprite = "Art/Player.png";
+                std::string file = "Art/Player.png";
+                ResourceId resourceId(file);
+                auto pTexture = mpOwner->GetGameManager().GetManager<ResourceManager>()->GetTexture(resourceId);
+                if (pTexture)
+                {
+                    pSpriteComponent->SetSprite(pTexture, pSpriteComponent->GetSprite().getScale());
+                }
+                mTilt = ESpriteTilt::Normal;
             }
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         {
             inputDirection.y += 1.f;
-            if (currentSprite != "Art/Player.png")
+            if (mTilt != ESpriteTilt::Normal)
             {
-                pSpriteComponent->SetSprite("Art/Player.png", pSpriteComponent->GetSprite().getScale());
-                currentSprite = "Art/Player.png";
+                std::string file = "Art/Player.png";
+                ResourceId resourceId(file);
+                auto pTexture = mpOwner->GetGameManager().GetManager<ResourceManager>()->GetTexture(resourceId);
+                if (pTexture)
+                {
+                    pSpriteComponent->SetSprite(pTexture, pSpriteComponent->GetSprite().getScale());
+                }
+                mTilt = ESpriteTilt::Normal;
             }
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
         {
             inputDirection.x -= 1.f;
-            if (currentSprite != "Art/PlayerLeft.png")
+            if (mTilt != ESpriteTilt::Left)
             {
-                pSpriteComponent->SetSprite("Art/PlayerLeft.png", pSpriteComponent->GetSprite().getScale());
-                currentSprite = "Art/PlayerLeft.png";
+                std::string file = "Art/PlayerLeft.png";
+                ResourceId resourceId(file);
+                auto pTexture = mpOwner->GetGameManager().GetManager<ResourceManager>()->GetTexture(resourceId);
+                if (pTexture)
+                {
+                    pSpriteComponent->SetSprite(pTexture, pSpriteComponent->GetSprite().getScale());
+                }
+                mTilt = ESpriteTilt::Left;
             }
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         {
             inputDirection.x += 1.f;
-            if (currentSprite != "Art/PlayerRight.png")
+            if (mTilt != ESpriteTilt::Right)
             {
-                pSpriteComponent->SetSprite("Art/PlayerRight.png", pSpriteComponent->GetSprite().getScale());
-                currentSprite = "Art/PlayerRight.png";
+                std::string file = "Art/PlayerRight.png";
+                ResourceId resourceId(file);
+                auto pTexture = mpOwner->GetGameManager().GetManager<ResourceManager>()->GetTexture(resourceId);
+                if (pTexture)
+                {
+                    pSpriteComponent->SetSprite(pTexture, pSpriteComponent->GetSprite().getScale());
+                }
+                mTilt = ESpriteTilt::Right;
             }
         }
 

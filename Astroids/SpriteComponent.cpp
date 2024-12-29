@@ -19,15 +19,14 @@ SpriteComponent::~SpriteComponent()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void SpriteComponent::SetSprite(const std::string & file, const sf::Vector2f & scale)
+void SpriteComponent::SetSprite(std::shared_ptr<sf::Texture> pTexture, const sf::Vector2f & scale)
 {
-    if (!mTexture.loadFromFile(file))
+    
+    if (pTexture)
     {
-        assert(false && "Failed to load texture");
+        mSprite.setTexture(*pTexture);
+        mSprite.setScale(scale);
     }
-    mFile = file;
-    mSprite.setTexture(mTexture);
-    mSprite.setScale(scale);
     SetOriginToCenter();
 }
 

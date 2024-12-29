@@ -12,6 +12,8 @@ public:
 
     void Update() override;
 
+    void OnGameEnd() override;
+
     void OnPlayerLostLife(GameObject * pPlayer);
 
     void OnPlayerDeath(GameObject * pPlayer);

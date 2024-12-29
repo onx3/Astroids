@@ -10,6 +10,9 @@
 #include "CollisionComponent.h"
 #include "HealthComponent.h"
 #include "PlayerManager.h"
+#include "DropManager.h"
+#include "Timer.h"
+#include "ResourceManager.h"
 
 GameManager::GameManager(WindowManager & windowManager)
     : mWindowManager(windowManager)
@@ -25,16 +28,18 @@ GameManager::GameManager(WindowManager & windowManager)
     , mSoundPlayed(false)
     , mIsGameOver(false)
     , mPhysicsWorld(b2Vec2(0.0f, 0.f))
-    , mCollisionListener()
+    , mCollisionListener(this)
 {
     mClock.restart();
     InitWindow();
 
     mpRootGameObject = new GameObject(this, ETeam::Neutral);
 
+    AddManager<ResourceManager>();
     AddManager<PlayerManager>();
     AddManager<EnemyAIManager>();
     AddManager<ScoreManager>();
+    AddManager<DropManager>();
 
     // Game Audio
     {
@@ -66,6 +71,13 @@ GameManager::GameManager(WindowManager & windowManager)
         mPhysicsWorld.SetContactListener(&mCollisionListener);
         mPhysicsWorld.Step(0.f, 0, 0);
     }
+
+    // ResourceManager
+    {
+        auto * pResourceManager = GetManager<ResourceManager>();
+        auto resourcesToLoad = GetCommonResourcePaths();
+        pResourceManager->PreloadResources(resourcesToLoad);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -80,17 +92,34 @@ GameManager::~GameManager()
             manager.second = nullptr;
         }
     }
+    mManagers.clear();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
 
 void GameManager::EndGame()
 {
+    // Stop any ongoing game logic
+    mIsGameOver = true;
+
+    // Notify all managers that the game is ending
+    for (auto & manager : mManagers)
+    {
+        if (manager.second)
+        {
+            manager.second->OnGameEnd();
+        }
+    }
+
+    // Cleanup all game objects starting from the root
     if (mpRootGameObject)
     {
+        CleanUpDestroyedGameObjects(mpRootGameObject);
         delete mpRootGameObject;
         mpRootGameObject = nullptr;
     }
+
+    mPhysicsWorld.ClearForces();
     GameOver();
 }
 
@@ -115,15 +144,13 @@ void GameManager::Update()
 
     UpdateGameObjects();
 
-    for (auto & manager : mManagers)
     {
-        if (manager.second)
+        for (auto & manager : mManagers)
         {
-            manager.second->Update();
-        }
-        else
-        {
-            std::cerr << "Error: Manager " << manager.first.name() << " is nullptr!\n";
+            if (manager.second)
+            {
+                manager.second->Update();
+            }
         }
     }
 }
@@ -134,10 +161,9 @@ void GameManager::UpdateGameObjects()
 {
     if (mpRootGameObject)
     {
+       
         mpRootGameObject->Update();
-
         CleanUpDestroyedGameObjects(mpRootGameObject);
-
         if (!mpRootGameObject)
         {
             EndGame();
@@ -153,6 +179,7 @@ void GameManager::CleanUpDestroyedGameObjects(GameObject * pRoot)
         return;
 
     auto & children = pRoot->GetChildren();
+    std::vector<GameObject *> objectsToDelete;
 
     for (int i = static_cast<int>(children.size()) - 1; i >= 0; --i)
     {
@@ -160,13 +187,21 @@ void GameManager::CleanUpDestroyedGameObjects(GameObject * pRoot)
 
         CleanUpDestroyedGameObjects(pChild);
 
+        // Collect destroyed objects
         if (pChild && pChild->IsDestroyed())
         {
-            delete pChild;
-            children.erase(children.begin() + i);
+            objectsToDelete.push_back(pChild);
         }
     }
+
+    // Notify and delete in bulk
+    for (GameObject * pObject : objectsToDelete)
+    {
+        pObject->NotifyParentOfDeletion(); // Notify parent
+        delete pObject;                    // Delete object
+    }
 }
+
 
 //------------------------------------------------------------------------------------------------------------------------
 
@@ -291,14 +326,16 @@ void GameManager::Render()
         // Draw UI
         {
             auto * pScoreManager = GetManager<ScoreManager>();
-            mpWindow->draw(pScoreManager->GetScoreText());
-
-            auto & spriteLives = pScoreManager->GetSpriteLives();
-            for (auto & life : spriteLives)
+            if (pScoreManager)
             {
-                mpWindow->draw(life);
-            }
-        }
+                mpWindow->draw(pScoreManager->GetScoreText());
+
+                auto & spriteLives = pScoreManager->GetSpriteLives();
+                for (auto & life : spriteLives)
+                {
+                    mpWindow->draw(life);
+                }
+            }        }
 
         // Draw Mouse Cursor
         {
@@ -388,12 +425,25 @@ void GameManager::GameOver()
     {
         mScoreText.setString("Score: " + std::to_string(pScoreManager->GetScore()) + "\n" + "Press ENTER to Play Again!");
     }
+}
 
-    if (mpRootGameObject)
-    {
-        delete mpRootGameObject;
-        mpRootGameObject = nullptr;
-    }
+//------------------------------------------------------------------------------------------------------------------------
+
+std::vector<std::string> GameManager::GetCommonResourcePaths()
+{
+    return {
+        "Art/Astroid.png",
+        "Art/Nuke.png",
+        "Art/life.png",
+        "Art/laserGreen.png",
+        "Art/laserRed.png",
+        "Art/player.png",
+        "Art/playerLeft.png",
+        "Art/playerRight.png",
+        "Art/playerDamaged.png",
+        "Art/Explosion.png",
+        
+    };
 }
 
 //------------------------------------------------------------------------------------------------------------------------

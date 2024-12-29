@@ -106,6 +106,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\ExtLibs\SFML\include;$(SolutionDir)\ExtLibs\ImGui\;$(SolutionDir)\ExtLibs\ImGui-sfml\;$(SolutionDir)\ExtLibs\Box2d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>AstroidsPrivate.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -124,6 +126,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\ExtLibs\SFML\include;$(SolutionDir)\ExtLibs\ImGui\;$(SolutionDir)\ExtLibs\ImGui-sfml\;$(SolutionDir)\ExtLibs\Box2d\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>AstroidsPrivate.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,10 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AstroidsPrivate.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="BaseManager.cpp" />
     <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="CollisionListener.cpp" />
     <ClCompile Include="ControlledMovementComponent.cpp" />
+    <ClCompile Include="DropManager.cpp" />
     <ClCompile Include="ExplosionComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameComponent.cpp" />
@@ -155,16 +164,20 @@
     <ClCompile Include="PlayerManager.cpp" />
     <ClCompile Include="ProjectileComponent.cpp" />
     <ClCompile Include="RandomMovementComponent.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="ScoreManager.cpp" />
     <ClCompile Include="SpriteComponent.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AstroidsPrivate.h" />
     <ClInclude Include="BaseManager.h" />
     <ClInclude Include="BDConfig.h" />
     <ClInclude Include="CollisionComponent.h" />
     <ClInclude Include="CollisionListener.h" />
     <ClInclude Include="ControlledMovementComponent.h" />
+    <ClInclude Include="DropManager.h" />
     <ClInclude Include="ExplosionComponent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameComponent.h" />
@@ -174,8 +187,10 @@
     <ClInclude Include="PlayerManager.h" />
     <ClInclude Include="ProjectileComponent.h" />
     <ClInclude Include="RandomMovementComponent.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ScoreManager.h" />
     <ClInclude Include="SpriteComponent.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="WindowManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

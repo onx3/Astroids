@@ -63,6 +63,8 @@ private:
 	
 	void GameOver();
 
+	std::vector<std::string> GetCommonResourcePaths();
+
 	bool mShowImGuiWindow;
 	std::unordered_map<std::type_index, BaseManager *> mManagers;
 	sf::Texture mBackgroundTexture;

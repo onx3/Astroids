@@ -1,6 +1,12 @@
 #pragma once
 
 #include "GameComponent.h"
+enum class ESpriteTilt
+{
+	Normal,
+	Right,
+	Left
+};
 
 class ControlledMovementComponent : public GameComponent
 {
@@ -25,6 +31,7 @@ private:
 	float mDeceleration;
 	float mMaxSpeed;
 	std::string mName;
+	ESpriteTilt mTilt;
 };
 
 //------------------------------------------------------------------------------------------------------------------------

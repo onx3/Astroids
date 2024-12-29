@@ -2,13 +2,18 @@
 #include "GameObject.h"
 #include <memory>
 #include <cassert>
+#include <iostream>
 #include "SpriteComponent.h"
 #include "CollisionComponent.h"
 #include "HealthComponent.h"
 #include "RandomMovementComponent.h"
 #include "ExplosionComponent.h"
-#include <iostream>
+#include "DropManager.h"
+#include "Timer.h"
+#include "ResourceManager.h"
 
+
+Timer gTimers[3];
 EnemyAIManager::EnemyAIManager(GameManager * pGameManager)
 	: BaseManager(pGameManager)
 {
@@ -36,7 +41,7 @@ void EnemyAIManager::Update()
 {
     for (auto * pEnemy : mEnemyObjects)
     {
-        if (pEnemy)
+        if (pEnemy && !pEnemy->IsDestroyed())
         {
             auto pHealthComp = pEnemy->GetComponent<HealthComponent>().lock();
             if (pHealthComp)
@@ -48,11 +53,19 @@ void EnemyAIManager::Update()
         }
     }
 	CleanUpDeadEnemies();
+
 	while (mEnemyObjects.size() < mMaxEnemies)
 	{
 		sf::Vector2f spawnPosition = GetRandomSpawnPosition();
 		RespawnEnemy(EEnemy::Asteroid, spawnPosition);
 	}
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void EnemyAIManager::OnGameEnd()
+{
+    mEnemyObjects.clear();
 }
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -120,29 +133,55 @@ void EnemyAIManager::AddEnemies(int count, EEnemy type, sf::Vector2f pos)
 
         if (pSpriteComp)
         {
-            std::string file = GetEnemyFile(type);
-            auto scale = sf::Vector2f(.08f, .08f);
-            pSpriteComp->SetSprite(file, scale);
-            pSpriteComp->SetPosition(pos);
-            pEnemy->AddComponent(pSpriteComp);
+            {
+                gTimers[0].Start();
+                std::string file = GetEnemyFile(type);
+                auto scale = sf::Vector2f(.08f, .08f);
+                ResourceId resourceId(file);
+                auto pTexture = mpGameManager->GetManager<ResourceManager>()->GetTexture(resourceId);
 
-            // Add random movement AFTER smooth intro
-            auto pRandomMovementComp = std::make_shared<RandomMovementComponent>(pEnemy);
-            pEnemy->AddComponent(pRandomMovementComp);
+                pSpriteComp->SetSprite(pTexture, scale);
+                pSpriteComp->SetPosition(pos);
+                pEnemy->AddComponent(pSpriteComp);
+                gTimers[0].Stop();
+            }
+            {
+                gTimers[1].Start();
 
-            auto pHealthComponent = std::make_shared<HealthComponent>(pEnemy, 10, 100, 1, 1);
-            pEnemy->AddComponent(pHealthComponent);
+                // Add random movement AFTER smooth intro
+                auto pRandomMovementComp = std::make_shared<RandomMovementComponent>(pEnemy);
+                pEnemy->AddComponent(pRandomMovementComp);
 
-            pEnemy->CreatePhysicsBody(&mpGameManager->GetPhysicsWorld(), pEnemy->GetSize(), true);
-            auto pCollisionComp = std::make_shared<CollisionComponent>(
-                pEnemy,
-                &mpGameManager->GetPhysicsWorld(),
-                pEnemy->GetPhysicsBody(),
-                pEnemy->GetSize(),
-                true
-            );
-            pEnemy->AddComponent(pCollisionComp);
+                auto pHealthComponent = std::make_shared<HealthComponent>(pEnemy, 10, 100, 1, 1);
+                pEnemy->AddComponent(pHealthComponent);
+                gTimers[1].Stop();
+            }
+            {
+                gTimers[2].Start();
+                pEnemy->CreatePhysicsBody(&mpGameManager->GetPhysicsWorld(), pEnemy->GetSize(), true);
+                auto pCollisionComp = std::make_shared<CollisionComponent>(
+                    pEnemy,
+                    &mpGameManager->GetPhysicsWorld(),
+                    pEnemy->GetPhysicsBody(),
+                    pEnemy->GetSize(),
+                    true
+                );
+                pEnemy->AddComponent(pCollisionComp);
+                gTimers[2].Stop();
+            }
+            
         }
+        
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void EnemyAIManager::DestroyAllEnemies()
+{
+    for (auto * pEnemy : mEnemyObjects)
+    {
+        pEnemy->Destroy();
     }
 }
 
@@ -152,19 +191,21 @@ void EnemyAIManager::CleanUpDeadEnemies()
 {
     for (auto * pEnemy : mEnemyObjects)
     {
-        auto explosionComp = pEnemy->GetComponent<ExplosionComponent>().lock();
-        if (explosionComp && explosionComp->IsAnimationFinished())
+        if (pEnemy && !pEnemy->IsDestroyed())
         {
-            pEnemy->Destroy();
+            auto explosionComp = pEnemy->GetComponent<ExplosionComponent>().lock();
+            if (explosionComp && explosionComp->IsAnimationFinished())
+            {
+                pEnemy->Destroy();
+            }
         }
-    }
+    }	
 
-	auto removeStart = std::remove_if(mEnemyObjects.begin(), mEnemyObjects.end(),
-		[](GameObject * pObj)
-		{
-			return pObj->IsDestroyed();
-		});
-
+    auto removeStart = std::remove_if(mEnemyObjects.begin(), mEnemyObjects.end(),
+        [](GameObject * pObj)
+        {
+            return pObj->IsDestroyed();
+        });
 	mEnemyObjects.erase(removeStart, mEnemyObjects.end());
 }
 
@@ -176,6 +217,7 @@ std::string EnemyAIManager::GetEnemyFile(EEnemy type)
 	{
 		case (EEnemy::Ship):
 		{
+            //return ResourceManager.GetTexture("Art/EnemyShip.png");
 			return "Art/EnemyShip.png";
 		}
 		case (EEnemy::Ufo):
@@ -204,13 +246,44 @@ const std::vector<GameObject *> & EnemyAIManager::GetEnemies() const
 
 void EnemyAIManager::OnDeath(GameObject * pEnemy)
 {
-    // Add the explosion animation here
+    // Explosion
     if (!pEnemy->GetComponent<ExplosionComponent>().lock())
     {
         auto explosionComp = std::make_shared<ExplosionComponent>(
             pEnemy, "Art/explosion.png", 32, 32, 7, 0.1f);
         pEnemy->AddComponent(explosionComp);
     }
+    // Add Score
+    {
+        auto pScoreManager = mpGameManager->GetManager<ScoreManager>();
+        pScoreManager->AddScore(1000);
+    }
+    // Drops
+    {
+        EDropType dropType = DetermineDropType();
+        auto pDropManager = mpGameManager->GetManager<DropManager>();
+        if (pDropManager)
+        {
+            sf::Vector2f position = pEnemy->GetPosition();
+            pDropManager->SpawnDrop(dropType, position);
+        }
+    }
+}
+
+EDropType EnemyAIManager::DetermineDropType() const
+{
+    int randomValue = rand() % 100;
+
+    if (randomValue < 10)
+    {
+        return EDropType::NukePickup;
+    }
+    else if (randomValue < 30)
+    {
+        return EDropType::LifePickup;
+    }
+
+    return EDropType::None;
 }
 
 //------------------------------------------------------------------------------------------------------------------------
