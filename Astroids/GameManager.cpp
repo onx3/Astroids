@@ -161,7 +161,6 @@ void GameManager::UpdateGameObjects()
 {
     if (mpRootGameObject)
     {
-       
         mpRootGameObject->Update();
         CleanUpDestroyedGameObjects(mpRootGameObject);
         if (!mpRootGameObject)

@@ -21,6 +21,11 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pPar
 {
     mClock.restart();
 
+    if (pParent)
+    {
+        pParent->AddChild(this);
+    }
+
     auto spriteComp = std::make_shared<SpriteComponent>(this);
     AddComponent(spriteComp);
 }
