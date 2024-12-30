@@ -17,22 +17,23 @@ GameManager::GameManager(WindowManager & windowManager)
     : mWindowManager(windowManager)
     , mpWindow(windowManager.GetWindow())
     , mEvent(windowManager.GetEvent())
-    , mBackgroundTexture()
-    , mBackgroundSprite()
     , mShowImGuiWindow(false)
     , mpRootGameObject(nullptr)
     , mManagers()
-    , mCursorTexture()
     , mCursorSprite()
     , mSoundPlayed(false)
     , mIsGameOver(false)
     , mPhysicsWorld(b2Vec2(0.0f, 0.f))
     , mCollisionListener(this)
 {
+    // Keep this first
+    {
+        AddManager<ResourceManager>();
+    }
+
     InitWindow();
     mpRootGameObject = new GameObject(this, ETeam::Neutral);
 
-    AddManager<ResourceManager>();
     AddManager<PlayerManager>();
     AddManager<EnemyAIManager>();
     AddManager<ScoreManager>();
@@ -99,7 +100,6 @@ GameManager::~GameManager()
 
 void GameManager::EndGame()
 {
-    // Stop any ongoing game logic
     mIsGameOver = true;
 
     // Notify all managers that the game is ending
@@ -298,7 +298,6 @@ void GameManager::Render(float deltaTime)
     RenderParallaxLayers();
     if (mIsGameOver)
     {
-        //mpWindow->draw(mBackgroundSprite);
         mpWindow->draw(mGameOverText);
         mpWindow->draw(mScoreText);
     }
@@ -313,9 +312,6 @@ void GameManager::Render(float deltaTime)
         {
             mpWindow->setMouseCursorVisible(true);
         }
-
-        // Draw background
-        mpWindow->draw(mBackgroundSprite);
 
         // Draw all GameObjects
         if (mpRootGameObject)
@@ -394,15 +390,9 @@ b2World & GameManager::GetPhysicsWorld()
 
 void GameManager::InitWindow()
 {
-    //std::string file = "Art/Background/original.png";
-    //assert(mBackgroundTexture.loadFromFile(file));
-    //mBackgroundSprite.setTexture(mBackgroundTexture);
-
-    //// Scale to window size
-    //mBackgroundSprite.setScale(float(mpWindow->getSize().x) / mBackgroundTexture.getSize().x, float(mpWindow->getSize().y) / mBackgroundTexture.getSize().y);
-
-    assert(mCursorTexture.loadFromFile("Art/Crosshair.png"));
-    mCursorSprite.setTexture(mCursorTexture);
+    ResourceId resourceId("Art/Crosshair.png");
+    auto pTexture = GetManager<ResourceManager>()->GetTexture(resourceId);
+    mCursorSprite.setTexture(*pTexture);
     mCursorSprite.setScale(.25f, .25f);
 
     sf::FloatRect localBounds = mCursorSprite.getLocalBounds();
@@ -442,9 +432,9 @@ std::vector<std::string> GameManager::GetCommonResourcePaths()
         "Art/playerRight.png",
         "Art/playerDamaged.png",
         "Art/Explosion.png",
+        "Art/Crosshair.png",
         "Art/Background/backgroundFar.png",
-        "Art/Background/backgroundMid.png",
-        "Art/Background/backgroundClose.png"
+        "Art/Background/backgroundReallyFar.png"
     };
 }
 
@@ -458,49 +448,36 @@ void GameManager::InitializeParallaxLayers()
         return;
     }
 
-    // Far background
-    {
-        ResourceId farResource("Art/Background/backgroundFar.png");
-        auto pFarTexture = pResourceManager->GetTexture(farResource);
-        if (!pFarTexture)
-        {
-            throw std::runtime_error("Failed to load backgroundFar.png");
-        }
-        sf::Sprite farSprite(*pFarTexture);
-        mParallaxLayers.push_back({ farSprite, 0.1f }); // Slowest movement
-    }
+    std::vector<std::pair<std::string, float>> layerConfigs = {
+        {"Art/Background/backgroundFar.png", 0.7f},
+        {"Art/Background/backgroundReallyFar.png", .9f},
+    };
 
-    // Midground
+    for (const auto & [texturePath, parallaxSpeed] : layerConfigs)
     {
-        ResourceId midResource("Art/Background/backgroundMid.png");
-        auto pMidTexture = pResourceManager->GetTexture(midResource);
-        if (!pMidTexture)
+        ResourceId resource(texturePath);
+        auto pTexture = pResourceManager->GetTexture(resource);
+        if (!pTexture)
         {
-            throw std::runtime_error("Failed to load backgroundMid.png");
+            throw std::runtime_error("Failed to load background layer: " + texturePath);
         }
-        sf::Sprite midSprite(*pMidTexture);
-        mParallaxLayers.push_back({ midSprite, 0.5f }); // Medium speed
-    }
 
-    // Foreground
-    {
-        ResourceId foreResource("Art/Background/backgroundClose.png");
-        auto pForeTexture = pResourceManager->GetTexture(foreResource);
-        if (!pForeTexture)
+        // Create three sprites per layer for seamless scrolling
+        ParallaxLayer layer;
+        layer.parallaxSpeed = parallaxSpeed;
+
+        for (int i = 0; i < 3; ++i)
         {
-            throw std::runtime_error("Failed to load backgroundClose.png");
+            sf::Sprite sprite(*pTexture);
+            sprite.setScale(
+                float(mpWindow->getSize().x) / sprite.getTexture()->getSize().x,
+                float(mpWindow->getSize().y) / sprite.getTexture()->getSize().y
+            );
+            sprite.setPosition(i * sprite.getGlobalBounds().width, 0);
+            layer.mSprites.push_back(sprite);
         }
-        sf::Sprite foreSprite(*pForeTexture);
-        mParallaxLayers.push_back({ foreSprite, 0.8f }); // Fastest movement
-    }
 
-    // Scale layers to fit the window
-    for (auto & layer : mParallaxLayers)
-    {
-        layer.mSprite.setScale(
-            float(mpWindow->getSize().x) / layer.mSprite.getTexture()->getSize().x,
-            float(mpWindow->getSize().y) / layer.mSprite.getTexture()->getSize().y
-        );
+        mParallaxLayers.push_back(layer);
     }
 }
 
@@ -510,17 +487,22 @@ void GameManager::UpdateParallaxLayers(float deltaTime, float playerSpeedX)
 {
     for (auto & layer : mParallaxLayers)
     {
-        // Move the layer relative to the player's speed and parallax speed
         float offset = -playerSpeedX * layer.parallaxSpeed * deltaTime;
-        layer.mSprite.move(offset, 0.0f);
 
-        // If the layer moves off-screen, loop it
-        if (layer.mSprite.getPosition().x + layer.mSprite.getGlobalBounds().width < 0)
+        for (auto & sprite : layer.mSprites)
         {
-            layer.mSprite.setPosition(
-                float(mpWindow->getSize().x), // Reset to the right edge
-                layer.mSprite.getPosition().y
-            );
+            sprite.move(offset, 0.0f);
+
+            // If the sprite goes off-screen to the left, reposition it to the right
+            if (sprite.getPosition().x + sprite.getGlobalBounds().width < 0)
+            {
+                float maxRight = 0;
+                for (const auto & s : layer.mSprites)
+                {
+                    maxRight = std::max(maxRight, s.getPosition().x);
+                }
+                sprite.setPosition(maxRight + sprite.getGlobalBounds().width, sprite.getPosition().y);
+            }
         }
     }
 }
@@ -531,7 +513,10 @@ void GameManager::RenderParallaxLayers()
 {
     for (const auto & layer : mParallaxLayers)
     {
-        mpWindow->draw(layer.mSprite);
+        for (const auto & sprite : layer.mSprites)
+        {
+            mpWindow->draw(sprite);
+        }
     }
 }
 

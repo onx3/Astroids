@@ -12,9 +12,11 @@
 
 struct ParallaxLayer
 {
-	sf::Sprite mSprite;
+	std::vector<sf::Sprite> mSprites;
 	float parallaxSpeed;
 };
+
+//------------------------------------------------------------------------------------------------------------------------
 
 class GameManager
 {
@@ -73,9 +75,6 @@ private:
 
 	bool mShowImGuiWindow;
 	std::unordered_map<std::type_index, BaseManager *> mManagers;
-	sf::Texture mBackgroundTexture;
-	sf::Sprite mBackgroundSprite;
-	sf::Texture mCursorTexture;
 	sf::Sprite mCursorSprite;
 	GameObject * mpRootGameObject;
 
