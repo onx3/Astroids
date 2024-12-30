@@ -6,6 +6,7 @@ int main()
 {
     WindowManager windowManager;
     bool paused = false;
+    sf::Clock clock;
 
     while (windowManager.GetWindow()->isOpen())
     {
@@ -19,11 +20,17 @@ int main()
             {
                 paused = !paused;
             }
+
+            float deltaTime = clock.restart().asSeconds();
             if (!paused)
             {
-                pGameManager->Update();
+                pGameManager->Update(deltaTime);
             }
-            pGameManager->Render();
+            else
+            {
+                clock.restart();
+            }
+            pGameManager->Render(deltaTime);
         }
         delete pGameManager;
 

@@ -37,7 +37,7 @@ EnemyAIManager::~EnemyAIManager()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void EnemyAIManager::Update()
+void EnemyAIManager::Update(float deltaTime)
 {
     for (auto * pEnemy : mEnemyObjects)
     {

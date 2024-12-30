@@ -10,7 +10,7 @@ public:
 	ExplosionComponent(GameObject * owner, const std::string & spriteSheetPath, int frameWidth, int frameHeight, int numFrames, float frameTime, sf::Vector2f scale, sf::Vector2f pos);
 	~ExplosionComponent();
 
-	virtual void Update() override;
+	virtual void Update(float deltaTime) override;
 
 	virtual void draw(sf::RenderTarget & target, sf::RenderStates states) override;
 

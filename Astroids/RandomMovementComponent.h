@@ -8,7 +8,7 @@ public:
     RandomMovementComponent(GameObject * pOwner);
     virtual ~RandomMovementComponent();
 
-    void Update() override;
+    void Update(float deltaTime) override;
 
     virtual void DebugImGuiComponentInfo() override;
 

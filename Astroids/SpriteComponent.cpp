@@ -120,7 +120,7 @@ void SpriteComponent::SetOriginToCenter()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void SpriteComponent::Update()
+void SpriteComponent::Update(float deltaTime)
 {
 }
 

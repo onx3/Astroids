@@ -17,7 +17,7 @@ public:
 
 	~ControlledMovementComponent();
 
-	void Update() override;
+	void Update(float deltaTime) override;
 
 	std::string & GetClassName() override;
 

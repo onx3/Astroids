@@ -61,9 +61,9 @@ ExplosionComponent::~ExplosionComponent()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void ExplosionComponent::Update()
+void ExplosionComponent::Update(float deltaTime)
 {
-    mElapsedTime += mpOwner->GetDeltaTime();
+    mElapsedTime += deltaTime;
 
     if (!mSoundPlayed && mCurrentFrame == 0)
     {

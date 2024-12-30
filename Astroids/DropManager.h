@@ -14,7 +14,7 @@ class DropManager : public BaseManager
 public:
 	DropManager(GameManager * pGameManager);
 
-	void Update() override;
+	void Update(float deltaTime) override;
 
 	void OnGameEnd() override;
 

@@ -34,7 +34,7 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
         {
             if (pObjB->IsActive())
             {
-                pHealthComp->LooseHealth(100);
+                pHealthComp->LoseHealth(100);
             }
         }
     }
@@ -45,7 +45,7 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
         {
             if (pObjB->IsActive())
             {
-                pHealthComp->LooseHealth(100);
+                pHealthComp->LoseHealth(100);
             }
         }
     }
@@ -57,7 +57,7 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
             auto pObjBHealthComp = pObjB->GetComponent<HealthComponent>().lock();
             if (pObjBHealthComp)
             {
-                pObjBHealthComp->LooseHealth(100);
+                pObjBHealthComp->LoseHealth(100);
                 pObjA->Destroy();
             }
         }
@@ -69,7 +69,7 @@ void CollisionListener::HandleCollision(GameObject * pObjA, GameObject * pObjB)
             auto pObjAHealthComp = pObjA->GetComponent<HealthComponent>().lock();
             if (pObjAHealthComp)
             {
-                pObjAHealthComp->LooseHealth(100);
+                pObjAHealthComp->LoseHealth(100);
                 pObjB->Destroy();
             }
         }

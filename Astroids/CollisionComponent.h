@@ -9,7 +9,7 @@ public:
     CollisionComponent(GameObject * pOwner, b2World * pWorld, b2Body * pBody, sf::Vector2f size, bool isDynamic);
     ~CollisionComponent();
 
-    void Update() override;
+    void Update(float deltaTime) override;
 
 private:
     b2Body * mpBody;

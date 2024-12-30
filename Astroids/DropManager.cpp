@@ -14,7 +14,7 @@ DropManager::DropManager(GameManager * pGameManager)
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void DropManager::Update()
+void DropManager::Update(float deltaTime)
 {
     CleanUpDrops();
     for (auto * pDrop : mDropObjects)

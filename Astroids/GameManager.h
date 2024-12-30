@@ -10,6 +10,12 @@
 #include "WindowManager.h"
 #include "CollisionListener.h"
 
+struct ParallaxLayer
+{
+	sf::Sprite mSprite;
+	float parallaxSpeed;
+};
+
 class GameManager
 {
 public:
@@ -18,10 +24,10 @@ public:
 
 	void EndGame();
 
-	void Update();
-	void UpdateGameObjects();
+	void Update(float deltaTime);
+	void UpdateGameObjects(float deltaTime);
 
-	void Render();
+	void Render(float deltaTime);
 
 	template <typename T>
 	void AddManager();
@@ -53,13 +59,17 @@ public:
 private:
 	void CleanUpDestroyedGameObjects(GameObject * pRoot);
 
-	void RenderImGui();
+	void RenderImGui(float deltaTime);
 
 	void InitWindow();
 	
 	void GameOver();
 
 	std::vector<std::string> GetCommonResourcePaths();
+
+	void InitializeParallaxLayers();  // Helper to initialize layers
+	void UpdateParallaxLayers(float deltaTime, float playerSpeedX);
+	void RenderParallaxLayers();
 
 	bool mShowImGuiWindow;
 	std::unordered_map<std::type_index, BaseManager *> mManagers;
@@ -68,7 +78,6 @@ private:
 	sf::Texture mCursorTexture;
 	sf::Sprite mCursorSprite;
 	GameObject * mpRootGameObject;
-	sf::Clock mClock;
 
 	// Audio
 	sf::SoundBuffer mSoundBuffer;
@@ -84,5 +93,6 @@ private:
 	// Box2d
 	b2World mPhysicsWorld;
 	CollisionListener mCollisionListener;
-};
 
+	std::vector<ParallaxLayer> mParallaxLayers;
+};

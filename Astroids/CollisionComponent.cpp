@@ -20,7 +20,7 @@ CollisionComponent::~CollisionComponent()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void CollisionComponent::Update()
+void CollisionComponent::Update(float deltaTime)
 {
     if (mpOwner->IsActive())
     {

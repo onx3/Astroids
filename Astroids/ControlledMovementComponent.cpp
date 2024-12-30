@@ -40,7 +40,7 @@ ControlledMovementComponent::~ControlledMovementComponent()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void ControlledMovementComponent::Update()
+void ControlledMovementComponent::Update(float deltaTime)
 {
     if (!mpOwner->IsActive())
     {
@@ -127,7 +127,7 @@ void ControlledMovementComponent::Update()
         }
 
         // Apply acceleration
-        mVelocity += inputDirection * mAcceleration * GetGameObject().GetDeltaTime();
+        mVelocity += inputDirection * mAcceleration * deltaTime;
 
         // Clamp velocity to max speed
         float velocityLength = std::hypot(mVelocity.x, mVelocity.y);
@@ -139,15 +139,15 @@ void ControlledMovementComponent::Update()
         // Apply deceleration if no input
         if (inputDirection.x == 0)
         {
-            mVelocity.x -= std::min(std::abs(mVelocity.x), mDeceleration * GetGameObject().GetDeltaTime()) * (mVelocity.x > 0 ? 1 : -1);
+            mVelocity.x -= std::min(std::abs(mVelocity.x), mDeceleration * deltaTime) * (mVelocity.x > 0 ? 1 : -1);
         }
         if (inputDirection.y == 0)
         {
-            mVelocity.y -= std::min(std::abs(mVelocity.y), mDeceleration * GetGameObject().GetDeltaTime()) * (mVelocity.y > 0 ? 1 : -1);
+            mVelocity.y -= std::min(std::abs(mVelocity.y), mDeceleration * deltaTime) * (mVelocity.y > 0 ? 1 : -1);
         }
 
         // Update position
-        position += mVelocity * GetGameObject().GetDeltaTime();
+        position += mVelocity * deltaTime;
 
         // Boundary checking
         float halfWidth = size.x / 2.0f;

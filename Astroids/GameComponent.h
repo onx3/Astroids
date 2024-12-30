@@ -15,7 +15,7 @@ public:
 
     GameObject & GetGameObject() const;
 
-    virtual void Update() = 0;
+    virtual void Update(float deltaTime) = 0;
 
     virtual void draw(sf::RenderTarget & target, sf::RenderStates states);
 

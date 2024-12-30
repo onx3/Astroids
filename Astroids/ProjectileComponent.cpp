@@ -118,11 +118,10 @@ void ProjectileComponent::Shoot()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void ProjectileComponent::Update()
+void ProjectileComponent::Update(float deltaTime)
 {
 	if (!mpOwner) return;
 
-	float deltaTime = mpOwner->GetDeltaTime();
 	mTimeSinceLastShot += deltaTime;
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && mTimeSinceLastShot >= mCooldown)

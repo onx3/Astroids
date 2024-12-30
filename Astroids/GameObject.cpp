@@ -9,8 +9,7 @@
 
 
 GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pParent)
-    : mDeltaTime(0.f)
-    , mpGameManager(pGameManager)
+    : mpGameManager(pGameManager)
     , mIsDestroyed(false)
     , mIsActive(true)
     , mTeam(team)
@@ -18,8 +17,6 @@ GameObject::GameObject(GameManager * pGameManager, ETeam team, GameObject * pPar
     , mpParent(pParent)
     , mpPhysicsBody(nullptr)
 {
-    mClock.restart();
-
     if (pParent)
     {
         pParent->AddChild(this);
@@ -140,16 +137,14 @@ void GameObject::NotifyParentOfDeletion()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void GameObject::Update()
+void GameObject::Update(float deltaTime)
 {
     if (!mIsDestroyed)
     {
-        mDeltaTime = mClock.restart().asSeconds();
-
         // Update components
         for (auto & component : mComponents)
         {
-            component.second->Update();
+            component.second->Update(deltaTime);
         }
 
         // Update child objects
@@ -157,17 +152,10 @@ void GameObject::Update()
         {
             if (pChild && !pChild->IsDestroyed())
             {
-                pChild->Update();
+                pChild->Update(deltaTime);
             }
         }
     }
-}
-
-//------------------------------------------------------------------------------------------------------------------------
-
-float GameObject::GetDeltaTime() const
-{
-    return mDeltaTime;
 }
 
 //------------------------------------------------------------------------------------------------------------------------

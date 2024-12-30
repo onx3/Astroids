@@ -60,9 +60,7 @@ public:
         return mComponents.find(std::type_index(typeid(T))) != mComponents.end();
     }
 
-    void Update();
-
-    float GetDeltaTime() const;
+    void Update(float deltaTime);
 
     ETeam GetTeam() const;
     void SetTeam(ETeam team);
@@ -103,8 +101,6 @@ protected:
     std::unordered_map<std::type_index, std::shared_ptr<GameComponent>> mComponents;
 
 private:
-    sf::Clock mClock;
-    float mDeltaTime;
     bool mIsDestroyed; // Used to know when GameManager can Delete
     bool mIsActive; // Used to know when the GameObject is dying
     GameManager * mpGameManager;

@@ -9,7 +9,7 @@ public:
 	explicit BaseManager(GameManager * pGameManager);
 	~BaseManager();
 
-	virtual void Update();
+	virtual void Update(float deltaTime);
 
 	virtual void OnGameEnd();
 

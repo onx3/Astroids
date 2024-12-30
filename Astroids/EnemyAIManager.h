@@ -19,7 +19,7 @@ public:
 	EnemyAIManager(GameManager * pGameManager, int enemyCount);
 	~EnemyAIManager();
 
-	void Update() override;
+	void Update(float deltaTime) override;
 
 	void OnGameEnd() override;
 

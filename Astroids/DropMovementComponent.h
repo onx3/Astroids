@@ -6,7 +6,7 @@ class DropMovementComponent : public GameComponent
 public:
 	DropMovementComponent(GameObject * pGameOwner);
 
-	void Update();
+	void Update(float deltaTime);
 	void DebugImGuiComponentInfo() override;
 	std::string & GetClassName() override;
 

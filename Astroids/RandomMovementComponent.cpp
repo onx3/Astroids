@@ -64,7 +64,7 @@ RandomMovementComponent::~RandomMovementComponent()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void RandomMovementComponent::Update()
+void RandomMovementComponent::Update(float deltaTime)
 {
     if (mpOwner->IsActive())
     {
@@ -84,7 +84,7 @@ void RandomMovementComponent::Update()
                 if (distance > 1.0f)
                 {
                     direction /= distance;
-                    position += direction * mVelocity * GetGameObject().GetDeltaTime();
+                    position += direction * mVelocity * deltaTime;
                 }
                 else
                 {
@@ -96,7 +96,7 @@ void RandomMovementComponent::Update()
                 spriteComponent->SetPosition(position);
                 return;
             }
-            position += mDirection * mVelocity * GetGameObject().GetDeltaTime();
+            position += mDirection * mVelocity * deltaTime;
 
             // Check for collisions with window bounds only after fully entering
             if (mHasEnteredScreen)
@@ -117,10 +117,14 @@ void RandomMovementComponent::Update()
     }
 }
 
+//------------------------------------------------------------------------------------------------------------------------
+
 void RandomMovementComponent::DebugImGuiComponentInfo()
 {
     ImGui::Text("%i %i", mpOwner->GetPosition().x, mpOwner->GetPosition().y);
 }
+
+//------------------------------------------------------------------------------------------------------------------------
 
 std::string & RandomMovementComponent::GetClassName()
 {

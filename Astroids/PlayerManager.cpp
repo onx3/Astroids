@@ -109,7 +109,7 @@ void PlayerManager::InitPlayer()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void PlayerManager::Update()
+void PlayerManager::Update(float deltaTime)
 {
     CleanUpDeadPlayers();
 

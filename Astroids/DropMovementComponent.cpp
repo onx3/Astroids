@@ -28,7 +28,7 @@ DropMovementComponent::DropMovementComponent(GameObject * pGameOwner)
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void DropMovementComponent::Update()
+void DropMovementComponent::Update(float deltaTime)
 {
     if (mpOwner->IsActive())
     {
@@ -37,7 +37,7 @@ void DropMovementComponent::Update()
         {
             // Move the object in the calculated direction
             sf::Vector2f position = spriteComponent->GetPosition();
-            position += mDirection * mVelocity * GetGameObject().GetDeltaTime();
+            position += mDirection * mVelocity * deltaTime;
 
             spriteComponent->SetPosition(position);
 

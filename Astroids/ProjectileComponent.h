@@ -21,7 +21,7 @@ public:
 
     void Shoot();
 
-    void Update() override;
+    void Update(float deltaTime) override;
 
     void draw(sf::RenderTarget & target, sf::RenderStates states) override;
 

@@ -10,7 +10,7 @@ public:
 
     void InitPlayer();
 
-    void Update() override;
+    void Update(float deltaTime) override;
 
     void OnGameEnd() override;
 

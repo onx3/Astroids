@@ -29,7 +29,6 @@ GameManager::GameManager(WindowManager & windowManager)
     , mPhysicsWorld(b2Vec2(0.0f, 0.f))
     , mCollisionListener(this)
 {
-    mClock.restart();
     InitWindow();
 
     mpRootGameObject = new GameObject(this, ETeam::Neutral);
@@ -124,7 +123,7 @@ void GameManager::EndGame()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void GameManager::Update()
+void GameManager::Update(float deltaTime)
 {
     // Game Audio
     if (!mSoundPlayed)
@@ -141,14 +140,14 @@ void GameManager::Update()
         mPhysicsWorld.Step(timeStep, velocityIterations, positionIterations);
     }
 
-    UpdateGameObjects();
+    UpdateGameObjects(deltaTime);
 
     {
         for (auto & manager : mManagers)
         {
             if (manager.second)
             {
-                manager.second->Update();
+                manager.second->Update(deltaTime);
             }
         }
     }
@@ -156,11 +155,11 @@ void GameManager::Update()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void GameManager::UpdateGameObjects()
+void GameManager::UpdateGameObjects(float deltaTime)
 {
     if (mpRootGameObject)
     {
-        mpRootGameObject->Update();
+        mpRootGameObject->Update(deltaTime);
         CleanUpDestroyedGameObjects(mpRootGameObject);
         if (!mpRootGameObject)
         {
@@ -203,12 +202,13 @@ void GameManager::CleanUpDestroyedGameObjects(GameObject * pRoot)
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void GameManager::RenderImGui()
+void GameManager::RenderImGui(float deltaTime)
 {
 #if IMGUI_ENABLED()
     static GameObject * pSelectedGameObject = nullptr;
 
-    ImGui::SFML::Update(*mpWindow, mClock.restart());
+    deltaTime = std::max(deltaTime, 0.0001f);
+    ImGui::SFML::Update(*mpWindow, sf::milliseconds(int(deltaTime * 10000)));
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::G))
     {
@@ -290,7 +290,7 @@ void GameManager::RenderImGui()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void GameManager::Render()
+void GameManager::Render(float deltaTime)
 {
     mpWindow->clear();
     
@@ -343,7 +343,7 @@ void GameManager::Render()
         }
     }
 
-    RenderImGui();
+    RenderImGui(deltaTime);
     mpWindow->display();
 }
 

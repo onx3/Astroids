@@ -16,7 +16,7 @@ BaseManager::~BaseManager()
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void BaseManager::Update()
+void BaseManager::Update(float deltaTime)
 {
 
 }

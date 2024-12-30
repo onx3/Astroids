@@ -10,7 +10,7 @@ public:
 
 	int GetHealth() const;
 	void AddHealth(int amount);
-	void LooseHealth(int amount);
+	void LoseHealth(int amount);
 
 	int GetLives() const;
 	void AddLife(int amount);
@@ -22,7 +22,7 @@ public:
 	void SetDeathCallBack(std::function<void()> callback);
 	void SetLifeLostCallback(std::function<void()> callback);
 
-	virtual void Update() override;
+	virtual void Update(float deltaTime) override;
 
 	virtual void DebugImGuiComponentInfo() override;
 
@@ -35,7 +35,6 @@ private:
 	float mHitCooldown;
 	float mTimeSinceLastHit;
 	std::string mName;
-	sf::Clock mClock;
 	
 	std::function<void()> mLifeLostCallback;
 	std::function<void()> mDeathCallback;
