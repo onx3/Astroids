@@ -30,7 +30,6 @@ GameManager::GameManager(WindowManager & windowManager)
     , mCollisionListener(this)
 {
     InitWindow();
-
     mpRootGameObject = new GameObject(this, ETeam::Neutral);
 
     AddManager<ResourceManager>();
@@ -38,6 +37,9 @@ GameManager::GameManager(WindowManager & windowManager)
     AddManager<EnemyAIManager>();
     AddManager<ScoreManager>();
     AddManager<DropManager>();
+
+    InitializeParallaxLayers();
+
 
     // Game Audio
     {
@@ -140,15 +142,14 @@ void GameManager::Update(float deltaTime)
         mPhysicsWorld.Step(timeStep, velocityIterations, positionIterations);
     }
 
+    UpdateParallaxLayers(deltaTime, 100.f);
     UpdateGameObjects(deltaTime);
 
+    for (auto & manager : mManagers)
     {
-        for (auto & manager : mManagers)
+        if (manager.second)
         {
-            if (manager.second)
-            {
-                manager.second->Update(deltaTime);
-            }
+            manager.second->Update(deltaTime);
         }
     }
 }
@@ -294,9 +295,10 @@ void GameManager::Render(float deltaTime)
 {
     mpWindow->clear();
     
+    RenderParallaxLayers();
     if (mIsGameOver)
     {
-        mpWindow->draw(mBackgroundSprite);
+        //mpWindow->draw(mBackgroundSprite);
         mpWindow->draw(mGameOverText);
         mpWindow->draw(mScoreText);
     }
@@ -392,12 +394,12 @@ b2World & GameManager::GetPhysicsWorld()
 
 void GameManager::InitWindow()
 {
-    std::string file = "Art/Background/background2.png";
-    assert(mBackgroundTexture.loadFromFile(file));
-    mBackgroundSprite.setTexture(mBackgroundTexture);
+    //std::string file = "Art/Background/original.png";
+    //assert(mBackgroundTexture.loadFromFile(file));
+    //mBackgroundSprite.setTexture(mBackgroundTexture);
 
-    // Scale to window size
-    mBackgroundSprite.setScale(float(mpWindow->getSize().x) / mBackgroundTexture.getSize().x, float(mpWindow->getSize().y) / mBackgroundTexture.getSize().y);
+    //// Scale to window size
+    //mBackgroundSprite.setScale(float(mpWindow->getSize().x) / mBackgroundTexture.getSize().x, float(mpWindow->getSize().y) / mBackgroundTexture.getSize().y);
 
     assert(mCursorTexture.loadFromFile("Art/Crosshair.png"));
     mCursorSprite.setTexture(mCursorTexture);
@@ -440,8 +442,97 @@ std::vector<std::string> GameManager::GetCommonResourcePaths()
         "Art/playerRight.png",
         "Art/playerDamaged.png",
         "Art/Explosion.png",
-        
+        "Art/Background/backgroundFar.png",
+        "Art/Background/backgroundMid.png",
+        "Art/Background/backgroundClose.png"
     };
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameManager::InitializeParallaxLayers()
+{
+    auto * pResourceManager = GetManager<ResourceManager>();
+    if (!pResourceManager)
+    {
+        return;
+    }
+
+    // Far background
+    {
+        ResourceId farResource("Art/Background/backgroundFar.png");
+        auto pFarTexture = pResourceManager->GetTexture(farResource);
+        if (!pFarTexture)
+        {
+            throw std::runtime_error("Failed to load backgroundFar.png");
+        }
+        sf::Sprite farSprite(*pFarTexture);
+        mParallaxLayers.push_back({ farSprite, 0.1f }); // Slowest movement
+    }
+
+    // Midground
+    {
+        ResourceId midResource("Art/Background/backgroundMid.png");
+        auto pMidTexture = pResourceManager->GetTexture(midResource);
+        if (!pMidTexture)
+        {
+            throw std::runtime_error("Failed to load backgroundMid.png");
+        }
+        sf::Sprite midSprite(*pMidTexture);
+        mParallaxLayers.push_back({ midSprite, 0.5f }); // Medium speed
+    }
+
+    // Foreground
+    {
+        ResourceId foreResource("Art/Background/backgroundClose.png");
+        auto pForeTexture = pResourceManager->GetTexture(foreResource);
+        if (!pForeTexture)
+        {
+            throw std::runtime_error("Failed to load backgroundClose.png");
+        }
+        sf::Sprite foreSprite(*pForeTexture);
+        mParallaxLayers.push_back({ foreSprite, 0.8f }); // Fastest movement
+    }
+
+    // Scale layers to fit the window
+    for (auto & layer : mParallaxLayers)
+    {
+        layer.mSprite.setScale(
+            float(mpWindow->getSize().x) / layer.mSprite.getTexture()->getSize().x,
+            float(mpWindow->getSize().y) / layer.mSprite.getTexture()->getSize().y
+        );
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameManager::UpdateParallaxLayers(float deltaTime, float playerSpeedX)
+{
+    for (auto & layer : mParallaxLayers)
+    {
+        // Move the layer relative to the player's speed and parallax speed
+        float offset = -playerSpeedX * layer.parallaxSpeed * deltaTime;
+        layer.mSprite.move(offset, 0.0f);
+
+        // If the layer moves off-screen, loop it
+        if (layer.mSprite.getPosition().x + layer.mSprite.getGlobalBounds().width < 0)
+        {
+            layer.mSprite.setPosition(
+                float(mpWindow->getSize().x), // Reset to the right edge
+                layer.mSprite.getPosition().y
+            );
+        }
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------
+
+void GameManager::RenderParallaxLayers()
+{
+    for (const auto & layer : mParallaxLayers)
+    {
+        mpWindow->draw(layer.mSprite);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------

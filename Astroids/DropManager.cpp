@@ -122,7 +122,7 @@ void DropManager::SpawnDrop(EDropType dropType, const sf::Vector2f & position)
                 default:
                     return;
             }
-            sf::Color greenTint(0, 255, 0, 255);
+            sf::Color greenTint(255, 255, 0, 255);
             pSpriteComp->GetSprite().setColor(greenTint);
 
             pSpriteComp->SetPosition(position);
