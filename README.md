@@ -1,6 +1,6 @@
 #  Astroids
 
-A 2D game engine project inspired by the classic "Asteroids" arcade game, developed using C++ with SFML for rendering and Box2D for physics simulation. I created this Game Engine as a learing project, to grow my knowledge of how Game Engines work. I could've done this in an engine such as Unity but I wouldn't have learned the core concepets that goes into creating a game from scratch.
+"Astroids" is a 2D game engine project inspired by the timeless arcade classic "Asteroids." Built using C++ with SFML for rendering and Box2D for collision simulation, this project emphasizes a custom architecture that revolves around a "GameManager" for centralized control and a flexible "GameObject" system. These systems form the backbone of the engine, enabling modular, reusable components to handle behaviors like rendering, physics, and input. By designing these foundational systems, I gained hands-on experience with game engine architecture, prioritizing scalability and maintainability over shortcuts offered by prebuilt engines like Unity or Unreal. This project reflects my commitment to understanding the core mechanics of game development from the ground up.
 
 ## Features
 
