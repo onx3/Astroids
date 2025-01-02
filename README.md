@@ -1,6 +1,10 @@
 #  Astroids
 
-"Astroids" is a 2D game engine project inspired by the timeless arcade classic "Asteroids." Built using C++ with SFML for rendering and Box2D for collision simulation, this project emphasizes a custom architecture that revolves around a "GameManager" for centralized control and a flexible "GameObject" system. These systems form the backbone of the engine, enabling modular, reusable components to handle behaviors like rendering, physics, and input. By designing these foundational systems, I gained hands-on experience with game engine architecture, prioritizing scalability and maintainability over shortcuts offered by prebuilt engines like Unity or Unreal. This project reflects my commitment to understanding the core mechanics of game development from the ground up. Below are several screenshots from the game—and yes, the "Astroids" do have muscular arms. A typo turned into a feature, and I decided to embrace the idea of buff, gym-loving space rocks.
+"Astroids" is a 2D game engine project inspired by the classic arcade game Asteroids. Developed in C++ using SFML for rendering and Box2D for collision simulation, the project is built around a custom architecture featuring a centralized GameManager and a flexible GameObject system. These components form the foundation of the engine, enabling modular and reusable features for rendering, physics, and input handling.
+
+This project allowed me to dive deep into game engine architecture, prioritizing scalability and maintainability over relying on prebuilt engines like Unity or Unreal. It reflects my commitment to understanding the core mechanics of game development from the ground up.
+
+And yes, the "Astroids" do have muscular arms! What started as a typo became a unique feature, embracing the concept of gym-loving, buff space rocks. Below are several screenshots showcasing the game and its quirky twist.
 
 ## Pictures
 ![Game Screenshot](Astroids/Art/Astroids.png)
@@ -9,39 +13,41 @@
 
 ## Features
 
-- **Rendering**: Utilizes [SFML (Simple and Fast Multimedia Library)](https://www.sfml-dev.org/) for graphics rendering.
-- **Physics**: Integrates [Box2D](https://box2d.org/) for realistic physics simulation.
-- **Collision Detection**: Implements precise collision detection for the player's ship, projectiles, and asteroids.
-- **User Interface**: Basic UI elements for displaying score and lives, developed with SFML and ImGui.
-- **Parallaxing**: Adds a dynamic background effect to create the illusion of depth.
+- **Rendering**: Powered by [SFML (Simple and Fast Multimedia Library)](https://www.sfml-dev.org/) for graphics.
+- **Physics**: Realistic simulations using [Box2D](https://box2d.org/).
+- **Collision Detection**: Precise handling for player ship, projectiles, and asteroids.
+- **User Interface**: Basic UI for score and lives, built with SFML and ImGui.
+- **Parallaxing**: Dynamic background effects for depth and immersion.
 
 ## Development Process
 
 The development of this project involved several key steps:
 
-1. **Setting Up the Development Environment**: Configured the project with SFML and Box2D libraries for seamless integration.
-2. **Implementing Core Mechanics**: Developed essential game mechanics, including player controls, asteroid generation, and movement systems.
-3. **Rendering Graphics**: Utilized SFML to render game objects, manage animations, and handle the dynamic background.
-4. **Building a Flexible Architecture**: Designed a component-based system to manage game object behaviors and promote code reuse.
-5. **User Interface**: Implemented UI elements to display critical game information such as scores and lives.
+1. **Setting Up the Development Environment**: Integrated SFML and Box2D for seamless development.
+2. **Implementing Core Mechanics**: Implemented player controls, asteroid generation, and movement.
+3. **Rendering Graphics**: Used SFML for object rendering, animations, and parallax effects.
+4. **Building a Flexible Architecture**: Designed a component-based system for modular and reusable behaviors.
+5. **User Interface**: Created interfaces for displaying critical game data like scores and lives.
+   
+Challenges and Solutions
 
 ## Challenges and Solutions
 
 - **Flexible GameObject Design**  
-  - **Challenge**: Managing duplication of logic across multiple object types like Player, Enemy, and Projectile.  
-  - **Solution**: Implemented a single `GameObject` class that can represent any entity in the world (e.g., player, asteroid, or projectile) by composing independent components.
+  - **Challenge**: Avoiding logic duplication across entities (e.g., Player, Enemy, Projectile). 
+  - **Solution**: Developed a single, versatile GameObject class with independent components.
 
 - **Decoupled Behaviors**  
-  - **Challenge**: Designing a system for handling various behaviors (e.g., rendering, physics, input, health) without creating tightly coupled code.  
-  - **Solution**: Adopted a component-based architecture where each `GameObject` contains modular components that can be reused and extended.
+  - **Challenge**: Preventing tightly coupled code for various behaviors (e.g., rendering, physics).
+  - **Solution**: Adopted a component-based system for reusable, extensible functionality.
 
 - **Debugging Challenges**  
-  - **Challenge**: Debugging GameObjects and their components on a frame-by-frame basis was cumbersome.  
-  - **Solution**: Integrated ImGui to display debug information, allowing real-time inspection and modification of GameObjects and their components during runtime.
+  - **Challenge**: Cumbersome frame-by-frame debugging of GameObjects and components.  
+  - **Solution**: Integrated ImGui for real-time inspection and modification during runtime.
 
 - **Hierarchical Relationships**  
-  - **Challenge**: Handling scenarios where a GameObject (e.g., a projectile) should logically be tied to its parent (e.g., the player). Without hierarchy, it was difficult to manage dependencies like destroying child objects when their parent is removed.  
-  - **Solution**: Implemented a hierarchical structure where each GameObject can have child objects, managed by a root `GameObject` held by the `GameManager`.
+  - **Challenge**: Managing dependencies between parent and child GameObjects (e.g., projectiles tied to a player).  
+  - **Solution**: Introduced a hierarchical structure with parent-child relationships managed by the GameManager.
 
 - **Efficient Collision Detection**  
   - **Challenge**: Custom collision detection was slow and inefficient.  
@@ -53,4 +59,4 @@ The development of this project involved several key steps:
 
 - **Flat Visuals**  
   - **Challenge**: The game world felt static and lacked depth.  
-  - **Solution**: Added parallaxing effects to create a dynamic and visually engaging background.
+  - **Solution**: Added parallax effects for a more dynamic and engaging background.
