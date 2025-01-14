@@ -1,0 +1,2 @@
+D:\SFML-Game\ExtLibs\SFML\lib\Debug
+D:\SFML-Game\ExtLibs\SFML\lib\Debug\
